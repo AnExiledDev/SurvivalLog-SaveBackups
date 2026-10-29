@@ -28,7 +28,7 @@
     cancel: ['Cancel', '取消'],
     dismiss: ['Dismiss', '忽略'],
     backups: ['Backups', '备份'],
-    noBackups: ['No backups of this save yet. One is made each morning, when you quit, and before a rebirth{0}.', '这个存档还没有备份。每天早上、退出时和重生前都会自动备份{0}。'],
+    noBackups: ['No backups of this save yet. One is made each morning, when you quit, before a rebirth, an expedition or a zombie wave, and at an ending{0}.', '这个存档还没有备份。每天早上、退出时、重生前、探索前、尸潮前和到达结局时都会自动备份{0}。'],
     keyHint: [', or press {0} in the run', '，也可以在游戏中按 {0}'],
     loop: ['Loop {0}', '第 {0} 轮'],
     day: ['Day {0}', '第 {0} 天'],
@@ -47,8 +47,34 @@
       quit: ['Quit', '退出'],
       rebirth: ['Before rebirth', '重生前'],
       manual: ['Manual', '手动'],
-      safety: ['Before a change', '改动前']
+      safety: ['Before a change', '改动前'],
+      expedition: ['Before expedition', '探索前'],
+      wave: ['Before zombie wave', '尸潮前'],
+      ending: ['Ending', '结局'],
+      imported: ['Imported', '导入']
     },
+    search: ['Search saves', '搜索存档'],
+    filters: {
+      all: ['All', '全部'],
+      active: ['In progress', '进行中'],
+      finished: ['Finished', '已结束'],
+      backed: ['Has backups', '有备份']
+    },
+    noMatch: ['No saves match.', '没有符合条件的存档。'],
+    importBtn: ['Import', '导入'],
+    copy: ['Copy as new save', '复制为新存档'],
+    note: ['Note', '备注'],
+    exportBtn: ['Export', '导出'],
+    more: ['More', '更多'],
+    less: ['Less', '收起'],
+    save: ['Save', '保存'],
+    noteTitle: ['Note on this backup', '这个备份的备注'],
+    noteHint: ['A few words to tell this backup apart. Leave it empty to remove the note.', '写几个字方便区分这个备份。留空即删除备注。'],
+    oldVersion: ['Older game version', '旧版本游戏'],
+    oldVersionTip: ['Made on game version {0}, you are playing {1}.', '在游戏版本 {0} 时创建，当前版本为 {1}。'],
+    oldVersionWarn: ['This backup was made on game version {0}, and you are playing {1}. It may not load as it did.', '这个备份是在游戏版本 {0} 时创建的，当前版本为 {1}，读取时可能和原来不一样。'],
+    copyTitle: ['Copy as a new save?', '复制为新存档？'],
+    copyBody: ['A new save is made from this backup: {0} at {1}, as it was on {2}. It shows in your saves as its own run, and {0} itself is not changed.', '将用这个备份创建一个新存档：「{0}」{1}（{2} 时的状态）。它会作为独立的存档出现在列表中，「{0}」本身不会改变。'],
     restoreTitle: ['Restore this backup?', '恢复这个备份？'],
     restoreBody: ['{0} goes back to {1}, as it was on {2}. What it is now is backed up first, so this can be undone.', '「{0}」将回到{1}（{2} 时的状态）。当前状态会先备份，可以撤销。'],
     bringBackTitle: ['Bring this save back?', '恢复这个存档？'],
@@ -121,13 +147,33 @@
     '.slsb-mbox{width:640px;border:1px solid var(--amber);background:#12100c;box-shadow:0 20px 60px rgba(0,0,0,.8)}',
     '.slsb-mhd{padding:14px 20px;border-bottom:1px solid var(--line);font-size:20px;font-weight:800;color:#fff;letter-spacing:2px}',
     '.slsb-mbd{padding:16px 20px;font-size:15px;line-height:1.6;color:#ccc}',
-    '.slsb-mft{padding:12px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}'
+    '.slsb-mft{padding:12px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}',
+    '.slsb-find{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}',
+    '.slsb input.q,.slsb input.nt{width:100%;background:rgba(0,0,0,.5);border:1px solid #5a5040;color:#eee;padding:7px 10px;font-size:15px;font-family:inherit;outline:none}',
+    '.slsb input.q:focus,.slsb input.nt:focus{border-color:var(--gold)}',
+    '.slsb-chips{display:flex;gap:6px;flex-wrap:wrap}',
+    '.slsb .chip{background:none;border:1px solid #4a4236;color:#aaa;padding:3px 10px;font-size:13px;cursor:pointer;font-family:inherit}',
+    '.slsb .chip.on{border-color:var(--amber);color:var(--gold)}',
+    '.slsb-bk{border:1px solid transparent}',
+    '.slsb-bk.open{border-color:#3a342a;background:rgba(255,255,255,.02)}',
+    '.slsb-bk .slsb-pt{cursor:pointer}',
+    '.slsb-bk .nb{padding:0 8px 6px 152px;color:#d8c9a6;font-size:13px;font-style:italic;word-break:break-word}',
+    '.slsb-bk .more{display:flex;gap:6px;flex-wrap:wrap;padding:0 8px 8px 152px}',
+    '.slsb .b-old{color:#e0a060;border-color:rgba(224,160,96,.6)}',
+    '.slsb .dtx{color:#a99c80;font-size:13px;font-style:italic;margin:-2px 0 6px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
+    '.slsb-mbd .mw{margin-top:10px;padding:8px 12px;border-left:3px solid #e0a060;background:rgba(224,160,96,.08);color:#f0d2b0}',
+    '.slsb-mbd .mh{color:var(--dim);font-size:13px;margin-bottom:8px}'
   ].join('');
 
   var view = null;
   var selected = null;
   var dialog = null;
   var isBusy = false;
+  var query = '';
+  var filter = 'all';
+  var expanded = null;
+  var isTyping = false;
+  var pageEscAt = 0;
 
   function post(parts) {
     if (window.vuplex) window.vuplex.postMessage(PREFIX + parts.join('|'));
@@ -156,6 +202,36 @@
   function kindName(kind) {
     var pair = TEXT.kinds[kind];
     return pair ? pair[view && view.zh ? 1 : 0] : kind;
+  }
+
+  // The game sends keys to the page only while the plugin asks it to, so a text box tells the plugin when it has
+  // focus. A redraw can drop a focused box without a blur, so the check waits a tick and looks at what has focus.
+  function isTextBox(node) {
+    return !!node && node.tagName === 'INPUT' && !!node.closest && !!node.closest('#' + ROOT_ID);
+  }
+
+  function typing(isOn) {
+    if (isOn === isTyping) return;
+    isTyping = isOn;
+    post(['typing', isOn ? '1' : '0']);
+  }
+
+  function watchTyping(input) {
+    input.addEventListener('focus', function () { typing(true); });
+    input.addEventListener('blur', function () {
+      setTimeout(function () { if (!isTextBox(document.activeElement)) typing(false); }, 0);
+    });
+  }
+
+  // Esc handled by the page; the plugin's own Esc for the same key press is ignored.
+  function pageEsc(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    pageEscAt = Date.now();
+  }
+
+  function oldVersionWarn(backup) {
+    return backup.oldVersion ? f('oldVersionWarn', backup.version, view.version) : '';
   }
 
   function el(tag, cls, text) {
@@ -204,6 +280,77 @@
       .concat((view.deleted || []).map(function (run) { return { run: run, isGone: true }; }));
   }
 
+  function matches(entry) {
+    var run = entry.run;
+    var backups = run.backups || [];
+    if (filter === 'active' && (entry.isGone || run.finished)) return false;
+    if (filter === 'finished' && (entry.isGone || !run.finished)) return false;
+    if (filter === 'backed' && !backups.length) return false;
+    var q = query.trim().toLowerCase();
+    if (!q) return true;
+    var text = [run.name, run.stem, run.role, run.diff, run.status].join(' ').toLowerCase();
+    for (var i = 0; i < backups.length; i++) text += ' ' + (backups[i].note || '').toLowerCase();
+    return text.indexOf(q) >= 0;
+  }
+
+  function fillList(list) {
+    list.textContent = '';
+    var runs = (view.runs || []).map(function (run) { return { run: run, isGone: false }; }).filter(matches);
+    var gone = (view.deleted || []).map(function (run) { return { run: run, isGone: true }; }).filter(matches);
+    if (!(view.runs || []).length && !gone.length) list.appendChild(el('div', 'slsb-empty', t('noRuns')));
+    else if (!runs.length && !gone.length) list.appendChild(el('div', 'slsb-empty', t('noMatch')));
+    runs.forEach(function (entry) { list.appendChild(runCard(entry)); });
+    if (gone.length) {
+      list.appendChild(el('div', 'slsb-sec', t('deleted')));
+      gone.forEach(function (entry) { list.appendChild(runCard(entry)); });
+    }
+  }
+
+  function finder() {
+    var box = el('div', 'slsb-find');
+    var input = el('input', 'q');
+    input.type = 'text';
+    input.placeholder = t('search');
+    input.value = query;
+    input.maxLength = 60;
+    input.spellcheck = false;
+    watchTyping(input);
+    input.addEventListener('input', function () {
+      query = input.value;
+      var list = document.querySelector('#' + ROOT_ID + ' .slsb-list');
+      if (list) fillList(list);
+    });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        pageEsc(e);
+        if (query) {
+          query = input.value = '';
+          var list = document.querySelector('#' + ROOT_ID + ' .slsb-list');
+          if (list) fillList(list);
+        } else {
+          input.blur();
+        }
+      } else if (e.key === 'Enter') {
+        input.blur();
+      }
+    });
+    box.appendChild(input);
+
+    var chips = el('div', 'slsb-chips');
+    ['all', 'active', 'finished', 'backed'].forEach(function (key) {
+      var chip = el('button', 'chip' + (filter === key ? ' on' : ''), TEXT.filters[key][view.zh ? 1 : 0]);
+      chip.type = 'button';
+      chip.addEventListener('click', function () {
+        if (isBusy) return;
+        filter = key;
+        draw();
+      });
+      chips.appendChild(chip);
+    });
+    box.appendChild(chips);
+    return box;
+  }
+
   function findSelected() {
     var all = allRuns();
     for (var i = 0; i < all.length; i++) if (all[i].run.stem === selected) return all[i];
@@ -246,12 +393,40 @@
     return cell;
   }
 
-  function confirmStep(title, body, label, cls, parts) {
-    dialog = { title: title, body: body, label: label, cls: cls, parts: parts };
+  function confirmStep(title, body, label, cls, parts, warn) {
+    dialog = { title: title, body: body, warn: warn || '', label: label, cls: cls, parts: parts };
+    draw();
+  }
+
+  function restoreStep(run, isGone, backup) {
+    var name = run.name || run.stem;
+    var warn = oldVersionWarn(backup);
+    if (isGone) {
+      confirmStep(t('bringBackTitle'), f('bringBackBody', name, where(backup), backup.at), t('bringBack'), 'pri', ['bringback', run.stem, backup.id], warn);
+    } else {
+      confirmStep(t('restoreTitle'), f('restoreBody', name, where(backup), backup.at), t('restore'), 'pri', ['restore', run.stem, backup.id], warn);
+    }
+  }
+
+  function noteStep(run, backup) {
+    dialog = {
+      title: t('noteTitle'),
+      hint: t('noteHint'),
+      input: backup.note || '',
+      label: t('save'),
+      cls: 'pri',
+      onOk: function (value) {
+        busy();
+        post(['note', run.stem, backup.id, encodeURIComponent(value.trim())]);
+      }
+    };
     draw();
   }
 
   function backupRow(run, isGone, backup) {
+    var key = run.stem + '/' + backup.id;
+    var isOpen = expanded === key;
+    var wrap = el('div', 'slsb-bk' + (isOpen ? ' open' : ''));
     var row = el('div', 'slsb-pt');
     row.appendChild(el('div', 'tm', backup.at));
 
@@ -261,28 +436,50 @@
       what.appendChild(document.createTextNode(' '));
       what.appendChild(el('span', 'pn', t('pinned')));
     }
+    if (backup.oldVersion) {
+      what.appendChild(document.createTextNode(' '));
+      var old = el('span', 'badge b-old', t('oldVersion'));
+      old.title = f('oldVersionTip', backup.version, view.version);
+      what.appendChild(old);
+    }
     row.appendChild(what);
     row.appendChild(el('div', 'sz', size(backup.bytes)));
 
-    var name = run.name || run.stem;
-    if (isGone) {
-      row.appendChild(button(t('bringBack'), 'sm pri', function () {
-        confirmStep(t('bringBackTitle'), f('bringBackBody', name, where(backup), backup.at), t('bringBack'), 'pri', ['bringback', run.stem, backup.id]);
-      }));
-    } else {
-      row.appendChild(button(t('restore'), 'sm pri', function () {
-        confirmStep(t('restoreTitle'), f('restoreBody', name, where(backup), backup.at), t('restore'), 'pri', ['restore', run.stem, backup.id]);
-      }));
+    function toggle() {
+      if (isBusy) return;
+      expanded = isOpen ? null : key;
+      draw();
     }
 
-    row.appendChild(button(backup.pinned ? t('unpin') : t('pin'), 'sm', function () {
-      busy();
-      post(['pin', run.stem, backup.id, backup.pinned ? '0' : '1']);
-    }));
-    row.appendChild(button(t('remove'), 'sm bad', function () {
-      confirmStep(t('removeTitle'), f('removeBody', backup.at, kindName(backup.kind)), t('remove'), 'bad', ['remove', run.stem, backup.id]);
-    }));
-    return row;
+    row.appendChild(button(t('restore'), 'sm pri', function () { restoreStep(run, isGone, backup); }));
+    row.appendChild(button(isOpen ? t('less') : t('more'), 'sm', toggle));
+    row.addEventListener('click', toggle);
+    wrap.appendChild(row);
+
+    if (backup.note) wrap.appendChild(el('div', 'nb', backup.note));
+
+    if (isOpen) {
+      var more = el('div', 'more');
+      if (backup.progress) {
+        more.appendChild(button(t('copy'), 'sm', function () {
+          confirmStep(t('copyTitle'), f('copyBody', run.name || run.stem, where(backup), backup.at), t('copy'), 'pri', ['copy', run.stem, backup.id], oldVersionWarn(backup));
+        }));
+      }
+      more.appendChild(button(backup.pinned ? t('unpin') : t('pin'), 'sm', function () {
+        busy();
+        post(['pin', run.stem, backup.id, backup.pinned ? '0' : '1']);
+      }));
+      more.appendChild(button(t('note'), 'sm', function () { noteStep(run, backup); }));
+      more.appendChild(button(t('exportBtn'), 'sm', function () {
+        busy();
+        post(['export', run.stem, backup.id]);
+      }));
+      more.appendChild(button(t('remove'), 'sm bad', function () {
+        confirmStep(t('removeTitle'), f('removeBody', backup.at, kindName(backup.kind)), t('remove'), 'bad', ['remove', run.stem, backup.id]);
+      }));
+      wrap.appendChild(more);
+    }
+    return wrap;
   }
 
   function detail(entry) {
@@ -324,7 +521,7 @@
       var wacts = el('div', 'acts');
       if (backup) {
         wacts.appendChild(button(t('restore'), 'sm pri', function () {
-          confirmStep(t('restoreTitle'), f('restoreBody', run.name || run.stem, where(backup), backup.at), t('restore'), 'pri', ['restore', run.stem, backup.id]);
+          restoreStep(run, false, backup);
         }));
       }
       wacts.appendChild(button(t('dismiss'), 'sm', function () { busy(); post(['dismiss', run.stem]); }));
@@ -339,11 +536,20 @@
       tl.appendChild(el('div', 'slsb-empty', f('noBackups', view.key ? f('keyHint', view.key) : '')));
     }
     var lastGroup = null;
+    var hasDayText = false;
     backups.forEach(function (b) {
       var group = b.progress ? f('loop', b.turn) + '  /  ' + f('day', b.day) : b.at.slice(0, 10);
       if (group !== lastGroup) {
         tl.appendChild(el('div', 'day', group));
         lastGroup = group;
+        hasDayText = false;
+      }
+      // The game's own words for the day, from the first backup of that day that kept them.
+      if (!hasDayText && b.dayText) {
+        var dtx = el('div', 'dtx', b.dayText);
+        dtx.title = b.dayText;
+        tl.appendChild(dtx);
+        hasDayText = true;
       }
       tl.appendChild(backupRow(run, entry.isGone, b));
     });
@@ -351,25 +557,64 @@
     return det;
   }
 
+  function closeDialog() {
+    dialog = null;
+    draw();
+  }
+
   function modal() {
+    var current = dialog;
     var back = el('div', 'slsb-modal');
     var box = el('div', 'slsb-mbox');
-    box.appendChild(el('div', 'slsb-mhd', dialog.title));
-    box.appendChild(el('div', 'slsb-mbd', dialog.body));
-    var ft = el('div', 'slsb-mft');
-    ft.appendChild(button(t('cancel'), '', function () { dialog = null; draw(); }));
-    var parts = dialog.parts;
-    ft.appendChild(button(dialog.label, dialog.cls, function () {
+    box.appendChild(el('div', 'slsb-mhd', current.title));
+    var bd = el('div', 'slsb-mbd');
+    var input = null;
+
+    function ok() {
       dialog = null;
       draw();
-      busy();
-      post(parts);
-    }));
+      if (current.onOk) {
+        current.onOk(input ? input.value : '');
+      } else {
+        busy();
+        post(current.parts);
+      }
+    }
+
+    if (current.onOk) {
+      if (current.hint) bd.appendChild(el('div', 'mh', current.hint));
+      input = el('input', 'nt');
+      input.type = 'text';
+      input.maxLength = 200;
+      input.spellcheck = false;
+      input.value = current.input || '';
+      watchTyping(input);
+      input.addEventListener('input', function () { current.input = input.value; });
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          pageEsc(e);
+          closeDialog();
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          ok();
+        }
+      });
+      bd.appendChild(input);
+    } else {
+      bd.appendChild(document.createTextNode(current.body));
+    }
+    if (current.warn) bd.appendChild(el('div', 'mw', current.warn));
+    box.appendChild(bd);
+
+    var ft = el('div', 'slsb-mft');
+    ft.appendChild(button(t('cancel'), '', closeDialog));
+    ft.appendChild(button(current.label, current.cls, ok));
     box.appendChild(ft);
     back.appendChild(box);
     back.addEventListener('click', function (e) {
-      if (e.target === back && !isBusy) { dialog = null; draw(); }
+      if (e.target === back && !isBusy) closeDialog();
     });
+    back.__input = input;
     return back;
   }
 
@@ -384,8 +629,15 @@
     }
 
     var scrollTop = 0;
+    var runsTop = 0;
     var oldList = root.querySelector('.slsb-tl');
     if (oldList) scrollTop = oldList.scrollTop;
+    var oldRuns = root.querySelector('.slsb-list');
+    if (oldRuns) runsTop = oldRuns.scrollTop;
+    var active = document.activeElement;
+    var wasSearching = !!active && !!active.classList && active.classList.contains('q') && isTextBox(active);
+    var caret = wasSearching ? active.selectionStart : 0;
+    var hadNote = !!root.querySelector('input.nt');
     root.textContent = '';
 
     var box = el('div', 'slsb' + (isBusy ? ' busy' : ''));
@@ -404,28 +656,41 @@
     var list = el('div', 'slsb-list');
     var entry = findSelected();
 
-    if (!(view.runs || []).length) list.appendChild(el('div', 'slsb-empty', t('noRuns')));
-    (view.runs || []).forEach(function (run) { list.appendChild(runCard({ run: run, isGone: false })); });
-    if ((view.deleted || []).length) {
-      list.appendChild(el('div', 'slsb-sec', t('deleted')));
-      view.deleted.forEach(function (run) { list.appendChild(runCard({ run: run, isGone: true })); });
-    }
+    left.appendChild(finder());
+    fillList(list);
     left.appendChild(list);
 
     var foot = el('div', 'slsb-foot');
     foot.appendChild(button(t('gameList'), '', function () { busy(); post(['gamelist']); }));
     foot.appendChild(button(t('folder'), '', function () { busy(); post(['folder']); }));
+    foot.appendChild(button(t('importBtn'), '', function () { busy(); post(['import']); }));
     foot.appendChild(el('div', 'disk', f('used', size(view.bytes || 0))));
     left.appendChild(foot);
 
     body.appendChild(left);
     body.appendChild(detail(entry));
     box.appendChild(body);
-    if (dialog) box.appendChild(modal());
+    var dlg = dialog ? modal() : null;
+    if (dlg) box.appendChild(dlg);
     root.appendChild(box);
 
     var newList = root.querySelector('.slsb-tl');
     if (newList) newList.scrollTop = scrollTop;
+    var newRuns = root.querySelector('.slsb-list');
+    if (newRuns) newRuns.scrollTop = runsTop;
+
+    // A redraw replaces the text boxes, so the one being typed in gets the focus back.
+    if (dlg && dlg.__input) {
+      dlg.__input.focus();
+      if (!hadNote) dlg.__input.setSelectionRange(dlg.__input.value.length, dlg.__input.value.length);
+    } else if (wasSearching && !dlg) {
+      var q = root.querySelector('input.q');
+      if (q) {
+        q.focus();
+        q.setSelectionRange(caret, caret);
+      }
+    }
+    if (!isTextBox(document.activeElement)) typing(false);
     uiSize(root, { fit: box });
   }
 
@@ -450,6 +715,8 @@
       dialog = null;
       isBusy = false;
       selected = null;
+      expanded = null;
+      isTyping = false;
       draw();
     },
     show: function (json) {
@@ -463,10 +730,16 @@
       view = null;
       dialog = null;
       isBusy = false;
+      isTyping = false;
       remove();
     },
     escape: function () {
-      if (isBusy) return;
+      // The same Esc press the page already used in a text box.
+      if (isBusy || Date.now() - pageEscAt < 250) return;
+      if (isTextBox(document.activeElement)) {
+        document.activeElement.blur();
+        return;
+      }
       if (dialog) {
         dialog = null;
         draw();

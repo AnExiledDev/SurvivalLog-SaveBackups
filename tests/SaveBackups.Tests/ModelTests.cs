@@ -46,10 +46,59 @@ public sealed class ModelTests
     {
         var existing = new[] { Make.Backup(BackupKind.Morning, 1, turn: 2, day: 4) };
 
-        Assert.True(Repeats.IsRepeat(BackupKind.Morning, new Progress(2, 4, 999), existing));
-        Assert.False(Repeats.IsRepeat(BackupKind.Morning, new Progress(2, 5, 0), existing));
-        Assert.False(Repeats.IsRepeat(BackupKind.Morning, new Progress(3, 4, 0), existing));
-        Assert.False(Repeats.IsRepeat(BackupKind.Manual, new Progress(2, 4, 0), existing));
+        Assert.True(Repeats.IsRepeat(BackupKind.Morning, new Progress(2, 4, 999), existing, Make.Start));
+        Assert.False(Repeats.IsRepeat(BackupKind.Morning, new Progress(2, 5, 0), existing, Make.Start));
+        Assert.False(Repeats.IsRepeat(BackupKind.Morning, new Progress(3, 4, 0), existing, Make.Start));
+        Assert.False(Repeats.IsRepeat(BackupKind.Manual, new Progress(2, 4, 0), existing, Make.Start));
+    }
+
+    [Fact]
+    public void A_wave_backup_is_one_per_day_and_an_expedition_one_only_skips_a_quick_retry()
+    {
+        var wave = new[] { Make.Backup(BackupKind.Wave, 0, turn: 1, day: 4) };
+        var expedition = new[] { Make.Backup(BackupKind.Expedition, 0, turn: 1, day: 4) };
+        var day4 = new Progress(1, 4, 0);
+
+        Assert.True(Repeats.IsRepeat(BackupKind.Wave, day4, wave, Make.Start.AddHours(1)));
+        Assert.False(Repeats.IsRepeat(BackupKind.Wave, new Progress(1, 5, 0), wave, Make.Start.AddHours(1)));
+
+        Assert.True(Repeats.IsRepeat(BackupKind.Expedition, day4, expedition, Make.Start.AddMinutes(1)));
+        Assert.False(Repeats.IsRepeat(BackupKind.Expedition, day4, expedition, Make.Start.AddMinutes(10)));
+        Assert.False(Repeats.IsRepeat(BackupKind.Expedition, new Progress(1, 5, 0), expedition, Make.Start.AddMinutes(1)));
+
+        // A wave backup does not stand in for an expedition one.
+        Assert.False(Repeats.IsRepeat(BackupKind.Expedition, day4, wave, Make.Start.AddMinutes(1)));
+    }
+
+    [Fact]
+    public void A_backup_from_another_game_version_is_marked_but_an_unknown_version_is_not()
+    {
+        var meta = Make.Backup(BackupKind.Morning, 1);
+
+        Assert.False(PageModel.IsOldVersion(meta, "1.1.19611"));
+        Assert.True(PageModel.IsOldVersion(meta, "1.2.20000"));
+        Assert.False(PageModel.IsOldVersion(meta, ""));
+        Assert.False(PageModel.IsOldVersion(meta with { GameVersion = "" }, "1.2.20000"));
+
+        var screen = new Screen(new[] { View("Save_A", 1, 3) }, new[] { meta with { Note = "keep" } }, new Dictionary<string, DateTime>(), "/b", "F8", false, "1.2.20000");
+        var root = Json(screen);
+        var backup = root.GetProperty("runs")[0].GetProperty("backups")[0];
+
+        Assert.Equal("1.2.20000", root.GetProperty("version").GetString());
+        Assert.True(backup.GetProperty("oldVersion").GetBoolean());
+        Assert.Equal("keep", backup.GetProperty("note").GetString());
+    }
+
+    [Fact]
+    public void A_note_and_the_days_words_round_trip_and_a_backup_without_them_reads_empty()
+    {
+        var meta = Make.Backup(BackupKind.Morning, 1) with { Note = "before the boss", DayText = "Rain." };
+
+        var read = BackupMeta.Parse(meta.Id, meta.Stem, meta.ToJson())!;
+
+        Assert.Equal("before the boss", read.Note);
+        Assert.Equal("Rain.", read.DayText);
+        Assert.Equal("", BackupMeta.Parse(meta.Id, meta.Stem, Make.Backup(BackupKind.Morning, 1).ToJson())!.Note);
     }
 
     [Fact]

@@ -5,7 +5,7 @@ namespace SaveBackups.Tests;
 
 public sealed class RetentionTests
 {
-    private static readonly Limits NoLimits = new(0, 0, 0, 0, 0, 0);
+    private static readonly Limits NoLimits = new(0, 0, 0, 0, 0, 0, 0, 0, 0);
 
     [Fact]
     public void Each_kind_keeps_its_newest_n_per_run()

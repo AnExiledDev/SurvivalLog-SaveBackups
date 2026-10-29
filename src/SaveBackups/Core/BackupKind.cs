@@ -19,6 +19,18 @@ public enum BackupKind
 
     /// <summary>Made by the mod before it restores a backup over a save or deletes a save, so the step can be undone.</summary>
     Safety,
+
+    /// <summary>Right before the survivor sets out on an expedition, after the game saved.</summary>
+    Expedition,
+
+    /// <summary>Right before a zombie wave starts, after the game saved.</summary>
+    Wave,
+
+    /// <summary>When the run reaches an ending and the game saved the ending choice, so another ending can be tried.</summary>
+    Ending,
+
+    /// <summary>Brought in from a .slsave file.</summary>
+    Imported,
 }
 
 public static class BackupKinds
@@ -30,4 +42,7 @@ public static class BackupKinds
 
     /// <summary>Kinds that record where the run really got to. A safety backup copies whatever was on disk, so it says nothing about that.</summary>
     public static bool ShowsProgress(BackupKind kind) => kind != BackupKind.Safety;
+
+    /// <summary>Kinds the run's own play makes, as opposed to ones the player asked for or the mod made around a change.</summary>
+    public static bool IsAutomatic(BackupKind kind) => kind is BackupKind.Morning or BackupKind.Quit or BackupKind.Rebirth or BackupKind.Expedition or BackupKind.Wave or BackupKind.Ending;
 }

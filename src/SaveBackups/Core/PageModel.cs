@@ -29,7 +29,8 @@ public sealed record Screen(
     IReadOnlyDictionary<string, DateTime> Settled,
     string Folder,
     string BackupKey,
-    bool IsChinese);
+    bool IsChinese,
+    string GameVersion = "");
 
 /// <summary>
 /// The save manager's view as JSON, written straight from the screen. Each run lists its backups newest first and a
@@ -59,6 +60,7 @@ public static class PageModel
             json.WriteBoolean("zh", screen.IsChinese);
             json.WriteString("key", screen.BackupKey);
             json.WriteString("folder", screen.Folder);
+            json.WriteString("version", screen.GameVersion);
             json.WriteNumber("bytes", screen.Backups.Sum(meta => meta.Bytes));
             json.WriteStartArray("runs");
 
@@ -95,7 +97,7 @@ public static class PageModel
                     json.WriteEndObject();
                 }
 
-                WriteBackups(json, backups);
+                WriteBackups(json, backups, screen.GameVersion);
                 json.WriteEndObject();
             }
 
@@ -111,7 +113,7 @@ public static class PageModel
                 json.WriteString("name", newest.Run.Name);
                 json.WriteNumber("day", newest.Run.Progress.Day + 1);
                 json.WriteNumber("turn", newest.Run.Progress.Turn);
-                WriteBackups(json, pair.Value);
+                WriteBackups(json, pair.Value, screen.GameVersion);
                 json.WriteEndObject();
             }
 
@@ -122,7 +124,11 @@ public static class PageModel
         return Encoding.UTF8.GetString(buffer.ToArray());
     }
 
-    private static void WriteBackups(Utf8JsonWriter json, List<BackupMeta> backups)
+    /// <summary>A backup made on another game version than the one running; restoring it may not load cleanly. Unknown versions never count.</summary>
+    public static bool IsOldVersion(BackupMeta meta, string gameVersion) =>
+        meta.GameVersion.Length > 0 && gameVersion.Length > 0 && !string.Equals(meta.GameVersion, gameVersion, StringComparison.OrdinalIgnoreCase);
+
+    private static void WriteBackups(Utf8JsonWriter json, List<BackupMeta> backups, string gameVersion)
     {
         json.WriteStartArray("backups");
 
@@ -137,6 +143,10 @@ public static class PageModel
             json.WriteBoolean("progress", BackupKinds.ShowsProgress(meta.Kind));
             json.WriteNumber("bytes", meta.Bytes);
             json.WriteBoolean("pinned", meta.IsPinned);
+            json.WriteString("note", meta.Note);
+            json.WriteString("dayText", meta.DayText);
+            json.WriteString("version", meta.GameVersion);
+            json.WriteBoolean("oldVersion", IsOldVersion(meta, gameVersion));
             json.WriteEndObject();
         }
 

@@ -53,7 +53,25 @@ public abstract record PageCommand
     /// <summary>The player read the "save went backwards" warning for this run and wants it gone.</summary>
     public sealed record Dismiss(string Stem) : PageCommand;
 
+    /// <summary>Copy this backup out as a new save, next to the others in the game's list.</summary>
+    public sealed record CopyAsNew(string Stem, string Id) : PageCommand;
+
+    /// <summary>Write this backup as a .slsave file in the Exports folder.</summary>
+    public sealed record Export(string Stem, string Id) : PageCommand;
+
+    /// <summary>Add every .slsave file in the Import folder to the backups.</summary>
+    public sealed record Import : PageCommand;
+
+    /// <summary>Set a backup's note; an empty note removes it.</summary>
+    public sealed record Note(string Stem, string Id, string Text) : PageCommand;
+
+    /// <summary>A text box in the page took (true) or lost (false) the keyboard.</summary>
+    public sealed record Typing(bool IsTyping) : PageCommand;
+
     public sealed record Unknown(string Text) : PageCommand;
+
+    /// <summary>The parts that are not names: the pin flag, the typing flag and the note text (percent-encoded, so it has no "|").</summary>
+    private static bool IsFree(string verb, int part) => (verb, part) is ("pin", 3) or ("note", 3) or ("typing", 1);
 
     public static bool IsOurs(string? message) => message is not null && message.StartsWith(Prefix, StringComparison.Ordinal);
 
@@ -65,7 +83,7 @@ public abstract record PageCommand
         var parts = message.Substring(Prefix.Length).Split('|');
 
         for (var i = 1; i < parts.Length; i++)
-            if (!(parts[0] == "pin" && i == 3) && !Names.IsSafe(parts[i])) return new Unknown(message);
+            if (!IsFree(parts[0], i) && !Names.IsSafe(parts[i])) return new Unknown(message);
 
         return (parts[0], parts.Length) switch
         {
@@ -82,6 +100,11 @@ public abstract record PageCommand
             ("folder", 1) => new OpenFolder(),
             ("gamelist", 1) => new GameList(),
             ("dismiss", 2) => new Dismiss(parts[1]),
+            ("copy", 3) => new CopyAsNew(parts[1], parts[2]),
+            ("export", 3) => new Export(parts[1], parts[2]),
+            ("import", 1) => new Import(),
+            ("note", 4) when Notes.Decode(parts[3]) is { } text => new Note(parts[1], parts[2], text),
+            ("typing", 2) when parts[1] is "0" or "1" => new Typing(parts[1] == "1"),
             _ => new Unknown(message),
         };
     }

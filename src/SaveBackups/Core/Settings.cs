@@ -6,6 +6,9 @@ public sealed record Settings(
     bool OnMorning,
     bool OnQuit,
     bool BeforeRebirth,
+    bool BeforeExpedition,
+    bool BeforeWave,
+    bool AtEnding,
     bool ReplaceLoadScreen,
     bool AutoBackupToasts,
     Limits Limits);

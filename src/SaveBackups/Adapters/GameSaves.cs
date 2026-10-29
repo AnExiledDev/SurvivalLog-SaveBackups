@@ -53,7 +53,136 @@ internal sealed class GameSaves
 
         GameSaveManager.AssignChildMetaFromGameSave(child, save);
 
-        return Facts(save.FileName, save.Name ?? "", child);
+        // A save copied by the mod keeps the old run's name inside it; its save list entry has the copy's name.
+        return Facts(save.FileName, ListedName(save.FileName) ?? save.Name ?? "", child);
+    }
+
+    private string? ListedName(string fileName)
+    {
+        var list = Manager?.GetHistoryList();
+
+        if (list == null) return null;
+
+        for (var i = 0; i < list.Count; i++)
+        {
+            var child = list[i];
+
+            if (child != null && string.Equals(child.FileName, fileName, StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(child.Name)) return child.Name;
+        }
+
+        return null;
+    }
+
+    /// <summary>The ending event the run has chosen and saved, or 0 when none (or no run).</summary>
+    public static int PendingEndingId()
+    {
+        var manager = Manager;
+
+        return manager != null && manager.IsInBattle ? manager.GetGameSave()?.CurSave?.PendingEndingChoiceEventId ?? 0 : 0;
+    }
+
+    /// <summary>The game's own journal line for the day the run is on, or "" when it has none.</summary>
+    public string DayText()
+    {
+        try
+        {
+            var manager = Manager;
+            var save = manager != null && manager.IsInBattle ? manager.GetGameSave() : null;
+            var child = save?.CurSave;
+
+            if (child == null) return "";
+
+            var text = GameSaveManager.GetDayDescription(child, child.Day);
+
+            return string.IsNullOrWhiteSpace(text) ? "" : text.Trim();
+        }
+        catch (Exception)
+        {
+            return "";
+        }
+    }
+
+    /// <summary>
+    /// Makes files copied from a backup into a run of their own. Each file names its run inside it, and the game
+    /// saves to the name it reads there, so a copy left as it is would save over the run it came from. The main
+    /// file and the snapshots are read with the game's own reader, given the new name and written back. A snapshot
+    /// that cannot be rewritten is deleted (the game would refuse it anyway). Gives null when it worked, or why not.
+    /// </summary>
+    public string? MakeOwnRun(string saveFolder, string newFile, IReadOnlyList<string> copied)
+    {
+        var manager = Manager;
+
+        if (manager == null) return "the save manager is not loaded";
+
+        var stem = RunFiles.Stem(newFile);
+
+        try
+        {
+            var save = manager.PeekGameSave(newFile);
+
+            if (save == null) return "the game could not read the copy";
+
+            save.FileName = newFile;
+            TemporaryFile.WritFile(TemporaryFile.GetFilePath(newFile), MemoryPackToolsExpand.SerializeObject<GameSaveData>(save), false);
+        }
+        catch (Exception ex)
+        {
+            return "the copy could not be renamed inside: " + ex.Message;
+        }
+
+        foreach (var name in copied)
+        {
+            if (string.Equals(name, RunFiles.MainFile(stem), StringComparison.OrdinalIgnoreCase)) continue;
+
+            var path = System.IO.Path.Combine(saveFolder, name);
+
+            try
+            {
+                if (name.EndsWith(".round.bytes", StringComparison.OrdinalIgnoreCase))
+                {
+                    var round = MemoryPackToolsExpand.DeserializeObject<RebirthRoundSnapshot>(TemporaryFile.ReadFileBytes(path));
+
+                    if (round == null) throw new InvalidOperationException("empty");
+
+                    round.SaveFileName = newFile;
+
+                    if (round.Save != null) round.Save.FileName = newFile;
+
+                    TemporaryFile.WritFile(path, MemoryPackToolsExpand.SerializeObject<RebirthRoundSnapshot>(round), false);
+                }
+                else if (name.Contains(".snap", StringComparison.OrdinalIgnoreCase))
+                {
+                    var day = MemoryPackToolsExpand.DeserializeObject<RebirthDaySnapshot>(TemporaryFile.ReadFileBytes(path));
+
+                    if (day == null) throw new InvalidOperationException("empty");
+
+                    day.SaveFileName = newFile;
+                    TemporaryFile.WritFile(path, MemoryPackToolsExpand.SerializeObject<RebirthDaySnapshot>(day), false);
+                }
+                else
+                {
+                    // A file this mod does not know the inside of; without a rewrite it would point at the old run.
+                    TemporaryFile.DeleteFile(path);
+                }
+            }
+            catch (Exception)
+            {
+                TemporaryFile.DeleteFile(path);
+            }
+        }
+
+        Flush();
+
+        try
+        {
+            var check = manager.PeekGameSave(newFile);
+
+            return check != null && string.Equals(check.FileName, newFile, StringComparison.OrdinalIgnoreCase) ? null : "the copy still names the old save inside";
+        }
+        catch (Exception ex)
+        {
+            return "the copy could not be read back: " + ex.Message;
+        }
     }
 
     /// <summary>Whether the game itself would save now (not mid-load, not between worlds).</summary>

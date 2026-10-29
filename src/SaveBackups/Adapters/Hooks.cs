@@ -23,6 +23,13 @@ internal static class Hooks
         Patch(harmony, typeof(GameSaveManager), "BattleToMain", nameof(BeforeLeaveRun), nameof(AfterLeaveRun), "backups on quit to title are not made");
         Patch(harmony, typeof(GameSaveManager), "OnApplicationQuitInternal", nameof(BeforeLeaveRun), nameof(AfterGameQuit), "backups on game quit are not made");
         Patch(harmony, typeof(GameSaveManager), "TryBeginMinorRebirth", nameof(BeforeRebirth), null, "backups before a rebirth are not made");
+        Patch(harmony, typeof(ExploreManager), "OnCheckAndGo", nameof(BeforeExpedition), null, "backups before an expedition are not made");
+        Patch(harmony, typeof(TowerWaveManager), "StartWave", nameof(BeforeWave), null, "backups before a zombie wave are not made");
+
+        // The ending choice is saved inside each ending line's confirm step (MarkPendingEndingChoice cannot be hooked).
+        Patch(harmony, typeof(LineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at an ending are not made");
+        Patch(harmony, typeof(GirlLineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at the girl line's ending are not made");
+        Patch(harmony, typeof(WarehouseLineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at the warehouse line's ending are not made");
         Patch(harmony, typeof(Reducer_Web_MainUI), "RA_LoadGame", nameof(OnLoadButton), null, "the Load button opens the game's own list");
     }
 
@@ -50,6 +57,27 @@ internal static class Hooks
     private static void AfterGameQuit() => Guard(() => Session?.LeftRun(wait: true));
 
     private static void BeforeRebirth() => Guard(() => Session?.RebirthStarting());
+
+    private static void BeforeExpedition() => Guard(() => Session?.ExpeditionStarting());
+
+    private static void BeforeWave() => Guard(() => Session?.WaveStarting());
+
+    /// <summary>The ending choice the save holds before the confirm, so the postfix can tell whether this confirm marked one.</summary>
+    private static void BeforeEndingConfirm(out int __state)
+    {
+        __state = 0;
+
+        try
+        {
+            __state = GameSaves.PendingEndingId();
+        }
+        catch (Exception ex)
+        {
+            ReportOnce(ex);
+        }
+    }
+
+    private static void AfterEndingConfirm(int __state) => Guard(() => Session?.EndingConfirmed(__state));
 
     /// <summary>False, with the state as the answer, when the mod's own manager opened instead of the game's list.</summary>
     private static bool OnLoadButton(State_Web_MainUI state, ref State_Web_MainUI __result)

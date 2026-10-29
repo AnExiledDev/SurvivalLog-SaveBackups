@@ -13,7 +13,7 @@ namespace SaveBackups.Core;
 /// the save under temporary names first and only then replaces the save's files, so a failed copy leaves the save as
 /// it was. Pure System.IO: the game is never touched here.
 /// </summary>
-public sealed class BackupStore
+public sealed partial class BackupStore
 {
     public const string TempSuffix = ".sbtmp";
     private const string PartialSuffix = ".partial";
@@ -33,8 +33,24 @@ public sealed class BackupStore
 
     public string RunFolder(string stem) => Path.Combine(_root, stem);
 
+    /// <summary>Where exported .slsave files go, inside the backup folder.</summary>
+    public string ExportsPath => Path.Combine(_root, ExportsFolder);
+
+    /// <summary>Where .slsave files are put to be imported.</summary>
+    public string ImportPath => Path.Combine(_root, ImportFolder);
+
+    public const string ExportsFolder = "Exports";
+    public const string ImportFolder = "Import";
+
+    /// <summary>The Exports and Import folders sit next to the run folders and are not runs.</summary>
+    private static bool IsRunFolder(string name) =>
+        !string.Equals(name, ExportsFolder, StringComparison.OrdinalIgnoreCase) && !string.Equals(name, ImportFolder, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Whether any run has a folder of backups.</summary>
+    public bool HasRuns() => Directory.Exists(_root) && Directory.EnumerateDirectories(_root).Any(folder => IsRunFolder(Path.GetFileName(folder)));
+
     /// <summary>Copies the run's files from <paramref name="saveFolder"/> into a new backup.</summary>
-    public Result<BackupMeta> Create(string saveFolder, RunFacts run, BackupKind kind, string gameVersion)
+    public Result<BackupMeta> Create(string saveFolder, RunFacts run, BackupKind kind, string gameVersion, string dayText = "")
     {
         var stem = RunFiles.Stem(run.FileName);
 
@@ -63,7 +79,7 @@ public sealed class BackupStore
                 bytes += new FileInfo(target).Length;
             }
 
-            var meta = new BackupMeta(id, stem, kind, created, run, bytes, gameVersion, IsPinned: false);
+            var meta = new BackupMeta(id, stem, kind, created, run, bytes, gameVersion, IsPinned: false) { DayText = dayText ?? "" };
 
             File.WriteAllText(Path.Combine(partial, BackupMeta.FileName), meta.ToJson());
             Directory.Move(partial, final);
@@ -84,7 +100,10 @@ public sealed class BackupStore
         if (!Directory.Exists(_root)) return Array.Empty<BackupMeta>();
 
         return Directory.EnumerateDirectories(_root)
-            .SelectMany(folder => Of(Path.GetFileName(folder)))
+            .Select(Path.GetFileName)
+            .OfType<string>()
+            .Where(IsRunFolder)
+            .SelectMany(Of)
             .OrderByDescending(meta => meta.CreatedUtc)
             .ThenByDescending(meta => meta.Id, StringComparer.Ordinal)
             .ToList();
@@ -93,7 +112,7 @@ public sealed class BackupStore
     /// <summary>One run's complete backups, newest first.</summary>
     public IReadOnlyList<BackupMeta> Of(string stem)
     {
-        if (!IsSafeId(stem)) return Array.Empty<BackupMeta>();
+        if (!IsSafeId(stem) || !IsRunFolder(stem)) return Array.Empty<BackupMeta>();
 
         var folder = RunFolder(stem);
 
@@ -208,6 +227,25 @@ public sealed class BackupStore
         try
         {
             File.WriteAllText(Path.Combine(RunFolder(stem), id, BackupMeta.FileName), (meta with { IsPinned = isPinned }).ToJson());
+
+            return Result.Done(new Unit());
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return Result.Failed<Unit>(ex.Message);
+        }
+    }
+
+    /// <summary>The player's note on a backup; an empty note removes it.</summary>
+    public Result<Unit> SetNote(string stem, string id, string note)
+    {
+        var meta = IsSafeId(stem) && IsSafeId(id) ? Find(stem, id) : null;
+
+        if (meta == null) return Result.Failed<Unit>("no backup " + id);
+
+        try
+        {
+            File.WriteAllText(Path.Combine(RunFolder(stem), id, BackupMeta.FileName), (meta with { Note = Notes.Clean(note) }).ToJson());
 
             return Result.Done(new Unit());
         }

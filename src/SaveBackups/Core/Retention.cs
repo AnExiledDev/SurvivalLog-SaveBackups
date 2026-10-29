@@ -5,7 +5,7 @@ using System.Linq;
 namespace SaveBackups.Core;
 
 /// <summary>How many backups of each kind a run keeps, and the most space all backups may take. 0 means no limit.</summary>
-public sealed record Limits(int Morning, int Quit, int Rebirth, int Manual, int Safety, long MaxTotalBytes)
+public sealed record Limits(int Morning, int Quit, int Rebirth, int Manual, int Safety, int Expedition, int Wave, int Ending, long MaxTotalBytes)
 {
     public int For(BackupKind kind) => kind switch
     {
@@ -14,13 +14,17 @@ public sealed record Limits(int Morning, int Quit, int Rebirth, int Manual, int 
         BackupKind.Rebirth => Rebirth,
         BackupKind.Manual => Manual,
         BackupKind.Safety => Safety,
+        BackupKind.Expedition => Expedition,
+        BackupKind.Wave => Wave,
+        BackupKind.Ending => Ending,
+        BackupKind.Imported => 0,
         _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
     };
 }
 
 /// <summary>
 /// Which backups to delete. Each run keeps its newest N of each kind. Then, while all backups together take more than
-/// the space limit, the oldest goes first, automatic ones before manual ones. Pinned backups are never deleted and
+/// the space limit, the oldest goes first, automatic ones before manual and imported ones. Imported backups have no per-kind limit. Pinned backups are never deleted and
 /// never counted against a kind's N, and the newest backup of each run always stays, so no run is left without one.
 /// </summary>
 public static class Retention
@@ -47,7 +51,7 @@ public static class Retention
             var total = all.Where(meta => !doomed.Contains(meta)).Sum(meta => meta.Bytes);
             var candidates = all
                 .Where(meta => !meta.IsPinned && !doomed.Contains(meta) && !newestOfRun.Contains(meta))
-                .OrderBy(meta => meta.Kind == BackupKind.Manual ? 1 : 0)
+                .OrderBy(meta => meta.Kind is BackupKind.Manual or BackupKind.Imported ? 1 : 0)
                 .ThenBy(meta => meta.CreatedUtc);
 
             foreach (var meta in candidates)

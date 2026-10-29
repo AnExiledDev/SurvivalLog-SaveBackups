@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.0
+
+- Copy as new save: any backup, a deleted save's included, can become a save of its own next to the original. The original save is not changed.
+- Export a backup to a single `.slsave` file in `SaveBackups\Exports`, to keep it safe or give it to a friend.
+- Import: put `.slsave` files in `SaveBackups\Import` and press 「Import」 in the save manager. Each one shows up under its save as an imported backup.
+- Add a note to any backup, so you can tell them apart later.
+- Search your saves by name, survivor or note, and filter the list to saves in progress, finished saves or saves with backups.
+- New automatic backups right before an expedition, right before a zombie wave and when a run reaches an ending, each with its own setting and its own number kept.
+- Morning backups keep the game's description of that day, and the save manager shows it under the day.
+- A backup made on another game version is marked, and restoring or copying it shows a warning first.
+- Click a backup to show more actions: Copy as new save, Pin, Note, Export and Remove.
+
 ## 0.1.0
 
 - First release.

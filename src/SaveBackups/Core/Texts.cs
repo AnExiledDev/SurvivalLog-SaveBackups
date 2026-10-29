@@ -30,5 +30,22 @@ public static class Texts
         "{0} is behind its last backup (day {1}). Steam Cloud may have put back an older copy. Open Load to restore it.",
         "「{0}」比最近的备份（第 {1} 天）更旧，可能是 Steam 云同步换回了旧存档。打开「读取存档」即可恢复。");
 
+    /// <summary>The name a copied save gets in the game's list.</summary>
+    public static readonly Phrase CopyName = new("{0} (day {1} copy)", "{0}（第 {1} 天副本）");
+
+    public static readonly Phrase Copied = new("Copied as a new save: {0}.", "已复制为新存档：「{0}」。");
+
+    public static readonly Phrase Exported = new("Exported to {0}", "已导出到 {0}");
+
+    public static readonly Phrase Imported = new("Imported {0} backup(s).", "已导入 {0} 个备份。");
+
+    public static readonly Phrase ImportedSome = new(
+        "Imported {0} backup(s). {1} file(s) could not be imported, see BepInEx/save-backups.log.",
+        "已导入 {0} 个备份。有 {1} 个文件无法导入，详见 BepInEx/save-backups.log。");
+
+    public static readonly Phrase NothingToImport = new(
+        "Nothing to import. Put .slsave files in {0} and press Import again.",
+        "没有可导入的文件。请把 .slsave 文件放进 {0}，然后再点一次「导入」。");
+
     public static string Format(Phrase phrase, bool isChinese, params object[] args) => string.Format(phrase.Pick(isChinese), args);
 }

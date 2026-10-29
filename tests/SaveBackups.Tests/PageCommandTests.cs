@@ -24,6 +24,21 @@ public sealed class PageCommandTests
         Assert.IsType<PageCommand.OpenFolder>(Parse("folder"));
         Assert.IsType<PageCommand.GameList>(Parse("gamelist"));
         Assert.Equal(new PageCommand.Dismiss("Save_A"), Parse("dismiss|Save_A"));
+        Assert.Equal(new PageCommand.CopyAsNew("Save_A", "x"), Parse("copy|Save_A|x"));
+        Assert.Equal(new PageCommand.Export("Save_A", "x"), Parse("export|Save_A|x"));
+        Assert.IsType<PageCommand.Import>(Parse("import"));
+        Assert.Equal(new PageCommand.Typing(true), Parse("typing|1"));
+        Assert.Equal(new PageCommand.Typing(false), Parse("typing|0"));
+    }
+
+    [Fact]
+    public void A_note_may_hold_any_text_once_decoded_but_its_backup_must_still_be_safe()
+    {
+        // The page percent-encodes the note, so "|" or "/" in it never splits the message or reads as a path.
+        Assert.Equal(new PageCommand.Note("Save_A", "x", "a|b ../c"), Parse("note|Save_A|x|" + Uri.EscapeDataString("a|b ../c")));
+        Assert.Equal(new PageCommand.Note("Save_A", "x", ""), Parse("note|Save_A|x|"));
+        Assert.IsType<PageCommand.Unknown>(Parse("note|../x|y|hi"));
+        Assert.IsType<PageCommand.Unknown>(Parse("note|Save_A|x|a|b"));
     }
 
     [Theory]
@@ -35,6 +50,10 @@ public sealed class PageCommandTests
     [InlineData("pin|Save_A|x|2")]
     [InlineData("restore|Save_A")]
     [InlineData("explode")]
+    [InlineData("copy|..|x")]
+    [InlineData("export|Save_A|../x")]
+    [InlineData("typing|2")]
+    [InlineData("import|x")]
     public void Bad_or_unsafe_messages_are_unknown(string rest)
     {
         Assert.IsType<PageCommand.Unknown>(Parse(rest));

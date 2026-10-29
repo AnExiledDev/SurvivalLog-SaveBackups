@@ -26,6 +26,7 @@ internal sealed class Session
     private readonly DiskWorker _worker;
     private readonly Action<string> _log;
     private readonly HashSet<string> _warnedBehind = new(StringComparer.OrdinalIgnoreCase);
+    private readonly WebKeyboard _keyboard = new();
 
     private Settings _settings;
     private BackupStore _store;
@@ -52,7 +53,7 @@ internal sealed class Session
         if (!string.Equals(settings.Root, _settings.Root, StringComparison.Ordinal)) _store = new BackupStore(settings.Root, () => DateTime.UtcNow);
 
         _settings = settings;
-        _log($"backups in {settings.Root}; morning {settings.OnMorning}, quit {settings.OnQuit}, rebirth {settings.BeforeRebirth}, load screen {settings.ReplaceLoadScreen}");
+        _log($"backups in {settings.Root}; morning {settings.OnMorning}, quit {settings.OnQuit}, rebirth {settings.BeforeRebirth}, expedition {settings.BeforeExpedition}, wave {settings.BeforeWave}, ending {settings.AtEnding}, load screen {settings.ReplaceLoadScreen}");
     }
 
     public void UseKey(KeyCode key) => _backupKey = key;
@@ -62,7 +63,12 @@ internal sealed class Session
     {
         var store = _store;
 
-        _worker.Run(store.SweepPartials, swept =>
+        _worker.Run(() =>
+        {
+            Directory.CreateDirectory(store.ImportPath);
+
+            return store.SweepPartials();
+        }, swept =>
         {
             if (swept > 0) _log($"removed {swept} unfinished backup(s) left by a crash");
         }, ex => _log("could not clear unfinished backups: " + ex.Message));
@@ -84,7 +90,7 @@ internal sealed class Session
 
         if (_isTitleCheckDue && _page.IsReady) CheckTitle();
         if (!Input.anyKeyDown) return;
-        if (_isOpen && Input.GetKeyDown(KeyCode.Escape)) _page.Escape();
+        if (_isOpen && !_keyboard.IsClaimed && Input.GetKeyDown(KeyCode.Escape)) _page.Escape();
         if (_backupKey != KeyCode.None && Input.GetKeyDown(_backupKey) && _game.CurrentRun() != null) BackUpRunning(BackupKind.Manual, isAsked: true);
     }
 
@@ -133,6 +139,59 @@ internal sealed class Session
         if (!_worker.WaitIdle(QuitWait)) _log("the backup before the rebirth did not finish in time");
     }
 
+    /// <summary>Before the survivor sets out: the run is saved (when the game allows it) and copied before the map loads.</summary>
+    public void ExpeditionStarting()
+    {
+        if (!_settings.BeforeExpedition) return;
+
+        if (SaveForBackup() is not { } facts) return;
+
+        BackUp(facts, BackupKind.Expedition, isAsked: false);
+
+        // Leaving for the map can write the run's files, so the copy is finished first.
+        if (!_worker.WaitIdle(QuitWait)) _log("the backup before the expedition did not finish in time");
+    }
+
+    public void WaveStarting()
+    {
+        if (!_settings.BeforeWave) return;
+
+        if (SaveForBackup() is { } facts) BackUp(facts, BackupKind.Wave, isAsked: false);
+    }
+
+    /// <summary>
+    /// After an ending line's confirm step. Only a confirm that marked a new ending choice is the ending: the game
+    /// saved the run there, so a backup now can be restored to try another ending.
+    /// </summary>
+    public void EndingConfirmed(int pendingBefore)
+    {
+        if (!_settings.AtEnding) return;
+
+        var pending = GameSaves.PendingEndingId();
+
+        if (pending == 0 || pending == pendingBefore) return;
+
+        GameSaves.Flush();
+
+        var facts = _game.CurrentRun();
+
+        if (facts == null) return;
+
+        _log($"ending choice {pending} saved");
+        BackUp(facts, BackupKind.Ending, isAsked: false);
+    }
+
+    /// <summary>Saves the run when the game would itself, else writes out what it queued; the run's facts after.</summary>
+    private RunFacts? SaveForBackup()
+    {
+        if (_game.CurrentRun() == null) return null;
+
+        if (_game.IsSafeToSave()) _game.SaveNow();
+        else GameSaves.Flush();
+
+        return _game.CurrentRun();
+    }
+
     // ===== The manager =====
 
     /// <summary>Called from the Load button's hook: true when the mod's manager opened and the game's list must not.</summary>
@@ -160,7 +219,7 @@ internal sealed class Session
     {
         try
         {
-            return Directory.Exists(_settings.Root) && Directory.GetDirectories(_settings.Root).Length > 0;
+            return _store.HasRuns();
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -170,6 +229,7 @@ internal sealed class Session
 
     private void Close()
     {
+        _keyboard.Release();
         _isOpen = false;
         HotkeyGate.MenuClosed();
         _page.Close();
@@ -185,9 +245,10 @@ internal sealed class Session
         var store = _store;
         var key = _backupKey == KeyCode.None ? "" : _backupKey.ToString();
         var isChinese = GameLanguage.IsChinese();
+        var version = _game.Version();
 
         _worker.Run(
-            () => PageModel.Json(new Core.Screen(runs, store.All(), store.AllSettled(), store.Root, key, isChinese)),
+            () => PageModel.Json(new Core.Screen(runs, store.All(), store.AllSettled(), store.Root, key, isChinese, version)),
             json =>
             {
                 if (!_isOpen) return;
@@ -235,11 +296,11 @@ internal sealed class Session
             return;
         }
 
-        BackUp(facts, kind, isAsked);
+        BackUp(facts, kind, isAsked, dayText: kind == BackupKind.Morning ? _game.DayText() : "");
     }
 
     /// <summary>Copies the run's files on the worker, then trims the backups to the limits.</summary>
-    private void BackUp(RunFacts facts, BackupKind kind, bool isAsked, bool settleAfter = false)
+    private void BackUp(RunFacts facts, BackupKind kind, bool isAsked, bool settleAfter = false, string dayText = "")
     {
         var saveFolder = _game.SaveFolder();
 
@@ -258,9 +319,9 @@ internal sealed class Session
         _worker.Run(
             () =>
             {
-                if (Repeats.IsRepeat(kind, facts.Progress, store.Of(stem))) return null;
+                if (Repeats.IsRepeat(kind, facts.Progress, store.Of(stem), DateTime.UtcNow)) return null;
 
-                var made = store.Create(saveFolder, facts, kind, version);
+                var made = store.Create(saveFolder, facts, kind, version, dayText);
 
                 if (made is Result<BackupMeta>.Done done)
                 {
@@ -282,7 +343,7 @@ internal sealed class Session
         switch (made)
         {
             case null:
-                _log($"{BackupKinds.Id(kind)} backup of {facts.FileName} skipped: day {facts.Progress.Day + 1} is already backed up");
+                _log($"{BackupKinds.Id(kind)} backup of {facts.FileName} skipped: loop {facts.Progress.Turn} day {facts.Progress.Day + 1} already has one");
                 break;
             case Result<BackupMeta>.Done done:
                 _log($"{BackupKinds.Id(kind)} backup {done.Value.Stem}/{done.Value.Id}, day {facts.Progress.Day + 1}, {done.Value.Bytes / 1024} KB");
@@ -363,6 +424,7 @@ internal sealed class Session
             case PageCommand.Ready:
                 _log("page script ready");
                 _page.IsReady = true;
+                _keyboard.Release();
 
                 // A reloaded page has no manager on screen, and one left marked open would hold the game's hotkeys.
                 if (_isOpen)
@@ -412,6 +474,22 @@ internal sealed class Session
                 break;
             case PageCommand.Dismiss dismiss:
                 OnDisk(() => _store.Settle(dismiss.Stem, DateTime.UtcNow), "dismiss " + dismiss.Stem);
+                break;
+            case PageCommand.Note note:
+                OnDisk(() => _store.SetNote(note.Stem, note.Id, note.Text), "note on " + note.Id);
+                break;
+            case PageCommand.CopyAsNew copy:
+                CopyAsNew(copy.Stem, copy.Id);
+                break;
+            case PageCommand.Export export:
+                Export(export.Stem, export.Id);
+                break;
+            case PageCommand.Import:
+                Import();
+                break;
+            case PageCommand.Typing typing:
+                if (typing.IsTyping && _isOpen) _keyboard.Claim();
+                else _keyboard.Release();
                 break;
             case PageCommand.Unknown unknown:
                 _log("page said: " + unknown.Text);
@@ -559,6 +637,161 @@ internal sealed class Session
             ex =>
             {
                 _log($"delete of {listed.FileName} failed: {ex}");
+                _page.Toast(Texts.Failed.Pick(GameLanguage.IsChinese()), ToastKind.Error);
+                Refresh();
+            });
+    }
+
+    /// <summary>
+    /// A backup copied into the save folder as a run of its own, under a new file name, then put in the game's list.
+    /// The run it came from is not touched, and a deleted save's backups can be copied too.
+    /// </summary>
+    private void CopyAsNew(string stem, string id)
+    {
+        var saveFolder = _game.SaveFolder();
+
+        if (saveFolder == null)
+        {
+            _page.Done();
+
+            return;
+        }
+
+        var store = _store;
+
+        _worker.Run(
+            () =>
+            {
+                var backup = store.Find(stem, id);
+
+                if (backup == null) return (Backup: (BackupMeta?)null, NewStem: "", Made: Result.Failed<IReadOnlyList<string>>("no backup " + id));
+
+                var newStem = NewSave.FreeStem(DateTime.Now, name => RunFiles.In(saveFolder, name).Count > 0 || Directory.Exists(store.RunFolder(name)));
+
+                if (newStem == null) return (Backup: backup, NewStem: "", Made: Result.Failed<IReadOnlyList<string>>("no free save name"));
+
+                return (Backup: backup, NewStem: newStem, Made: store.CopyAsNew(stem, id, saveFolder, newStem));
+            },
+            answer =>
+            {
+                var isChinese = GameLanguage.IsChinese();
+
+                if (answer.Made is not Result<IReadOnlyList<string>>.Done done || answer.Backup == null)
+                {
+                    _log($"copy of {stem}/{id} failed: {(answer.Made as Result<IReadOnlyList<string>>.Failed)?.Why}");
+                    _page.Toast(Texts.Failed.Pick(isChinese), ToastKind.Error);
+                    Refresh();
+
+                    return;
+                }
+
+                var backup = answer.Backup;
+                var newFile = RunFiles.MainFile(answer.NewStem);
+                var why = _game.MakeOwnRun(saveFolder, newFile, done.Value);
+
+                if (why != null)
+                {
+                    _log($"copy of {stem}/{id} as {newFile} undone: {why}");
+                    DeleteCopied(saveFolder, done.Value);
+                    _page.Toast(Texts.Failed.Pick(isChinese), ToastKind.Error);
+                    Refresh();
+
+                    return;
+                }
+
+                var name = Texts.Format(Texts.CopyName, isChinese, backup.Run.Name, backup.Run.Progress.Day + 1);
+
+                _game.AddEntry(newFile, name);
+                _game.RefreshEntry(newFile);
+                _log($"copied {stem}/{id} (day {backup.Run.Progress.Day + 1}) as {newFile}, {done.Value.Count} file(s)");
+                _page.Toast(Texts.Format(Texts.Copied, isChinese, name), ToastKind.Success);
+                Refresh();
+            },
+            ex =>
+            {
+                _log($"copy of {stem}/{id} failed: {ex}");
+                _page.Toast(Texts.Failed.Pick(GameLanguage.IsChinese()), ToastKind.Error);
+                Refresh();
+            });
+    }
+
+    private void DeleteCopied(string saveFolder, IReadOnlyList<string> names)
+    {
+        foreach (var name in names)
+        {
+            try
+            {
+                File.Delete(Path.Combine(saveFolder, name));
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                _log($"could not remove {name} after a failed copy: {ex.Message}");
+            }
+        }
+    }
+
+    private void Export(string stem, string id)
+    {
+        var store = _store;
+
+        _worker.Run(
+            () => store.Export(stem, id, store.ExportsPath),
+            made =>
+            {
+                var isChinese = GameLanguage.IsChinese();
+
+                if (made is Result<string>.Done done)
+                {
+                    _log("exported " + done.Value);
+                    _page.Toast(Texts.Format(Texts.Exported, isChinese, done.Value), ToastKind.Success, 10);
+                }
+                else
+                {
+                    _log($"export of {stem}/{id} failed: {(made as Result<string>.Failed)?.Why}");
+                    _page.Toast(Texts.Failed.Pick(isChinese), ToastKind.Error);
+                }
+
+                _page.Done();
+            },
+            ex =>
+            {
+                _log($"export of {stem}/{id} failed: {ex}");
+                _page.Toast(Texts.Failed.Pick(GameLanguage.IsChinese()), ToastKind.Error);
+                _page.Done();
+            });
+    }
+
+    private void Import()
+    {
+        var store = _store;
+
+        _worker.Run(
+            () => store.ImportAll(store.ImportPath),
+            outcomes =>
+            {
+                var isChinese = GameLanguage.IsChinese();
+                var added = 0;
+                var bad = 0;
+
+                foreach (var outcome in outcomes)
+                {
+                    if (outcome.IsDone) added++;
+                    else if (!outcome.IsAlreadyThere) bad++;
+
+                    _log(outcome.IsDone
+                        ? $"imported {outcome.File} as {outcome.Meta!.Stem}/{outcome.Meta.Id}"
+                        : $"import of {outcome.File}: {outcome.Why}");
+                }
+
+                if (outcomes.Count == 0) _page.Toast(Texts.Format(Texts.NothingToImport, isChinese, store.ImportPath), ToastKind.Info, 12);
+                else if (bad > 0) _page.Toast(Texts.Format(Texts.ImportedSome, isChinese, added, bad), ToastKind.Warning, 10);
+                else _page.Toast(Texts.Format(Texts.Imported, isChinese, added), ToastKind.Success);
+
+                Refresh();
+            },
+            ex =>
+            {
+                _log("import failed: " + ex);
                 _page.Toast(Texts.Failed.Pick(GameLanguage.IsChinese()), ToastKind.Error);
                 Refresh();
             });

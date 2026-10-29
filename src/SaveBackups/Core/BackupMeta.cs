@@ -24,6 +24,12 @@ public sealed record BackupMeta(
     public const string FileName = "backup.json";
     private const int Format = 1;
 
+    /// <summary>The player's own words about the backup, empty when there are none.</summary>
+    public string Note { get; init; } = "";
+
+    /// <summary>The game's own line for the day the run was on, on morning backups; empty on the others.</summary>
+    public string DayText { get; init; } = "";
+
     public string ToJson()
     {
         using var buffer = new System.IO.MemoryStream();
@@ -45,6 +51,8 @@ public sealed record BackupMeta(
             json.WriteNumber("bytes", Bytes);
             json.WriteString("gameVersion", GameVersion);
             json.WriteBoolean("pinned", IsPinned);
+            if (Note.Length > 0) json.WriteString("note", Note);
+            if (DayText.Length > 0) json.WriteString("dayText", DayText);
             json.WriteEndObject();
         }
 
@@ -75,7 +83,11 @@ public sealed record BackupMeta(
                 Number(root, "preset"),
                 Flag(root, "finished"));
 
-            return new BackupMeta(id, stem, kind, created.ToUniversalTime(), run, Long(root, "bytes"), Text(root, "gameVersion"), Flag(root, "pinned"));
+            return new BackupMeta(id, stem, kind, created.ToUniversalTime(), run, Long(root, "bytes"), Text(root, "gameVersion"), Flag(root, "pinned"))
+            {
+                Note = Notes.Clean(Text(root, "note")),
+                DayText = Text(root, "dayText"),
+            };
         }
         catch (JsonException)
         {

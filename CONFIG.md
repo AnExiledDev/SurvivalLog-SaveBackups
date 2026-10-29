@@ -18,10 +18,13 @@ The value is a Unity key name, for example `F8`, `F11`, `Insert` or `Keypad5`.
 | `OnMorning` | `true` | Back up the run each morning, right after the game's own save. |
 | `OnQuit` | `true` | Back up the run when you quit to the title screen or close the game. |
 | `BeforeRebirth` | `true` | Back up the run right before a rebirth rolls it back. |
+| `BeforeExpedition` | `true` | Back up the run right before the survivor sets out on an expedition. The game saves first when it can. |
+| `BeforeWave` | `true` | Back up the run right before a zombie wave starts, once a day. The game saves first when it can. |
+| `AtEnding` | `true` | Back up the run when it reaches an ending and the game saved your choice, so you can restore it and try another ending. |
 
 ## Keep
 
-How many backups of each kind every save keeps. When a new backup is made, older ones of the same kind are removed. Pinned backups are never removed and do not count. `0` keeps them all.
+How many backups of each kind every save keeps. Imported backups are never removed by these counts. When a new backup is made, older ones of the same kind are removed. Pinned backups are never removed and do not count. `0` keeps them all.
 
 | Setting | Default | What it does |
 | --- | --- | --- |
@@ -30,6 +33,9 @@ How many backups of each kind every save keeps. When a new backup is made, older
 | `Rebirth` | `5` | Backups made before a rebirth. |
 | `Manual` | `0` | Backups you made yourself, with the key or Back up now. `0` keeps them all. |
 | `Safety` | `5` | Backups made before a restore or a delete. |
+| `Expedition` | `5` | Backups made before an expedition. |
+| `Wave` | `5` | Backups made before a zombie wave. |
+| `Ending` | `3` | Backups made at an ending. |
 | `MaxTotalMB` | `2048` | Most space all backups together may take, in MB. Past it, the oldest backups go first, automatic ones before your own. Pinned backups and each save's newest backup are always kept. `0` means no limit. |
 
 ## Screen

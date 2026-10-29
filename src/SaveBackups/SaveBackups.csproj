@@ -21,6 +21,7 @@
     <Reference Include="$(BepInExCore)\0Harmony.dll" Private="false" />
     <Reference Include="$(BepInExCore)\Il2CppInterop.Runtime.dll" Private="false" />
     <Reference Include="$(BepInExCore)\Il2CppInterop.Common.dll" Private="false" />
+    <Reference Include="$(Interop)\AOT.dll" Private="false" />
     <Reference Include="$(Interop)\HotUpdate.dll" Private="false" />
     <Reference Include="$(Interop)\Il2Cppmscorlib.dll" Private="false" />
     <Reference Include="$(Interop)\UnityEngine.CoreModule.dll" Private="false" />
@@ -40,7 +41,7 @@
   <!-- What the Mod Manager's Mods screen shows about this mod. -->
   <ItemGroup>
     <AssemblyMetadata Include="ModManager.Name" Value="Save Backups&#10;存档备份" />
-    <AssemblyMetadata Include="ModManager.Description" Value="Backs up every save each morning, when you quit and before a rebirth, outside Steam Cloud. The Load button opens a save manager: restore any backup, bring back a deleted save, and get a warning when a save went backwards. F8 backs up the run you are playing.&#10;每天早上、退出时和重生前自动备份所有存档，备份放在 Steam 云同步之外。「读取存档」按钮会打开存档管理：可以恢复任意备份、找回已删除的存档，存档回退时会提醒你。按 F8 备份当前存档。" />
+    <AssemblyMetadata Include="ModManager.Description" Value="Backs up every save each morning, when you quit, before a rebirth, an expedition or a zombie wave, and at an ending, outside Steam Cloud. The Load button opens a save manager: restore any backup, copy one as a new save, bring back a deleted save, add notes, search, and export or import backups. F8 backs up the run you are playing.&#10;每天早上、退出时、重生前、探索前、尸潮前和到达结局时自动备份所有存档，备份放在 Steam 云同步之外。「读取存档」按钮会打开存档管理：可以恢复任意备份、复制为新存档、找回已删除的存档、添加备注、搜索，以及导出和导入备份。按 F8 备份当前存档。" />
     <AssemblyMetadata Include="ModManager.Author" Value="AnExiledDev" />
     <AssemblyMetadata Include="ModManager.Category" Value="QualityOfLife" />
     <AssemblyMetadata Include="ModManager.GameVersion" Value="1.1.19611" />
