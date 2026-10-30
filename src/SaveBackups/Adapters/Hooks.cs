@@ -3,6 +3,7 @@ using GameCore.HotUpdate;
 using GameCore.HotUpdate.Battle.Logic;
 using GameCore.HotUpdate.ReduxUI;
 using HarmonyLib;
+using Il2CppInterop.Runtime;
 
 namespace SaveBackups.Adapters;
 
@@ -30,7 +31,8 @@ internal static class Hooks
         Patch(harmony, typeof(LineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at an ending are not made");
         Patch(harmony, typeof(GirlLineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at the girl line's ending are not made");
         Patch(harmony, typeof(WarehouseLineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at the warehouse line's ending are not made");
-        Patch(harmony, typeof(Reducer_Web_MainUI), "RA_LoadGame", nameof(OnLoadButton), null, "the Load button opens the game's own list");
+        // RA_LoadGame is compiled into Trigger_RA_LoadGame, so a patch on RA_LoadGame itself never runs.
+        Patch(harmony, typeof(Reducer_Web_MainUI), "Trigger_RA_LoadGame", nameof(OnLoadButton), null, "the Load button opens the game's own list");
     }
 
     private static void Patch(Harmony harmony, Type type, string method, string? prefix, string? postfix, string without)
@@ -79,16 +81,14 @@ internal static class Hooks
 
     private static void AfterEndingConfirm(int __state) => Guard(() => Session?.EndingConfirmed(__state));
 
-    /// <summary>False, with the state as the answer, when the mod's own manager opened instead of the game's list.</summary>
-    private static bool OnLoadButton(State_Web_MainUI state, ref State_Web_MainUI __result)
+    /// <summary>False, so the game's list stays shut, when the mod's own manager opened instead.</summary>
+    private static bool OnLoadButton()
     {
         try
         {
-            if (Session == null || state == null || !Session.OpenInsteadOfGameList(state)) return true;
+            var state = Session == null ? null : MainScreen();
 
-            __result = state;
-
-            return false;
+            return state == null || !Session!.OpenInsteadOfGameList(state);
         }
         catch (Exception ex)
         {
@@ -97,6 +97,11 @@ internal static class Hooks
             return true;
         }
     }
+
+    private static Il2CppSystem.Type? _mainScreenType;
+
+    private static State_Web_MainUI? MainScreen() =>
+        GameSingleton.Existing<ReduxUISystem>()?.GetState<State_Web_MainUI>(_mainScreenType ??= Il2CppType.Of<State_Web_MainUI>());
 
     private static void Guard(Action step)
     {

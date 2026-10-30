@@ -367,7 +367,7 @@ internal sealed class Session
     {
         var store = _store;
 
-        if (_game.CurrentRun() != null || _game.SaveFolder() == null) return;
+        if (_game.CurrentRun() != null || _game.SaveFolder() == null || !_game.HasHistory()) return;
 
         _isTitleCheckDue = false;
 

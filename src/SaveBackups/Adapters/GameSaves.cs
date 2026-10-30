@@ -199,10 +199,13 @@ internal sealed class GameSaves
     public static void Flush() => TemporaryFile.FlushPendingWrites();
 
     /// <summary>The runs in the game's save list, as facts.</summary>
+    /// <summary>False until the game has read its save history; until then its history calls throw.</summary>
+    public bool HasHistory() => Manager?.historyData != null;
+
     public List<RunFacts> History()
     {
         var runs = new List<RunFacts>();
-        var list = Manager?.GetHistoryList();
+        var list = HasHistory() ? Manager!.GetHistoryList() : null;
 
         if (list == null) return runs;
 
@@ -216,7 +219,7 @@ internal sealed class GameSaves
         return runs;
     }
 
-    public bool HasSaveList() => Manager?.HasSaveList() == true;
+    public bool HasSaveList() => HasHistory() && Manager!.HasSaveList();
 
     /// <summary>
     /// The runs the game's Load screen would list, with its own texts, read from the list it just built for

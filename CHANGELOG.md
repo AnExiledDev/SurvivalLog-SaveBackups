@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+
+- 「Read save file」 on the title screen now opens the save manager instead of the game's own list.
+- Fixed an error at the title screen when the game had not finished reading its saves yet.
+- Made for Survival Log 1.1.20151.
+
 ## 0.2.1
 
 - The backup key no longer goes off while you type in a search box or any other text box.
