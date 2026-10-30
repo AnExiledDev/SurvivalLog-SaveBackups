@@ -53,7 +53,7 @@ Steam Cloud only syncs `Saves`, so the backups stay on this PC. Copy the folder 
 
 - Survival Log 1.1.19611. Built on this version; a game update can break it until the mod is updated.
 - The [BepInEx Pack for Survival Log](https://www.nexusmods.com/survivallog/mods/12), the BepInEx 6 (IL2CPP) build for the game.
-- [Exiled's Toolkit](https://github.com/AnExiledDev/SurvivalLog-ExiledToolkit) 0.11.0 or newer. Save Backups does not load without it. It shows the mod's messages as toasts, sizes the save manager to the Toolkit's UI size, and applies settings changed on the Mod Manager's Mods screen without a restart.
+- [Exiled's Toolkit](https://github.com/AnExiledDev/SurvivalLog-ExiledToolkit) 0.12.0 or newer. Save Backups does not load without it. It shows the mod's messages as toasts, sizes the save manager to the Toolkit's UI size, and applies settings changed on the Mod Manager's Mods screen without a restart.
 
 ## Install
 
@@ -73,7 +73,7 @@ Settings live in `BepInEx\config\com.dev.survivallog.savebackups.cfg`, created t
 
 ## Troubleshooting
 
-Check `BepInEx\LogOutput.log` for `===== Save Backups 0.2.0 started`, followed by `backup key F8`. Every backup, restore and delete, and anything that went wrong, is in `BepInEx\save-backups.log`, which survives restarts.
+Check `BepInEx\LogOutput.log` for `===== Save Backups 0.2.1 started`, followed by `backup key F8`. Every backup, restore and delete, and anything that went wrong, is in `BepInEx\save-backups.log`, which survives restarts.
 
 If the Load button opens the game's list, check that `ReplaceLoadScreen` is `true`, and look in the log for a line starting with `could not hook`.
 

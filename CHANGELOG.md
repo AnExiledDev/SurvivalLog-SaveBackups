@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- The backup key no longer goes off while you type in a search box or any other text box.
+- Needs Exiled's Toolkit 0.12.0 or newer.
+- Made for Survival Log 1.1.20151.
+
 ## 0.2.0
 
 - Copy as new save: any backup, a deleted save's included, can become a save of its own next to the original. The original save is not changed.

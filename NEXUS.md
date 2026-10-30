@@ -45,7 +45,7 @@ Backups are kept in [font=Courier New]AppData\LocalLow\LLS\SLGame\SaveBackups[/f
 [list]
 [*]Survival Log 1.1.19611. A game update can break it until the mod is updated.[/*]
 [*][url=https://www.nexusmods.com/survivallog/mods/12]BepInEx for Survival Log[/url]. Install it first.[/*]
-[*][url=https://www.nexusmods.com/survivallog/mods/61]Exiled's Toolkit[/url] 0.11.0 or newer. Save Backups does not load without it. It shows the mod's messages as toasts and applies settings changed on the Mod Manager's Mods screen without a restart.[/*]
+[*][url=https://www.nexusmods.com/survivallog/mods/61]Exiled's Toolkit[/url] 0.12.0 or newer. Save Backups does not load without it. It shows the mod's messages as toasts and applies settings changed on the Mod Manager's Mods screen without a restart.[/*]
 [/list]
 
 [size=5]Installation[/size]
@@ -115,7 +115,7 @@ F8 可以在配置中修改或关闭。
 [list]
 [*]Survival Log 1.1.19611。游戏更新后模组可能暂时失效，直到模组更新为止。[/*]
 [*][url=https://www.nexusmods.com/survivallog/mods/12]BepInEx for Survival Log[/url]，请先安装。[/*]
-[*][url=https://www.nexusmods.com/survivallog/mods/61]Exiled's Toolkit[/url] 0.11.0 或更新版本。没有它本模组不会加载。它把模组的提示显示为弹出通知，并让在 Mod Manager 的「模组」界面改动的设置无需重启即可生效。[/*]
+[*][url=https://www.nexusmods.com/survivallog/mods/61]Exiled's Toolkit[/url] 0.12.0 或更新版本。没有它本模组不会加载。它把模组的提示显示为弹出通知，并让在 Mod Manager 的「模组」界面改动的设置无需重启即可生效。[/*]
 [/list]
 
 [size=5]安装[/size]

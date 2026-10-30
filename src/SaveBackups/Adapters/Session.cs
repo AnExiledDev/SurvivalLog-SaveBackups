@@ -20,6 +20,7 @@ internal sealed class Session
     private const double MorningDelaySeconds = 1.5;
 
     private static readonly TimeSpan QuitWait = TimeSpan.FromSeconds(8);
+    private static readonly Func<KeyCode, bool> IsKeyDown = Input.GetKeyDown;
 
     private readonly GameSaves _game;
     private readonly WebPage _page;
@@ -91,7 +92,8 @@ internal sealed class Session
         if (_isTitleCheckDue && _page.IsReady) CheckTitle();
         if (!Input.anyKeyDown) return;
         if (_isOpen && !_keyboard.IsClaimed && Input.GetKeyDown(KeyCode.Escape)) _page.Escape();
-        if (_backupKey != KeyCode.None && Input.GetKeyDown(_backupKey) && _game.CurrentRun() != null) BackUpRunning(BackupKind.Manual, isAsked: true);
+        // A key typed into a text box, here or in another mod's window, is text, not a backup.
+        if (KeyGate.Fires(_backupKey, KeyCode.None, IsKeyDown, OptionalLive.IsTyping) && _game.CurrentRun() != null) BackUpRunning(BackupKind.Manual, isAsked: true);
     }
 
     // ===== Game moments =====

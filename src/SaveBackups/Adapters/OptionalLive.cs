@@ -17,8 +17,8 @@ internal static class OptionalLive
 {
     public const string ToolkitGuid = "com.dev.survivallog.exiledtoolkit";
 
-    /// <summary>The oldest Toolkit the mod loads with: its toasts and live settings come from it.</summary>
-    public const string ToolkitVersion = ">=0.11.0";
+    /// <summary>The oldest Toolkit the mod loads with: its toasts, live settings and typing watch come from it.</summary>
+    public const string ToolkitVersion = ">=0.12.0";
 
     public const string MissingNote = "Exiled's Toolkit is not installed, so settings are read once at start. Install Toolkit 0.4.0 or newer to change settings in game without a restart.";
 
@@ -53,6 +53,15 @@ internal static class OptionalLive
             return false;
         }
     }
+
+    /// <summary>
+    /// Whether a text box in any page or mod window has the keyboard. The Toolkit is a hard dependency at 0.12.0 or newer,
+    /// so it is always there. A cached delegate, so a key check allocates nothing.
+    /// </summary>
+    public static readonly Func<bool> IsTyping = ReadTyping;
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool ReadTyping() => ExiledToolkit.Typing.IsActive;
 
     // Kept in its own method so the Toolkit's types are only looked up when it is installed.
     [MethodImpl(MethodImplOptions.NoInlining)]
