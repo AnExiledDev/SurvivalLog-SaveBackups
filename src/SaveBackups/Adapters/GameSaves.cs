@@ -57,6 +57,18 @@ internal sealed class GameSaves
         return Facts(save.FileName, ListedName(save.FileName) ?? save.Name ?? "", child);
     }
 
+    /// <summary>The main file of the run being played, or null; cheaper than <see cref="CurrentRun"/>.</summary>
+    public static string? CurrentFile()
+    {
+        var manager = Manager;
+
+        if (manager == null || !manager.IsInBattle) return null;
+
+        var file = manager.GetGameSave()?.FileName;
+
+        return string.IsNullOrEmpty(file) ? null : file;
+    }
+
     private string? ListedName(string fileName)
     {
         var list = Manager?.GetHistoryList();
@@ -198,10 +210,10 @@ internal sealed class GameSaves
     /// <summary>Writes out any save the game queued, so the files on disk are the ones a backup should copy.</summary>
     public static void Flush() => TemporaryFile.FlushPendingWrites();
 
-    /// <summary>The runs in the game's save list, as facts.</summary>
     /// <summary>False until the game has read its save history; until then its history calls throw.</summary>
     public bool HasHistory() => Manager?.historyData != null;
 
+    /// <summary>The runs in the game's save list, as facts.</summary>
     public List<RunFacts> History()
     {
         var runs = new List<RunFacts>();
@@ -258,10 +270,64 @@ internal sealed class GameSaves
                 Text(row.DiffText),
                 Text(row.PhaseText),
                 Flag(row.IsFinished),
-                Flag(row.IsEndless)));
+                Flag(row.IsEndless)) { SurvivorId = run?.SurvivorId ?? 0 });
         }
 
         return views;
+    }
+
+    /// <summary>
+    /// The runs in the save list as the manager shows them from inside a run, where the Load screen's list is not
+    /// built: names and progress from the list itself, and no texts of the game's own.
+    /// </summary>
+    public List<RunView> HistoryRuns()
+    {
+        var views = new List<RunView>();
+
+        foreach (var run in History())
+            views.Add(new RunView(run.FileName, run.Name, run.Progress, "", "", "", "", "", "", run.IsFinished, false) { SurvivorId = run.SurvivorId });
+
+        return views;
+    }
+
+    /// <summary>Gives a run a new name in the save list. False when it is not listed.</summary>
+    public bool Rename(string fileName, string name)
+    {
+        var manager = Manager;
+        var list = HasHistory() ? manager!.GetHistoryList() : null;
+
+        if (list == null) return false;
+
+        for (var i = 0; i < list.Count; i++)
+        {
+            var child = list[i];
+
+            if (child == null || !string.Equals(child.FileName, fileName, StringComparison.OrdinalIgnoreCase)) continue;
+
+            child.Name = name;
+            manager!.PersistHistoryData();
+
+            // The save carries its name too; the list is filled from it when the game rebuilds its history.
+            try
+            {
+                var save = manager.PeekGameSave(fileName);
+
+                if (save != null)
+                {
+                    save.Name = name;
+                    TemporaryFile.WritFile(TemporaryFile.GetFilePath(fileName), MemoryPackToolsExpand.SerializeObject<GameSaveData>(save), false);
+                    Flush();
+                }
+            }
+            catch (Exception)
+            {
+                // The list entry has the new name, which is what the game shows.
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>After a restore the save list entry still shows the old day; it is read again from the restored file and written out.</summary>
@@ -310,6 +376,19 @@ internal sealed class GameSaves
         manager.AddHistoryEntry(fileName, name);
 
         return true;
+    }
+
+    /// <summary>The name a save carries inside it, or null when it cannot be read.</summary>
+    public string? SaveName(string fileName)
+    {
+        try
+        {
+            return Manager?.PeekGameSave(fileName)?.Name;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public bool IsListed(string fileName)

@@ -16,6 +16,17 @@ public readonly record struct Progress(int Turn, int Day, int GameTime) : ICompa
         return GameTime.CompareTo(other.GameTime);
     }
 
+    /// <summary>The time in the day as the game's clock shows it, "HH:MM"; <see cref="GameTime"/> is seconds into the day.</summary>
+    public string Clock
+    {
+        get
+        {
+            var seconds = Math.Max(0, GameTime);
+
+            return (seconds / 3600).ToString("00", System.Globalization.CultureInfo.InvariantCulture) + ":" + (seconds % 3600 / 60).ToString("00", System.Globalization.CultureInfo.InvariantCulture);
+        }
+    }
+
     public static bool operator >(Progress a, Progress b) => a.CompareTo(b) > 0;
 
     public static bool operator <(Progress a, Progress b) => a.CompareTo(b) < 0;

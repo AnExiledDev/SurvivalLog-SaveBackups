@@ -19,6 +19,7 @@ public sealed partial class BackupStore
     private const string PartialSuffix = ".partial";
     private const string IdFormat = "yyyyMMdd-HHmmss";
     private const string RunNoteFile = "run.json";
+    public const string ShotFile = "shot.jpg";
 
     private readonly string _root;
     private readonly Func<DateTime> _utcNow;
@@ -42,15 +43,21 @@ public sealed partial class BackupStore
     public const string ExportsFolder = "Exports";
     public const string ImportFolder = "Import";
 
-    /// <summary>The Exports and Import folders sit next to the run folders and are not runs.</summary>
+    /// <summary>The Exports, Import and Bin folders sit next to the run folders and are not runs.</summary>
     private static bool IsRunFolder(string name) =>
-        !string.Equals(name, ExportsFolder, StringComparison.OrdinalIgnoreCase) && !string.Equals(name, ImportFolder, StringComparison.OrdinalIgnoreCase);
+        !string.Equals(name, ExportsFolder, StringComparison.OrdinalIgnoreCase)
+        && !string.Equals(name, ImportFolder, StringComparison.OrdinalIgnoreCase)
+        && !string.Equals(name, BinFolder, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Whether any run has a folder of backups.</summary>
     public bool HasRuns() => Directory.Exists(_root) && Directory.EnumerateDirectories(_root).Any(folder => IsRunFolder(Path.GetFileName(folder)));
 
-    /// <summary>Copies the run's files from <paramref name="saveFolder"/> into a new backup.</summary>
-    public Result<BackupMeta> Create(string saveFolder, RunFacts run, BackupKind kind, string gameVersion, string dayText = "")
+    /// <summary>
+    /// Copies the run's files from <paramref name="saveFolder"/> into a new backup, with <paramref name="shot"/> as its
+    /// picture when there is one. With <paramref name="verify"/>, every copy is read back and compared with the save
+    /// file before the backup counts as made.
+    /// </summary>
+    public Result<BackupMeta> Create(string saveFolder, RunFacts run, BackupKind kind, string gameVersion, string dayText = "", byte[]? shot = null, bool verify = false, SaveStats? stats = null)
     {
         var stem = RunFiles.Stem(run.FileName);
 
@@ -77,9 +84,18 @@ public sealed partial class BackupStore
 
                 File.Copy(Path.Combine(saveFolder, name), target, overwrite: true);
                 bytes += new FileInfo(target).Length;
+
+                if (verify && !IsSame(Path.Combine(saveFolder, name), target))
+                {
+                    TryDeleteFolder(partial);
+
+                    return Result.Failed<BackupMeta>("the copy of " + name + " does not match the save; it may have changed while it was copied");
+                }
             }
 
-            var meta = new BackupMeta(id, stem, kind, created, run, bytes, gameVersion, IsPinned: false) { DayText = dayText ?? "" };
+            if (shot is { Length: > 0 }) File.WriteAllBytes(Path.Combine(partial, ShotFile), shot);
+
+            var meta = new BackupMeta(id, stem, kind, created, run, bytes, gameVersion, IsPinned: false) { DayText = dayText ?? "", Stats = stats, HasShot = shot is { Length: > 0 } };
 
             File.WriteAllText(Path.Combine(partial, BackupMeta.FileName), meta.ToJson());
             Directory.Move(partial, final);
@@ -134,7 +150,7 @@ public sealed partial class BackupStore
             {
                 var meta = BackupMeta.Parse(id, stem, File.ReadAllText(metaPath));
 
-                if (meta != null) found.Add(meta);
+                if (meta != null) found.Add(meta with { HasShot = File.Exists(Path.Combine(backup, ShotFile)) });
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
@@ -201,7 +217,11 @@ public sealed partial class BackupStore
         }
     }
 
-    public Result<Unit> Delete(string stem, string id)
+    /// <summary>Moves one backup to the recycle bin.</summary>
+    public Result<Unit> Delete(string stem, string id) => MoveToBin(stem, id, BinReason.Deleted);
+
+    /// <summary>Deletes one backup for good, without the recycle bin.</summary>
+    public Result<Unit> DeleteForever(string stem, string id)
     {
         if (!IsSafeId(stem) || !IsSafeId(id)) return Result.Failed<Unit>("not a backup: " + stem + "/" + id);
 
@@ -276,37 +296,44 @@ public sealed partial class BackupStore
     /// When the run's save was last put right by the player: a restore, or a dismissed "save went backwards" warning.
     /// Backups older than that are not compared with the save again. Kept in the run folder's run.json.
     /// </summary>
-    public DateTime? SettledAt(string stem)
+    public DateTime? SettledAt(string stem) => ReadNote(stem).Settled;
+
+    public Result<Unit> Settle(string stem, DateTime utc) => UpdateNote(stem, note => note with { Settled = utc });
+
+    /// <summary>The run's run.json; empty when there is none or it cannot be read.</summary>
+    public RunNote ReadNote(string stem)
     {
+        if (!IsSafeId(stem) || !IsRunFolder(stem)) return RunNote.Empty;
+
         var path = Path.Combine(RunFolder(stem), RunNoteFile);
 
         try
         {
-            if (!File.Exists(path)) return null;
-
-            using var document = System.Text.Json.JsonDocument.Parse(File.ReadAllText(path));
-
-            return document.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object
-                   && document.RootElement.TryGetProperty("settled", out var value)
-                   && value.ValueKind == System.Text.Json.JsonValueKind.String
-                   && DateTime.TryParse(value.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var at)
-                ? at.ToUniversalTime()
-                : null;
+            return File.Exists(path) ? RunNote.Parse(File.ReadAllText(path)) : RunNote.Empty;
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Text.Json.JsonException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            return null;
+            return RunNote.Empty;
         }
     }
 
-    public Result<Unit> Settle(string stem, DateTime utc)
+    /// <summary>Changes the run's run.json, written whole through a temp file so a crash never leaves half of one.</summary>
+    public Result<Unit> UpdateNote(string stem, Func<RunNote, RunNote> change)
     {
-        if (!IsSafeId(stem)) return Result.Failed<Unit>("not a run: " + stem);
+        if (!IsSafeId(stem) || !IsRunFolder(stem)) return Result.Failed<Unit>("not a run: " + stem);
+
+        var path = Path.Combine(RunFolder(stem), RunNoteFile);
 
         try
         {
+            var before = ReadNote(stem);
+            var after = change(before);
+
+            if (after == before && File.Exists(path)) return Result.Done(new Unit());
+
             Directory.CreateDirectory(RunFolder(stem));
-            File.WriteAllText(Path.Combine(RunFolder(stem), RunNoteFile), "{\"settled\":\"" + utc.ToString("o", CultureInfo.InvariantCulture) + "\"}");
+            File.WriteAllText(path + TempSuffix, after.ToJson());
+            File.Move(path + TempSuffix, path, overwrite: true);
 
             return Result.Done(new Unit());
         }
@@ -316,32 +343,98 @@ public sealed partial class BackupStore
         }
     }
 
-    /// <summary>Every run's settled time, for the save manager.</summary>
-    public IReadOnlyDictionary<string, DateTime> AllSettled()
+    /// <summary>Every run folder's run.json, for the save manager.</summary>
+    public IReadOnlyDictionary<string, RunNote> AllNotes()
     {
-        var settled = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
+        var notes = new Dictionary<string, RunNote>(StringComparer.OrdinalIgnoreCase);
 
-        if (!Directory.Exists(_root)) return settled;
+        if (!Directory.Exists(_root)) return notes;
 
         foreach (var folder in Directory.EnumerateDirectories(_root))
         {
             var stem = Path.GetFileName(folder);
 
-            if (SettledAt(stem) is { } at) settled[stem] = at;
+            if (!IsRunFolder(stem)) continue;
+
+            var note = ReadNote(stem);
+
+            if (note != RunNote.Empty) notes[stem] = note;
         }
 
-        return settled;
+        return notes;
     }
 
-    /// <summary>Deletes what <see cref="Retention"/> says is over the limits; returns how many went.</summary>
+    /// <summary>Every run's settled time.</summary>
+    public IReadOnlyDictionary<string, DateTime> AllSettled() =>
+        AllNotes().Where(pair => pair.Value.Settled != null).ToDictionary(pair => pair.Key, pair => pair.Value.Settled!.Value, StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>The backup's picture file, whether or not it has one.</summary>
+    public string ShotPath(string stem, string id) => Path.Combine(RunFolder(stem), id, ShotFile);
+
+    public bool HasShot(string stem, string id) => IsSafeId(stem) && IsSafeId(id) && File.Exists(ShotPath(stem, id));
+
+    /// <summary>Rewrites a backup's backup.json, as with stats read after it was made.</summary>
+    public Result<Unit> Rewrite(BackupMeta meta)
+    {
+        var path = Path.Combine(RunFolder(meta.Stem), meta.Id, BackupMeta.FileName);
+
+        if (!IsSafeId(meta.Stem) || !IsSafeId(meta.Id) || !File.Exists(path)) return Result.Failed<Unit>("no backup " + meta.Id);
+
+        try
+        {
+            File.WriteAllText(path, meta.ToJson());
+
+            return Result.Done(new Unit());
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return Result.Failed<Unit>(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Applies <see cref="Retention"/>: backups over a kind's N or thinned by age go to the recycle bin. Then, while
+    /// backups and the bin together are over the space limit, the oldest bin entries go for good, then the oldest
+    /// backups the space rule picks. Returns how many backups left the list.
+    /// </summary>
     public int Prune(Limits limits)
     {
         var removed = 0;
 
-        foreach (var meta in Retention.Plan(All(), limits))
-            if (Delete(meta.Stem, meta.Id) is Result<Unit>.Done) removed++;
+        foreach (var meta in Retention.Thin(All(), limits))
+            if (MoveToBin(meta.Stem, meta.Id, BinReason.Thinned) is Result<Unit>.Done) removed++;
+
+        if (limits.MaxTotalBytes <= 0) return removed;
+
+        var kept = All();
+        var binBytes = BinBytes();
+        var total = kept.Sum(meta => meta.Bytes) + binBytes;
+
+        foreach (var entry in Bin().OrderBy(entry => entry.BinnedUtc))
+        {
+            if (total <= limits.MaxTotalBytes) break;
+
+            if (DeleteFromBin(entry.Meta.Stem, entry.Meta.Id) is not Result<Unit>.Done) continue;
+
+            total -= entry.Meta.Bytes;
+            binBytes -= entry.Meta.Bytes;
+        }
+
+        // An empty bin with backups still over the limit: the space rule picks what goes for good. Limit never reaches 0 here, which would mean no limit.
+        foreach (var meta in Retention.OverSpace(kept, Math.Max(1, limits.MaxTotalBytes - binBytes)))
+            if (DeleteForever(meta.Stem, meta.Id) is Result<Unit>.Done) removed++;
 
         return removed;
+    }
+
+    /// <summary>Whether two files hold the same bytes.</summary>
+    private static bool IsSame(string a, string b)
+    {
+        using var sha = System.Security.Cryptography.SHA256.Create();
+        using var first = File.OpenRead(a);
+        using var second = File.OpenRead(b);
+
+        return first.Length == second.Length && sha.ComputeHash(first).AsSpan().SequenceEqual(sha.ComputeHash(second));
     }
 
     private string FreeId(string stem, DateTime created, BackupKind kind)

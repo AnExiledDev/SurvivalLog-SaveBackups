@@ -47,5 +47,30 @@ public static class Texts
         "Nothing to import. Put .slsave files in {0} and press Import again.",
         "没有可导入的文件。请把 .slsave 文件放进 {0}，然后再点一次「导入」。");
 
+    public static readonly Phrase Renamed = new("Renamed to {0}.", "已改名为「{0}」。");
+
+    /// <summary>The name a duplicated save gets in the game's list.</summary>
+    public static readonly Phrase DuplicateName = new("{0} (copy)", "{0}（副本）");
+
+    public static readonly Phrase PutBack = new("Put back in the list of {0}.", "已放回「{0}」的还原点列表。");
+
+    public static readonly Phrase BinDeleted = new("Deleted for good.", "已永久删除。");
+
+    public static readonly Phrase BinEmptied = new("The bin is empty. {0} backup(s) deleted for good.", "回收站已清空，永久删除了 {0} 个备份。");
+
+    public static readonly Phrase SettingRefused = new("That setting could not be changed: {0}", "无法修改这项设置：{0}");
+
+    public static readonly Phrase SnapCopied = new("The game's snapshot of day {0} is now a new save: {1}.", "游戏自带的第 {0} 天快照已成为新存档：「{1}」。");
+
+    public static readonly Phrase ImportedSave = new("Added {0} as a new save.", "已添加为新存档：「{0}」。");
+
+    public static readonly Phrase MirrorFailed = new("The second copy could not be written: {0}", "无法写入第二份备份：{0}");
+
+    public static readonly Phrase VerifyFailed = new("A backup did not match the save and was not kept. See BepInEx/save-backups.log.", "有一个备份与存档不一致，未保留。详见 BepInEx/save-backups.log。");
+
+    public static readonly Phrase NoPicture = new("No picture this time: {0}", "这次没有拍到画面：{0}");
+
+    public static readonly Phrase InRunBlocked = new("Not while you are playing this save. Quit to the title screen first.", "正在游玩这个存档时不能这样做。请先返回标题画面。");
+
     public static string Format(Phrase phrase, bool isChinese, params object[] args) => string.Format(phrase.Pick(isChinese), args);
 }

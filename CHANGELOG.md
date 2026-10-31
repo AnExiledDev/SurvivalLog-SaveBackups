@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.3.0
+
+- Pictures: each backup made while you play takes a small picture of the game, shown in the timeline and the save manager. `TakePictures` turns it off.
+- Each save shows its survivor's portrait, the same picture as on the new game screen.
+- Pause menu: 「Backups of this run」 opens the save manager over your run, and 「Back up now」 saves and backs up the run. The run you are playing can't be restored over, renamed or deleted from there; everything else works.
+- The backup key is now unbound by default, since the pause menu has a button for it. Set `BackupKey` to bring it back.
+- Timeline: a save's backups and the game's own day snapshots on one timeline, grouped by day, with the save as it is now on top.
+- Click a backup to see its picture, its day, how your survivor stood then (health, fullness, mood, stamina, money, planning points, items) and how that changed since, the game's journal for that day, and its buttons right under the heading.
+- Compare with now: what changed between a backup and the save as it is now, item by item.
+- Restore asks whether to load the backup as a new save or replace the save. The save as it is gets a backup of its own first either way.
+- The game's day snapshots can each be loaded as a new save. `ShowGameSnapshots` hides them.
+- Saves: rename, pin to the top of the list, write a note on the save itself, duplicate, and export a whole save with all its backups. Sort by last played, most days, survivor or name, and filter to saves playing, finished, endless or needing a look.
+- Import also takes loose save files, lists what each file holds before you bring it in, and marks the ones that won't import.
+- Bin: removed backups and deleted saves wait in the bin for `BinDays` days (30 by default), where you can put them back or delete them for good.
+- Thinning: every backup of the last 3 days of play is kept, then one a day for 14 more days, then one per loop. Thinned backups go to the bin. `KeepAllDays`, `DailyDays` and `PerLoop` set it.
+- Timer backups every `TimerMinutes` minutes of play when `OnTimer` is on (off by default).
+- `SecondFolder` keeps a second copy of every backup, for example on another drive.
+- Each backup is read back and checked against the save before it counts. `Verify` turns that off.
+- When Steam Cloud puts back an older save, the save manager shows both days side by side and lets you keep either one. `WarnWhenBehind` turns the warning off.
+- A Settings tab in the save manager changes every setting, the backup key included, and they apply at once.
+- A bar shows how much of the size limit the backups and the bin use.
+- Made for Survival Log 1.1.20151.
+
 ## 0.2.3
 
 - New look for the save manager, in the game's own font.

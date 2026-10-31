@@ -30,6 +30,12 @@ public sealed record BackupMeta(
     /// <summary>The game's own line for the day the run was on, on morning backups; empty on the others.</summary>
     public string DayText { get; init; } = "";
 
+    /// <summary>How the survivor and home stood in the backup, once read; null until then.</summary>
+    public SaveStats? Stats { get; init; }
+
+    /// <summary>Whether a picture was taken with the backup. Read from the folder, not written into backup.json.</summary>
+    public bool HasShot { get; init; }
+
     public string ToJson()
     {
         using var buffer = new System.IO.MemoryStream();
@@ -53,6 +59,7 @@ public sealed record BackupMeta(
             json.WriteBoolean("pinned", IsPinned);
             if (Note.Length > 0) json.WriteString("note", Note);
             if (DayText.Length > 0) json.WriteString("dayText", DayText);
+            Stats?.Write(json, "stats");
             json.WriteEndObject();
         }
 
@@ -87,6 +94,7 @@ public sealed record BackupMeta(
             {
                 Note = Notes.Clean(Text(root, "note")),
                 DayText = Text(root, "dayText"),
+                Stats = SaveStats.Read(root, "stats"),
             };
         }
         catch (JsonException)

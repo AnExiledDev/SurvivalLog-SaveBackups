@@ -60,6 +60,72 @@ public sealed class PageCommandTests
     }
 
     [Fact]
+    public void The_save_manager_verbs_parse_with_their_arguments()
+    {
+        Assert.Equal(new PageCommand.OpenFolder("Save_A"), Parse("folder|Save_A"));
+        Assert.Equal(new PageCommand.ExportRun("Save_A", true, false), Parse("exportrun|Save_A|1|0"));
+        Assert.IsType<PageCommand.ImportList>(Parse("importlist"));
+        Assert.Equal(new PageCommand.ImportFile("Save_X.bytes"), Parse("importfile|Save_X.bytes"));
+        Assert.Equal(new PageCommand.Rename("Save_A", "Day 9 | best"), Parse("rename|Save_A|" + Uri.EscapeDataString("Day 9 | best")));
+        Assert.Equal(new PageCommand.RunPin("Save_A", true), Parse("runpin|Save_A|1"));
+        Assert.Equal(new PageCommand.SaveNote("Save_A", "a/b"), Parse("runnote|Save_A|" + Uri.EscapeDataString("a/b")));
+        Assert.Equal(new PageCommand.Duplicate("Save_A"), Parse("duplicate|Save_A"));
+        Assert.Equal(new PageCommand.Detail("Save_A"), Parse("detail|Save_A"));
+        Assert.Equal(new PageCommand.SnapshotAsNew("Save_A", "Save_A.snap2.bytes"), Parse("snapnew|Save_A|Save_A.snap2.bytes"));
+        Assert.Equal(new PageCommand.BinPutBack("Save_A", "x"), Parse("binback|Save_A|x"));
+        Assert.Equal(new PageCommand.BinDelete("Save_A", "x"), Parse("bindel|Save_A|x"));
+        Assert.Equal(new PageCommand.BinDeleteRun("Save_A"), Parse("binrundel|Save_A"));
+        Assert.IsType<PageCommand.BinEmpty>(Parse("binempty"));
+        Assert.IsType<PageCommand.NewGame>(Parse("newgame"));
+        Assert.IsType<PageCommand.BackUpNow>(Parse("backupnow"));
+        Assert.IsType<PageCommand.OpenInRun>(Parse("openinrun"));
+    }
+
+    [Theory]
+    [InlineData("Keep.BinDays", "14", "14")]
+    [InlineData("Keep.BinDays", " 7 ", "7")]
+    [InlineData("Backups.OnTimer", "true", "true")]
+    [InlineData("Backups.Folder", "D:/Backups/SL", "D:/Backups/SL")]
+    [InlineData("Backups.SecondFolder", "", "")]
+    [InlineData("Controls.BackupKey", "F8", "F8")]
+    public void A_setting_the_page_may_change_parses_with_its_value(string id, string value, string stored)
+    {
+        Assert.Equal(new PageCommand.Set(id, stored), Parse("set|" + id + "|" + Uri.EscapeDataString(value)));
+    }
+
+    [Theory]
+    [InlineData("Keep.BinDays", "400")]
+    [InlineData("Keep.BinDays", "-1")]
+    [InlineData("Keep.BinDays", "1.5")]
+    [InlineData("Backups.TimerMinutes", "2")]
+    [InlineData("Backups.OnTimer", "yes")]
+    [InlineData("Backups.Folder", "relative/path")]
+    [InlineData("Backups.Folder", "D:/a\"b")]
+    [InlineData("Backups.Folder", "D:/a:b")]
+    [InlineData("Controls.BackupKey", "F8; rm")]
+    [InlineData("General.Secret", "1")]
+    public void A_setting_outside_its_range_or_not_offered_is_refused(string id, string value)
+    {
+        Assert.IsType<PageCommand.Unknown>(Parse("set|" + id + "|" + Uri.EscapeDataString(value)));
+    }
+
+    [Theory]
+    [InlineData("/")]
+    [InlineData("/home/me/backups")]
+    [InlineData(@"\\server\share")]
+    [InlineData(@"C:\Backups")]
+    public void Full_paths_count_as_folders(string path) => Assert.True(SettingKeys.IsFolder(path));
+
+    [Theory]
+    [InlineData("rename|Save_A|")]
+    [InlineData("runpin|Save_A|2")]
+    [InlineData("exportrun|Save_A|1")]
+    [InlineData("snapnew|Save_A|../Save_B.bytes")]
+    [InlineData("binback|..|x")]
+    [InlineData("duplicate|C:")]
+    public void Bad_save_manager_messages_are_unknown(string rest) => Assert.IsType<PageCommand.Unknown>(Parse(rest));
+
+    [Fact]
     public void Another_mods_message_is_not_ours()
     {
         Assert.False(PageCommand.IsOurs("slmod|unpackall|ready"));

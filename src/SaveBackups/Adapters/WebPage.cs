@@ -52,6 +52,12 @@ internal sealed class WebPage
 
     public void Close() => Run(Api + "&&" + Api + ".close()");
 
+    /// <summary>The detail view's extra data for one run (stats, items, the game's snapshots, ending photos).</summary>
+    public void Detail(string detailJson) => Run(Api + "&&" + Api + ".detail(" + JsText.Literal(detailJson) + ")");
+
+    /// <summary>The files waiting in the Import folder, for the Import dialog.</summary>
+    public void Imports(string importsJson) => Run(Api + "&&" + Api + ".imports(" + JsText.Literal(importsJson) + ")");
+
     /// <summary>The page gets no keys; Esc closes its open dialog, or the manager when none is open.</summary>
     public void Escape() => Run(Api + "&&" + Api + ".escape()");
 

@@ -6,20 +6,22 @@ The game keeps one copy of each save, and Steam Cloud can quietly put back an ol
 
 ## Features
 
-- **Automatic backups**: each morning right after the game's own save, when you quit to the title screen or close the game, right before a rebirth rolls the run back, right before an expedition, right before a zombie wave (once a day), and when a run reaches an ending, so you can go back and pick another one. A backup copies every file of the save, its rebirth day snapshots included.
-- **Back up any time**: press `F8` in a run to save it and back it up. On the title screen, **Back up now** in the save manager does the same for any save.
-- **Save manager**: the Load button on the title screen opens a list of your saves with their backups, newest first, grouped by loop and day. **Load** starts the save, **Restore** puts a backup back, **Delete save** removes the save from the game's list. **Default list** opens the game's normal Load screen.
-- **Nothing is lost by a restore or a delete**: the save as it is gets a backup of its own first. If that backup cannot be made, nothing is changed.
-- **Deleted saves**: a deleted save keeps its backups under **Deleted saves**, and **Restore** on one of its backups puts it back in your list.
-- **Backup actions**: click a backup to see it on the right, with **Restore**, **Copy as new save**, **Pin**, **Note**, **Export** and **Remove**.
-- **Copy as new save**: turns any backup, a deleted save's included, into a save of its own next to the original, named after it with the day it was copied from. The original save is not changed.
-- **Notes**: write a few words on any backup to tell it apart. Notes show under the backup and can be searched.
-- **Export and import**: **Export** writes a backup to one `.slsave` file in `SaveBackups\Exports`. To bring one in, put `.slsave` files in `SaveBackups\Import` and press **Import**; each shows up under its save as an imported backup, and the file moves to `Import\Imported`.
-- **Search and filters**: search your saves by name, survivor or note, and show all saves, saves in progress, finished saves or saves with backups.
-- **Day descriptions**: morning backups keep the game's own description of that day, shown under the day in the save manager.
-- **Game version warning**: a backup made on another game version is marked, and restoring or copying it warns that it may not load as it did.
-- **Went-backwards warning**: if a save is behind its own last backup, for example after Steam Cloud or a crash put back an older copy, a message says so on the title screen and the save manager offers to restore that backup or dismiss the warning.
-- **Pin and limits**: pin a backup to keep it no matter what. Older backups are removed by a count for each kind and by a total size limit (2 GB by default), oldest automatic ones first. Each save's newest backup always stays.
+- **Automatic backups**: each morning right after the game's own save, when you quit to the title screen or close the game, right before a rebirth rolls the run back, right before an expedition, right before a zombie wave (once a day), when a run reaches an ending, and, if you turn it on, every few minutes of play. A backup copies every file of the save, its rebirth day snapshots included, and is read back and checked before it counts.
+- **Pictures**: each backup made while you play takes a small picture of the game, so you can see where you were. Each save also shows its survivor's portrait.
+- **Pause menu buttons**: **Backups of this run** opens the save manager over the run you are playing, and **Back up now** saves the run and backs it up.
+- **Save manager**: the Load button on the title screen opens your saves, each with its survivor, loop, day and play time. Search, sort, filter, pin a save to the top, rename it or write a note on it. **Game's own list** opens the game's normal Load screen.
+- **Timeline**: a save's backups and the game's own day snapshots on one timeline, grouped by day, with the save as it is now on top. Click one to see its picture, how your survivor stood then (health, fullness, mood, stamina, money, planning points and items) and what changed since, and the game's journal for that day.
+- **Compare with now**: what changed between a backup and the save as it is now, item by item.
+- **Restore**: load any backup as a new save next to the original, or replace the save with it. The save as it is gets a backup of its own first, and if that backup cannot be made, nothing is changed.
+- **Snapshots as new saves**: any of the game's own day snapshots can become a save of its own.
+- **Duplicate and export**: duplicate a save, export one backup to a `.slsave` file, or export a whole save with every backup. To bring one in, put `.slsave` files or loose save files in `SaveBackups\Import` and press **Import**: it lists what each file holds before you add it.
+- **Bin**: removed backups and deleted saves wait in the bin for 30 days, where you can put them back or delete them for good.
+- **Thinning**: every backup of the last 3 days of play is kept, then one a day for 14 more days, then the last one of each loop. Thinned backups go to the bin. Pinned backups are never touched, and each kind of backup also has a number kept.
+- **Size limit**: all backups and the bin together stay under 2 GB by default, the bin emptied first, then the oldest automatic backups. A bar in the save manager shows how much is in use.
+- **Second copy**: set a second folder, such as another drive or a synced folder, and every backup is copied there too.
+- **Steam Cloud check**: if a save is behind its own last backup, for example after Steam Cloud put back an older copy, the title screen says so and the save manager shows both days side by side so you can keep either.
+- **Game version warning**: a backup made on another game version is marked, and restoring it warns that it may not load as it did.
+- **Settings tab**: every setting can be changed in the save manager, the backup key included, and applies at once.
 - **Log file**: every backup, restore and delete is written to `BepInEx\save-backups.log`.
 
 The save manager and messages follow the game's language, English or Simplified Chinese.
@@ -30,10 +32,8 @@ Save Backups adds no data of its own to your saves. You can remove it at any tim
 
 | Key | What it does |
 | --- | --- |
-| `F8` | Saves the run you are playing and backs it up. Works only in a run, when the game could save; otherwise a message says to try again in a moment. |
+| `BackupKey` (unbound) | Saves the run you are playing and backs it up, like **Back up now** in the pause menu. Works only in a run, when the game could save. Set a key in the save manager's Settings tab or in the config. |
 | `Esc` | In the save manager, closes the open question, then the save manager. In the search box or a note, it clears or closes that first. |
-
-`F8` can be changed or turned off in the config.
 
 ## Where the backups are
 
@@ -43,15 +43,16 @@ Steam Cloud only syncs `Saves`, so the backups stay on this PC. Copy the folder 
 
 ## Known issues and limits
 
-- Restore, delete, copy, export and import work only on the title screen, in the save manager.
+- In a run, the save manager can't load a save, start a new game, or restore over, rename or delete the run you are playing. Those wait for the title screen.
 - A copied save starts without the game's ending snapshots of the original, so it cannot jump back to one of the original's endings.
-- The game's rebirth day snapshots are backed up with the save, but the save manager restores the whole save, not a single snapshot.
-- The went-backwards warning compares the loop and day the game's save list shows with the newest backup. A save you rolled back on purpose with the game's own tools can show it once; **Dismiss** clears it.
+- A game snapshot comes back as a new save, not in place of the save it belongs to.
+- Pictures are taken only while you play. Backups made on the title screen, and those from before 0.3.0, have none.
+- The Steam Cloud check compares the loop and day the game's save list shows with the newest backup. A save you rolled back on purpose with the game's own tools can show it once; **Dismiss** clears it.
 - Backups from earlier game versions can be restored, but the game decides whether it can still read them.
 
 ## Requirements
 
-- Survival Log 1.1.19611. Built on this version; a game update can break it until the mod is updated.
+- Survival Log 1.1.20151. Built on this version; a game update can break it until the mod is updated.
 - The [BepInEx Pack for Survival Log](https://www.nexusmods.com/survivallog/mods/12), the BepInEx 6 (IL2CPP) build for the game.
 - [Exiled's Toolkit](https://github.com/AnExiledDev/SurvivalLog-ExiledToolkit) 0.12.0 or newer. Save Backups does not load without it. It shows the mod's messages as toasts, sizes the save manager to the Toolkit's UI size, and applies settings changed on the Mod Manager's Mods screen without a restart.
 
@@ -73,9 +74,9 @@ Settings live in `BepInEx\config\com.dev.survivallog.savebackups.cfg`, created t
 
 ## Troubleshooting
 
-Check `BepInEx\LogOutput.log` for `===== Save Backups 0.2.3 started`, followed by `backup key F8`. Every backup, restore and delete, and anything that went wrong, is in `BepInEx\save-backups.log`, which survives restarts.
+Check `BepInEx\LogOutput.log` for `===== Save Backups 0.2.3 started`, followed by `backup key` and the key set (`None` when unbound). Every backup, restore and delete, and anything that went wrong, is in `BepInEx\save-backups.log`, which survives restarts.
 
-If the Load button opens the game's list, check that `ReplaceLoadScreen` is `true`, and look in the log for a line starting with `could not hook`.
+If the pause menu has no **Back up now** button, or the Load button opens the game's list, check that `ReplaceLoadScreen` is `true`, and look in the log for a line starting with `could not hook`.
 
 ## Feedback and bug reports
 
@@ -93,7 +94,7 @@ dotnet build src/SaveBackups -c Release -p:GameDir="C:\path\to\Survival Log" -p:
 
 The output DLL is at `src\SaveBackups\bin\Release\SaveBackups.dll`.
 
-The unit tests cover the backup folder (copy, restore, cleanup and refusing paths outside it), copying a backup as a new save, export and import, notes, the limits, the went-backwards check and the save manager's messages, and need nothing from the game:
+The unit tests cover the backup folder (copy, restore, cleanup and refusing paths outside it), copying a backup as a new save, export and import, notes, the limits, thinning, the bin, the second copy, the stats, the went-backwards check and the save manager's messages, and need nothing from the game:
 
 ```
 dotnet test tests/SaveBackups.Tests

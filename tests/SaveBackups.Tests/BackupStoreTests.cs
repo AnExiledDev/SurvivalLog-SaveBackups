@@ -184,7 +184,7 @@ public sealed class BackupStoreTests : IDisposable
             Create(day: i);
         }
 
-        var removed = _store.Prune(new Limits(2, 0, 0, 0, 0, 0, 0, 0, 0));
+        var removed = _store.Prune(new Limits(2, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 
         Assert.Equal(2, removed);
         Assert.Equal(new[] { 3, 2 }, _store.Of("Save_A").Select(m => m.Run.Progress.Day).ToArray());
