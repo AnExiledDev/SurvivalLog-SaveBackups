@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+- 「Backups of this run」 and 「Back up now」 in the pause menu are now placed by Exiled's Toolkit, along with every other mod's menu buttons. The pause menu no longer runs off the screen when several mods add buttons to it.
+- Exiled's Toolkit 0.14.0 or newer is now required.
+- Made for Survival Log 1.1.20151.
+
 ## 0.3.0
 
 - Pictures: each backup made while you play takes a small picture of the game, shown in the timeline and the save manager. `TakePictures` turns it off.

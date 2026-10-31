@@ -1,6 +1,6 @@
 // Save Backups' web half. Runs in Root.html, the document every game page iframe sits in. Draws the save manager over
-// the title screen (or over a run, from the pause menu) when the plugin opens it, and puts "Backups of this run" and
-// "Back up now" in the game's pause menu. Talks to the plugin through vuplex.postMessage("slmod|savebackups|<verb>")
+// the title screen (or over a run, from the pause menu) when the plugin opens it. The pause menu's "Backups of this
+// run" and "Back up now" buttons are placed by Exiled's Toolkit, from the plugin. Talks to the plugin through vuplex.postMessage("slmod|savebackups|<verb>")
 // and is driven by window.__slsavebackups. Every step that changes a save waits for the plugin: the page takes no
 // clicks until the plugin sends the new view (show) or says the step is over (done).
 (function () {
@@ -8,7 +8,6 @@
 
   var PREFIX = 'slmod|savebackups|';
   var ROOT_ID = 'slsb-root';
-  var POLL_MS = 400;
   var DOT = ' \u00b7 ';
 
   var TEXT = {
@@ -197,8 +196,6 @@
     snapsRow: ["Show the game's own day snapshots on the timeline", '在时间线上显示游戏自带的每日快照', '', ''],
     replaceScreen: ["Open this screen instead of the game's save list", '用这个界面代替游戏的存档列表', '', ''],
     toasts: ['A message for each automatic backup', '自动备份时显示提示', '', ''],
-    pauseOpen: ['Backups of this run', '本局备份'],
-    pauseNow: ['Back up now', '立即备份'],
     ago: { now: ['just now', '刚刚'], min: ['{0} min ago', '{0} 分钟前'], hour: ['{0} h ago', '{0} 小时前'], day: ['yesterday', '昨天'], days: ['{0} days ago', '{0} 天前'] },
     playTime: ['{0} h {1} m', '{0} 小时 {1} 分']
   };
@@ -1512,75 +1509,6 @@
     if (node.hasAttribute('data-tab')) { tab = node.getAttribute('data-tab'); modal = null; isListening = false; draw(); return; }
     if (node.hasAttribute('data-filter')) { filter = node.getAttribute('data-filter'); draw(); }
   }
-
-  // ---------- the pause menu ----------
-
-  // Two buttons in the game's pause menu (OutSetting) while a run is open, above Save & Exit and anything another mod
-  // puts there: the save manager for this run, and a backup right now. Vue re-renders the menu list whenever it likes
-  // and drops foreign nodes, so they are put back on every poll and on every change to the menu.
-  var PAUSE_CSS = '#slsb-pm-open,#slsb-pm-now{border-left-color:rgba(143,199,191,.45)}';
-
-  function pauseButton(doc, id, text, verb) {
-    var node = doc.getElementById(id);
-    if (!node) {
-      node = doc.createElement('div');
-      node.id = id;
-      node.className = 'main-btn';
-      node.addEventListener('click', function () { post([verb]); });
-    }
-    if (node.textContent !== text) node.textContent = text;
-    return node;
-  }
-
-  function menuIsChinese(list) {
-    var exit = list.querySelector(':scope > .btn-exit');
-    return !!exit && /[一-鿿]/.test(exit.textContent || '');
-  }
-
-  function placePauseButtons(doc) {
-    var list = doc.querySelector('.menu-list');
-    var exit = list && list.querySelector(':scope > .btn-exit');
-    var open = doc.getElementById('slsb-pm-open');
-    var now = doc.getElementById('slsb-pm-now');
-    if (!exit) {
-      if (open) open.remove();
-      if (now) now.remove();
-      return;
-    }
-    if (!doc.getElementById('slsb-pm-style')) {
-      var style = doc.createElement('style');
-      style.id = 'slsb-pm-style';
-      style.textContent = PAUSE_CSS;
-      doc.head.appendChild(style);
-    }
-    var lang = menuIsChinese(list) ? 1 : 0;
-    var anchor = list.querySelector(':scope > #slnlp-end') || list.querySelector(':scope > .btn-restart') || exit;
-    open = pauseButton(doc, 'slsb-pm-open', TEXT.pauseOpen[lang], 'openinrun');
-    now = pauseButton(doc, 'slsb-pm-now', TEXT.pauseNow[lang], 'backupnow');
-    if (now.nextElementSibling !== anchor) list.insertBefore(now, anchor);
-    if (open.nextElementSibling !== now) list.insertBefore(open, now);
-  }
-
-  function patchPauseMenu() {
-    var frames = document.querySelectorAll('iframe');
-    for (var i = 0; i < frames.length; i++) {
-      if (!/OutSetting\.html/.test(frames[i].src || '')) continue;
-      var doc = null;
-      try { doc = frames[i].contentDocument; } catch (e) {}
-      if (!doc || !doc.body || !doc.head) continue;
-      if (!doc.slsbWatched && doc.defaultView && typeof doc.defaultView.MutationObserver !== 'undefined') {
-        doc.slsbWatched = true;
-        new doc.defaultView.MutationObserver(patchSafely).observe(doc.body, { childList: true, subtree: true });
-      }
-      placePauseButtons(doc);
-    }
-  }
-
-  function patchSafely() {
-    try { patchPauseMenu(); } catch (e) {}
-  }
-
-  setInterval(patchSafely, POLL_MS);
 
   // ---------- the plugin's side ----------
 

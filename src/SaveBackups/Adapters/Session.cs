@@ -336,8 +336,14 @@ internal sealed class Session
         }
     }
 
+    /// <summary>The pause menu's Back up now button: saves the run being played and backs it up.</summary>
+    public void BackUpFromPauseMenu()
+    {
+        if (_game.CurrentRun() != null) BackUpRunning(BackupKind.Manual, isAsked: true);
+    }
+
     /// <summary>From the pause menu's button: the manager over the run, with the run being played marked and kept safe.</summary>
-    private void OpenInRun()
+    public void OpenInRun()
     {
         var file = GameSaves.CurrentFile();
 

@@ -16,7 +16,7 @@ namespace SaveBackups;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.savebackups";
-    private const string Version = "0.3.0";
+    private const string Version = "0.3.1";
     private const long Megabyte = 1024L * 1024L;
 
     public override void Load()
@@ -196,11 +196,38 @@ public sealed class Plugin : BasePlugin
             keepMorning, keepQuit, keepRebirth, keepManual, keepSafety, keepExpedition, keepWave, keepEnding, keepTimer, keepAllDays, dailyDays, perLoop, maxTotal, binDays,
             replaceLoadScreen, warnWhenBehind, showGameSnapshots, autoToasts);
         session.Start();
+        AddPauseButtons(session);
         Ticker.Session = session;
         Ticker.Log = log.Write;
         Ticker.Quit = log.Finish;
         AddComponent<Ticker>();
     }
+
+    /// <summary>
+    /// Backups of this run and Back up now, at the bottom of the pause menu while a run is open. Exiled's Toolkit places
+    /// them with every other mod's menu buttons, so the menu fits on screen however many there are.
+    /// </summary>
+    private static void AddPauseButtons(Session session)
+    {
+        static bool IsInRun() => GameSaves.CurrentFile() != null;
+
+        ExiledToolkit.GameMenu.Add(new ExiledToolkit.GameMenuButton("savebackups.open", "Backups of this run", ExiledToolkit.GameMenuPlace.PauseBottom, session.OpenInRun)
+        {
+            ChineseLabel = "本局备份",
+            Order = 200,
+            Accent = Accent,
+            IsShown = IsInRun,
+        });
+        ExiledToolkit.GameMenu.Add(new ExiledToolkit.GameMenuButton("savebackups.now", "Back up now", ExiledToolkit.GameMenuPlace.PauseBottom, session.BackUpFromPauseMenu)
+        {
+            ChineseLabel = "立即备份",
+            Order = 210,
+            Accent = Accent,
+            IsShown = IsInRun,
+        });
+    }
+
+    private const string Accent = "#8fc7bf";
 
     private static ConfigEntry<int> Keep(ConfigFile config, string kind, int keep, string what, string whatZh) =>
         config.Bind("Keep", kind, keep,
