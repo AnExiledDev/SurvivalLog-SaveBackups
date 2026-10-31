@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.3
+
+- New look for the save manager, in the game's own font.
+- Each save shows its survivor, a status badge, loop and day, how many backups it has and when the last one was made.
+- Click a backup to see it on the right: its day, its note, its size, and the buttons for it.
+- A dot by each backup shows its kind, with a key above the list.
+- A bar under the list shows how much of the backup size limit is in use.
+- The save details no longer call the current day "played".
+- Made for Survival Log 1.1.20151.
+
 ## 0.2.2
 
 - 「Read save file」 on the title screen now opens the save manager instead of the game's own list.

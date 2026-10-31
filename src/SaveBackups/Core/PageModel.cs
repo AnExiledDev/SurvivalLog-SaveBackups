@@ -30,7 +30,8 @@ public sealed record Screen(
     string Folder,
     string BackupKey,
     bool IsChinese,
-    string GameVersion = "");
+    string GameVersion = "",
+    long LimitBytes = 0);
 
 /// <summary>
 /// The save manager's view as JSON, written straight from the screen. Each run lists its backups newest first and a
@@ -62,6 +63,7 @@ public static class PageModel
             json.WriteString("folder", screen.Folder);
             json.WriteString("version", screen.GameVersion);
             json.WriteNumber("bytes", screen.Backups.Sum(meta => meta.Bytes));
+            json.WriteNumber("limit", screen.LimitBytes);
             json.WriteStartArray("runs");
 
             var listed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

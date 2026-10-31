@@ -248,9 +248,10 @@ internal sealed class Session
         var key = _backupKey == KeyCode.None ? "" : _backupKey.ToString();
         var isChinese = GameLanguage.IsChinese();
         var version = _game.Version();
+        var limit = _settings.Limits.MaxTotalBytes;
 
         _worker.Run(
-            () => PageModel.Json(new Core.Screen(runs, store.All(), store.AllSettled(), store.Root, key, isChinese, version)),
+            () => PageModel.Json(new Core.Screen(runs, store.All(), store.AllSettled(), store.Root, key, isChinese, version, limit)),
             json =>
             {
                 if (!_isOpen) return;

@@ -11,7 +11,7 @@ The game keeps one copy of each save, and Steam Cloud can quietly put back an ol
 - **Save manager**: the Load button on the title screen opens a list of your saves with their backups, newest first, grouped by loop and day. **Load** starts the save, **Restore** puts a backup back, **Delete save** removes the save from the game's list. **Default list** opens the game's normal Load screen.
 - **Nothing is lost by a restore or a delete**: the save as it is gets a backup of its own first. If that backup cannot be made, nothing is changed.
 - **Deleted saves**: a deleted save keeps its backups under **Deleted saves**, and **Restore** on one of its backups puts it back in your list.
-- **More actions**: click a backup (or its **More** button) for **Copy as new save**, **Pin**, **Note**, **Export** and **Remove**.
+- **Backup actions**: click a backup to see it on the right, with **Restore**, **Copy as new save**, **Pin**, **Note**, **Export** and **Remove**.
 - **Copy as new save**: turns any backup, a deleted save's included, into a save of its own next to the original, named after it with the day it was copied from. The original save is not changed.
 - **Notes**: write a few words on any backup to tell it apart. Notes show under the backup and can be searched.
 - **Export and import**: **Export** writes a backup to one `.slsave` file in `SaveBackups\Exports`. To bring one in, put `.slsave` files in `SaveBackups\Import` and press **Import**; each shows up under its save as an imported backup, and the file moves to `Import\Imported`.
@@ -73,7 +73,7 @@ Settings live in `BepInEx\config\com.dev.survivallog.savebackups.cfg`, created t
 
 ## Troubleshooting
 
-Check `BepInEx\LogOutput.log` for `===== Save Backups 0.2.2 started`, followed by `backup key F8`. Every backup, restore and delete, and anything that went wrong, is in `BepInEx\save-backups.log`, which survives restarts.
+Check `BepInEx\LogOutput.log` for `===== Save Backups 0.2.3 started`, followed by `backup key F8`. Every backup, restore and delete, and anything that went wrong, is in `BepInEx\save-backups.log`, which survives restarts.
 
 If the Load button opens the game's list, check that `ReplaceLoadScreen` is `true`, and look in the log for a line starting with `could not hook`.
 

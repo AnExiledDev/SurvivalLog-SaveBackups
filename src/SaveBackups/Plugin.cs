@@ -15,7 +15,7 @@ namespace SaveBackups;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.savebackups";
-    private const string Version = "0.2.2";
+    private const string Version = "0.2.3";
     private const long Megabyte = 1024L * 1024L;
 
     public override void Load()

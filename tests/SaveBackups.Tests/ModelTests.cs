@@ -42,6 +42,14 @@ public sealed class ModelTests
     }
 
     [Fact]
+    public void The_page_gets_the_size_limit_so_the_storage_bar_can_show_how_full_it_is()
+    {
+        var screen = new Screen(new[] { View("Save_A", 1, 3) }, Array.Empty<BackupMeta>(), new Dictionary<string, DateTime>(), "/b", "F8", false, "1.1", 2048L * 1024 * 1024);
+
+        Assert.Equal(2048L * 1024 * 1024, Json(screen).GetProperty("limit").GetInt64());
+    }
+
+    [Fact]
     public void A_morning_backup_of_a_day_already_backed_up_is_a_repeat()
     {
         var existing = new[] { Make.Backup(BackupKind.Morning, 1, turn: 2, day: 4) };
