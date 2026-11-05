@@ -5,6 +5,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using ExiledToolkit;
+using ExiledToolkit.Game;
+using ExiledToolkit.Kit;
+using ExiledToolkit.Web;
 using GameCore.HotUpdate;
 using GameCore.HotUpdate.ReduxUI;
 using SaveBackups.Core;
@@ -24,6 +27,12 @@ internal sealed class Session
 
     private static readonly TimeSpan QuitWait = TimeSpan.FromSeconds(8);
     private static readonly Func<KeyCode, bool> IsKeyDown = Input.GetKeyDown;
+
+    /// <summary>Whether a text box in any page or mod window has the keyboard. Cached, so a key check allocates nothing.</summary>
+    private static readonly Func<bool> IsTyping = () => Typing.IsActive;
+
+    /// <summary>The name the save manager holds the game's hotkeys under while it is open.</summary>
+    private const string HotkeyHolder = "SaveBackups.manager";
 
     /// <summary>How often play time is counted, and how often what was counted is written to the run's note.</summary>
     private const double PlayCheckSeconds = 1;
@@ -46,6 +55,7 @@ internal sealed class Session
     private readonly Func<IReadOnlyDictionary<string, string>> _settingValues;
     private readonly HashSet<string> _warnedBehind = new(StringComparer.OrdinalIgnoreCase);
     private readonly WebKeyboard _keyboard = new();
+    private readonly PageMailbox _inbox = PageInbox.Listen(PageCommand.Prefix);
 
     private Settings _settings;
     private BackupStore _store;
@@ -128,7 +138,7 @@ internal sealed class Session
         if (!Input.anyKeyDown) return;
         if (_isOpen && !_keyboard.IsClaimed && Input.GetKeyDown(KeyCode.Escape)) _page.Escape();
         // A key typed into a text box, here or in another mod's window, is text, not a backup.
-        if (KeyGate.Fires(_backupKey, KeyCode.None, IsKeyDown, OptionalLive.IsTyping) && _game.CurrentRun() != null) BackUpRunning(BackupKind.Manual, isAsked: true);
+        if (KeyGate.Fires(_backupKey, KeyCode.None, IsKeyDown, IsTyping) && _game.CurrentRun() != null) BackUpRunning(BackupKind.Manual, isAsked: true);
     }
 
     /// <summary>
@@ -318,7 +328,7 @@ internal sealed class Session
 
         _mainState = state;
         _isOpen = true;
-        HotkeyGate.MenuOpened();
+        HotkeyGate.Hold(HotkeyHolder);
         Refresh(isOpening: true);
 
         return true;
@@ -352,7 +362,7 @@ internal sealed class Session
         _inRunStem = RunFiles.Stem(file);
         _mainState = null;
         _isOpen = true;
-        HotkeyGate.MenuOpened();
+        HotkeyGate.Hold(HotkeyHolder);
         Refresh(isOpening: true);
     }
 
@@ -361,7 +371,7 @@ internal sealed class Session
         _keyboard.Release();
         _isOpen = false;
         _inRunStem = "";
-        HotkeyGate.MenuClosed();
+        HotkeyGate.Release(HotkeyHolder);
         _page.Close();
     }
 
@@ -666,8 +676,10 @@ internal sealed class Session
 
     private void TakePageCommands()
     {
-        while (PageMessages.TryTake(out var command))
+        while (_inbox.TryTake(out var message))
         {
+            var command = PageCommand.Parse(message);
+
             try
             {
                 Handle(command);
@@ -694,7 +706,7 @@ internal sealed class Session
                 if (_isOpen)
                 {
                     _isOpen = false;
-                    HotkeyGate.MenuClosed();
+                    HotkeyGate.Release(HotkeyHolder);
                 }
 
                 break;

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2
+
+- Now uses Exiled's Toolkit for its shared parts, so it needs Exiled's Toolkit 0.19.0 or newer.
+- Made for Survival Log 1.1.20719.
+
 ## 0.3.1
 
 - 「Backups of this run」 and 「Back up now」 in the pause menu are now placed by Exiled's Toolkit, along with every other mod's menu buttons. The pause menu no longer runs off the screen when several mods add buttons to it.

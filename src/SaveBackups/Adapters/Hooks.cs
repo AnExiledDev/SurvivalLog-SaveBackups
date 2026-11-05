@@ -1,8 +1,8 @@
 using System;
+using ExiledToolkit.Game;
 using GameCore.HotUpdate;
 using GameCore.HotUpdate.Battle.Logic;
 using GameCore.HotUpdate.ReduxUI;
-using HarmonyLib;
 using Il2CppInterop.Runtime;
 
 namespace SaveBackups.Adapters;
@@ -13,42 +13,32 @@ namespace SaveBackups.Adapters;
 /// </summary>
 internal static class Hooks
 {
-    internal static Session? Session;
-    private static Action<string> _log = _ => { };
-    private static bool _hasReportedFailure;
+    /// <summary>One line for every hook's failure: they all fail the same way, the game carrying on without the mod.</summary>
+    private const string HookRun = "running a save hook, the game carried on without the mod";
 
-    public static void Apply(Harmony harmony, Action<string> log)
+    internal static Session? Session;
+    private static PatchKit? _hooks;
+
+    public static void Apply(PatchKit hooks)
     {
-        _log = log;
-        Patch(harmony, typeof(CountUpTimer), "CaptureRebirthDaySnapshot", null, nameof(AfterMorningSave), "morning backups are not made");
-        Patch(harmony, typeof(GameSaveManager), "BattleToMain", nameof(BeforeLeaveRun), nameof(AfterLeaveRun), "backups on quit to title are not made");
-        Patch(harmony, typeof(GameSaveManager), "OnApplicationQuitInternal", nameof(BeforeLeaveRun), nameof(AfterGameQuit), "backups on game quit are not made");
-        Patch(harmony, typeof(GameSaveManager), "TryBeginMinorRebirth", nameof(BeforeRebirth), null, "backups before a rebirth are not made");
-        Patch(harmony, typeof(ExploreManager), "OnCheckAndGo", nameof(BeforeExpedition), null, "backups before an expedition are not made");
-        Patch(harmony, typeof(TowerWaveManager), "StartWave", nameof(BeforeWave), null, "backups before a zombie wave are not made");
+        _hooks = hooks;
+        Patch(typeof(CountUpTimer), "CaptureRebirthDaySnapshot", null, nameof(AfterMorningSave), "morning backups are not made");
+        Patch(typeof(GameSaveManager), "BattleToMain", nameof(BeforeLeaveRun), nameof(AfterLeaveRun), "backups on quit to title are not made");
+        Patch(typeof(GameSaveManager), "OnApplicationQuitInternal", nameof(BeforeLeaveRun), nameof(AfterGameQuit), "backups on game quit are not made");
+        Patch(typeof(GameSaveManager), "TryBeginMinorRebirth", nameof(BeforeRebirth), null, "backups before a rebirth are not made");
+        Patch(typeof(ExploreManager), "OnCheckAndGo", nameof(BeforeExpedition), null, "backups before an expedition are not made");
+        Patch(typeof(TowerWaveManager), "StartWave", nameof(BeforeWave), null, "backups before a zombie wave are not made");
 
         // The ending choice is saved inside each ending line's confirm step (MarkPendingEndingChoice cannot be hooked).
-        Patch(harmony, typeof(LineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at an ending are not made");
-        Patch(harmony, typeof(GirlLineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at the girl line's ending are not made");
-        Patch(harmony, typeof(WarehouseLineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at the warehouse line's ending are not made");
+        Patch(typeof(LineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at an ending are not made");
+        Patch(typeof(GirlLineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at the girl line's ending are not made");
+        Patch(typeof(WarehouseLineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at the warehouse line's ending are not made");
         // RA_LoadGame is compiled into Trigger_RA_LoadGame, so a patch on RA_LoadGame itself never runs.
-        Patch(harmony, typeof(Reducer_Web_MainUI), "Trigger_RA_LoadGame", nameof(OnLoadButton), null, "the Load button opens the game's own list");
+        Patch(typeof(Reducer_Web_MainUI), "Trigger_RA_LoadGame", nameof(OnLoadButton), null, "the Load button opens the game's own list");
     }
 
-    private static void Patch(Harmony harmony, Type type, string method, string? prefix, string? postfix, string without)
-    {
-        try
-        {
-            harmony.Patch(
-                AccessTools.Method(type, method),
-                prefix: prefix == null ? null : new HarmonyMethod(typeof(Hooks), prefix),
-                postfix: postfix == null ? null : new HarmonyMethod(typeof(Hooks), postfix));
-        }
-        catch (Exception ex)
-        {
-            _log($"could not hook {type.Name}.{method}, {without}: {ex.Message}");
-        }
-    }
+    private static void Patch(Type type, string method, string? prefix, string? postfix, string without) =>
+        _hooks?.Patch(typeof(Hooks), type, method, prefix: prefix, postfix: postfix, consequence: without);
 
     private static void AfterMorningSave() => Guard(() => Session?.MorningSaved());
 
@@ -115,11 +105,5 @@ internal static class Hooks
         }
     }
 
-    private static void ReportOnce(Exception ex)
-    {
-        if (_hasReportedFailure) return;
-
-        _hasReportedFailure = true;
-        _log("a save hook failed, the game carried on without the mod (reported once): " + ex);
-    }
+    private static void ReportOnce(Exception ex) => _hooks?.Fail(HookRun, ex);
 }

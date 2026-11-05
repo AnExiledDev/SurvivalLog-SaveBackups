@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ExiledToolkit.Game;
+using ExiledToolkit.Kit;
 using GameCore.HotUpdate;
 using SaveBackups.Core;
 
@@ -315,22 +317,8 @@ internal static class SaveReader
         }
     }
 
-    /// <summary>The game answers a key it has no text for with the key itself.</summary>
-    private static string? Text(ConfigManager config, string? key, LanguageType language)
-    {
-        if (string.IsNullOrEmpty(key)) return null;
+    /// <summary>The game's text for a key in one language, trimmed for the page; null when it has none.</summary>
+    private static string? Text(ConfigManager config, string? key, LanguageType language) => GameNames.Translate(config, key, language)?.Trim();
 
-        try
-        {
-            var text = config.GetLocalTxtByLanguage(key, language);
-
-            return string.IsNullOrWhiteSpace(text) || text == key ? null : text.Trim();
-        }
-        catch (Exception)
-        {
-            return null;
-        }
-    }
-
-    private static string? NonEmpty(string? text) => string.IsNullOrWhiteSpace(text) ? null : text.Trim();
+    private static string? NonEmpty(string? text) => GameNames.NonEmpty(text)?.Trim();
 }

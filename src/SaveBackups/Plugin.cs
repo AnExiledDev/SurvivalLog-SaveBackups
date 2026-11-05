@@ -4,6 +4,9 @@ using System.IO;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
+using ExiledToolkit;
+using ExiledToolkit.Game;
+using ExiledToolkit.Kit;
 using HarmonyLib;
 using SaveBackups.Adapters;
 using SaveBackups.Core;
@@ -12,12 +15,16 @@ using UnityEngine;
 namespace SaveBackups;
 
 [BepInPlugin(Guid, "Save Backups", Version)]
-[BepInDependency(OptionalLive.ToolkitGuid, OptionalLive.ToolkitVersion)]
+[BepInDependency(ToolkitGuid, ToolkitVersion)]
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.savebackups";
-    private const string Version = "0.3.1";
+    private const string Version = "0.3.2";
     private const long Megabyte = 1024L * 1024L;
+
+    /// <summary>Exiled's Toolkit: its shared helpers, toasts, live settings, typing watch and pause menu buttons all come from it.</summary>
+    private const string ToolkitGuid = "com.dev.survivallog.exiledtoolkit";
+    private const string ToolkitVersion = ">=0.19.0";
 
     public override void Load()
     {
@@ -99,8 +106,8 @@ public sealed class Plugin : BasePlugin
             "Show a message for every automatic backup, not only for the ones you make.\n" +
             "每次自动备份都显示提示，而不仅是手动备份。");
 
-        var log = new ModLog(Log, Path.Combine(Paths.BepInExRootPath, "save-backups.log"));
-        var harmony = new Harmony(Guid);
+        var log = new ModLog(Log, "save-backups.log");
+        var hooks = new PatchKit(new Harmony(Guid), log.Write);
         var worker = new DiskWorker("SaveBackups disk");
 
         Settings Read() => new(
@@ -182,16 +189,14 @@ public sealed class Plugin : BasePlugin
         var session = new Session(new GameSaves(), new WebPage(log.Write), worker, Read(), log.Write, SetSetting, SettingValues);
 
         log.Write($"===== Save Backups {Version} started");
-        PageMessages.Apply(harmony, log.Write);
-        HotkeyGate.Apply(harmony, log.Write);
         Hooks.Session = session;
-        Hooks.Apply(harmony, log.Write);
-        OptionalLive.Watch(backupKey, key =>
+        Hooks.Apply(hooks);
+        LiveSettings.Watch(backupKey, key =>
         {
             session.UseKey(key);
             log.Write($"backup key {key}");
         });
-        OptionalLive.Watch(() => session.UseSettings(Read()),
+        LiveSettings.Watch(() => session.UseSettings(Read()),
             folder, secondFolder, onMorning, onQuit, beforeRebirth, beforeExpedition, beforeWave, atEnding, onTimer, timerMinutes, takePictures, verify,
             keepMorning, keepQuit, keepRebirth, keepManual, keepSafety, keepExpedition, keepWave, keepEnding, keepTimer, keepAllDays, dailyDays, perLoop, maxTotal, binDays,
             replaceLoadScreen, warnWhenBehind, showGameSnapshots, autoToasts);
@@ -199,7 +204,7 @@ public sealed class Plugin : BasePlugin
         AddPauseButtons(session);
         Ticker.Session = session;
         Ticker.Log = log.Write;
-        Ticker.Quit = log.Finish;
+        Ticker.Quit = log.Flush;
         AddComponent<Ticker>();
     }
 

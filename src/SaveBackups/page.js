@@ -1,8 +1,9 @@
 // Save Backups' web half. Runs in Root.html, the document every game page iframe sits in. Draws the save manager over
 // the title screen (or over a run, from the pause menu) when the plugin opens it. The pause menu's "Backups of this
-// run" and "Back up now" buttons are placed by Exiled's Toolkit, from the plugin. Talks to the plugin through vuplex.postMessage("slmod|savebackups|<verb>")
-// and is driven by window.__slsavebackups. Every step that changes a save waits for the plugin: the page takes no
-// clicks until the plugin sends the new view (show) or says the step is over (done).
+// run" and "Back up now" buttons are placed by Exiled's Toolkit, from the plugin. Talks to the plugin through Exiled's
+// Toolkit's page API ("slmod|savebackups|<verb>") and is driven by window.__slsavebackups. Every step that changes a
+// save waits for the plugin: the page takes no clicks until the plugin sends the new view (show) or says the step is
+// over (done).
 (function () {
   if (window.__slsavebackups) return;
 
@@ -417,8 +418,13 @@
   var pageEscAt = 0;
   var drafts = {};
 
+  // The Toolkit's page API (window.ExiledToolkit). The game can run its script after this one, so this stays null
+  // until it has; the page says it is ready only then, so the plugin opens nothing before.
+  var etk = null;
+
+  // Through the Toolkit's bridge. Nothing goes before its page API is there.
   function post(parts) {
-    if (window.vuplex) window.vuplex.postMessage(PREFIX + parts.join('|'));
+    if (etk) etk.send(PREFIX, parts.join('|'));
   }
 
   function step(parts) {
@@ -426,15 +432,6 @@
     var box = document.querySelector('#' + ROOT_ID + ' .slsb');
     if (box) box.classList.add('busy');
     post(parts);
-  }
-
-  // The Toolkit's shared sizing, or a queue it picks up once it loads.
-  function uiSize(node, options) {
-    var ui = window.ExiledUi;
-    if (ui) { ui.size(node, options); return; }
-    var waiting = window.__exiledUiWait = window.__exiledUiWait || [];
-    waiting.push([node, options]);
-    if (waiting.length > 32) waiting.shift();
   }
 
   function isZh() {
@@ -1212,11 +1209,7 @@
   }
 
   function ensureStyle() {
-    if (document.getElementById(ROOT_ID + '-css')) return;
-    var style = document.createElement('style');
-    style.id = ROOT_ID + '-css';
-    style.textContent = fontFaces() + CSS;
-    (document.head || document.documentElement).appendChild(style);
+    etk.addStyle(document, ROOT_ID + '-css', fontFaces() + CSS);
   }
 
   var SCROLLERS = ['.list', '.pts', '.pv', '.set', '.trash', '.mbd'];
@@ -1268,7 +1261,7 @@
       } catch (e) {}
     }
     if (!isTextBox(document.activeElement)) typing(false);
-    uiSize(root, { fit: root.querySelector('.slsb') });
+    etk.size(root, { fit: root.querySelector('.slsb') });
     if (tab === 'saves') askDetail(run);
   }
 
@@ -1588,5 +1581,9 @@
     }
   };
 
-  post(['ready']);
+  // Runs once the Toolkit's page API is there: at once when its script ran first, else when it runs.
+  (window.ExiledToolkitReady = window.ExiledToolkitReady || []).push(function (api) {
+    etk = api;
+    post(['ready']);
+  });
 })();

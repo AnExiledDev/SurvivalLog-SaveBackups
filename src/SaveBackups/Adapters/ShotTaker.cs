@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using ExiledToolkit.Game;
 using GameCore.HotUpdate;
 using GameCore.HotUpdate.Battle.Show;
 using Il2CppInterop.Runtime;

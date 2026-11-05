@@ -1,10 +1,6 @@
-namespace SaveBackups.Core;
+using ExiledToolkit.Kit;
 
-/// <summary>One piece of on-screen text in the two languages the game ships.</summary>
-public readonly record struct Phrase(string En, string Zh)
-{
-    public string Pick(bool isChinese) => isChinese ? Zh : En;
-}
+namespace SaveBackups.Core;
 
 /// <summary>The words of the mod's toasts. The save manager's own words are in page.js.</summary>
 public static class Texts
