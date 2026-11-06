@@ -409,6 +409,9 @@ internal sealed class Session
         // The game's table is read once it has loaded; an empty answer is asked again next time.
         if (_survivors == null || _survivors.Count == 0) _survivors = SaveReader.Survivors();
 
+        // Item pictures for the compare view; the first call starts the walk of the game's icon folder on a worker.
+        WebIcons.StartScan();
+
         var survivors = _survivors;
 
         _worker.Run(
@@ -558,7 +561,7 @@ internal sealed class Session
         var second = _settings.SecondFolder;
         var isCurrent = string.Equals(GameSaves.CurrentFile(), facts.FileName, StringComparison.OrdinalIgnoreCase);
         var noShot = "";
-        byte[]? shot = null;
+        Shot? shot = null;
 
         if (_settings.TakePictures)
         {
@@ -575,7 +578,7 @@ internal sealed class Session
             {
                 if (Repeats.IsRepeat(kind, facts.Progress, store.Of(stem), DateTime.UtcNow)) return (Made: (Result<BackupMeta>?)null, Mirror: (Result<int>?)null);
 
-                var made = store.Create(saveFolder, facts, kind, version, dayText, shot, verify, stats);
+                var made = store.Create(saveFolder, facts, kind, version, dayText, shot?.Small, verify, stats, shot?.Large);
                 Result<int>? mirror = null;
 
                 if (made is Result<BackupMeta>.Done done)
@@ -1379,14 +1382,14 @@ internal sealed class Session
                 if (now == null && saveFolder != null && listed != null) now = SaveReader.OfFile(Path.Combine(saveFolder, RunFiles.MainFile(stem)));
 
                 var snaps = _settings.ShowGameSnapshots && saveFolder != null && listed != null
-                    ? SaveReader.Snaps(saveFolder, stem, listed.Progress.Turn)
+                    ? SaveReader.Snaps(saveFolder, stem, listed.Progress.Turn, now?.PlanningPoints ?? 0)
                     : new List<GameSnap>();
                 var ids = new HashSet<int>();
 
                 foreach (var stats in shown.Select(meta => meta.Stats).Append(now).Concat(snaps.Select(snap => snap.Stats)))
                     if (stats != null) ids.UnionWith(stats.Items.Keys);
 
-                _page.Detail(PageModel.Detail(new RunDetail(stem, now, shown, snaps, SaveReader.Photos(stem), SaveReader.ItemNames(ids))));
+                _page.Detail(PageModel.Detail(new RunDetail(stem, now, shown, snaps, SaveReader.Photos(stem), SaveReader.Items(ids))));
 
                 if (filled.Count == 0) return;
 

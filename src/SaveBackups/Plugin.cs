@@ -19,7 +19,7 @@ namespace SaveBackups;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.savebackups";
-    private const string Version = "0.3.2";
+    private const string Version = "0.4.0";
     private const long Megabyte = 1024L * 1024L;
 
     /// <summary>Exiled's Toolkit: its shared helpers, toasts, live settings, typing watch and pause menu buttons all come from it.</summary>
@@ -82,20 +82,20 @@ public sealed class Plugin : BasePlugin
             "Every backup of the last this many days of play is kept. Older automatic backups are thinned to one a day (see DailyDays). 0 turns thinning off.\n" +
             "最近这么多个游戏日的备份全部保留。更早的自动备份会精简为每天一个（见 DailyDays）。设为 0 表示不精简。");
         var dailyDays = Config.Bind("Keep", "DailyDays", 14,
-            "After KeepAllDays, one backup a day is kept for this many more days of play; older ones keep one per loop when PerLoop is on. Thinned backups go to the bin.\n" +
+            "After KeepAllDays, one backup a day is kept for this many more days of play; older ones keep one per loop when PerLoop is on. Thinned backups go to the trash.\n" +
             "超过 KeepAllDays 之后，再往前这么多个游戏日每天保留一个备份；更早的在开启 PerLoop 时每个轮回保留一个。被精简的备份会进入回收站。");
         var perLoop = Config.Bind("Keep", "PerLoop", true,
             "Past DailyDays, keep the last backup of each loop. False lets the per-kind limits take them.\n" +
             "超过 DailyDays 后，保留每个轮回的最后一个备份。设为 false 则交给各类备份的数量上限处理。");
         var maxTotal = Config.Bind("Keep", "MaxTotalMB", 2048,
-            "Most space all backups and the bin together may take, in MB. Past it, the bin is emptied oldest first, then the oldest backups go, automatic ones before your own. Pinned backups and each run's newest backup are always kept. 0 means no limit.\n" +
+            "Most space all backups and the trash together may take, in MB. Past it, the trash is emptied oldest first, then the oldest backups go, automatic ones before your own. Pinned backups and each run's newest backup are always kept. 0 means no limit.\n" +
             "所有备份和回收站合计最多占用的空间（MB）。超出后先从最旧的开始清空回收站，再删除最旧的备份，自动备份先于手动备份。已固定的备份和每个存档最新的备份始终保留。设为 0 表示不限制。");
-        var binDays = Config.Bind("Keep", "BinDays", 30,
-            "Days a removed backup, or a deleted save's backups, stay in the bin before they are deleted for good. 0 keeps them until you empty the bin.\n" +
+        var binDays = Config.Bind("Keep", "TrashDays", 30,
+            "Days a removed backup, or a deleted save's backups, stay in the trash before they are deleted for good. 0 keeps them until you empty the trash.\n" +
             "被移除的备份以及已删除存档的备份在回收站中保留的天数，之后永久删除。设为 0 表示一直保留，直到手动清空回收站。");
         var replaceLoadScreen = Config.Bind("Screen", "ReplaceLoadScreen", true,
-            "The title screen's Load button opens the save manager, with every save's backups. Its Game's own list button opens the game's list. False keeps the game's list.\n" +
-            "标题画面的「读取存档」按钮会打开存档管理，显示每个存档的备份。其中的「游戏原版列表」按钮可打开游戏原本的列表。设为 false 则使用游戏原本的列表。");
+            "The title screen's Load button opens the save manager, with every save's backups. Its Default Load screen button opens the game's own list. False keeps the game's list.\n" +
+            "标题画面的「读取存档」按钮会打开存档管理，显示每个存档的备份。其中的「默认读取画面」按钮可打开游戏原本的列表。设为 false 则使用游戏原本的列表。");
         var warnWhenBehind = Config.Bind("Screen", "WarnWhenBehind", true,
             "Warn on the title screen when a save is older than its last backup, as when Steam Cloud put back an older copy.\n" +
             "当某个存档比它最近的备份更旧时（例如 Steam 云同步换回了旧存档），在标题画面提醒。");
@@ -236,6 +236,6 @@ public sealed class Plugin : BasePlugin
 
     private static ConfigEntry<int> Keep(ConfigFile config, string kind, int keep, string what, string whatZh) =>
         config.Bind("Keep", kind, keep,
-            $"How many {what} each save keeps. Older ones go to the bin when a new one is made; pinned backups do not count. 0 means keep them all.\n" +
+            $"How many {what} each save keeps. Older ones go to the trash when a new one is made; pinned backups do not count. 0 means keep them all.\n" +
             $"每个存档保留多少个{whatZh}。新备份完成后，更旧的会进入回收站，已固定的备份不计入。设为 0 表示全部保留。");
 }

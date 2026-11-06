@@ -21,9 +21,9 @@ public sealed class LibraryTests : IDisposable
 
     public void Dispose() => _dirs.Dispose();
 
-    private BackupMeta Create(BackupKind kind = BackupKind.Morning, int turn = 1, int day = 3, byte[]? shot = null)
+    private BackupMeta Create(BackupKind kind = BackupKind.Morning, int turn = 1, int day = 3, byte[]? shot = null, byte[]? largeShot = null)
     {
-        var made = _store.Create(_dirs.Saves, Make.Run(turn: turn, day: day), kind, "1.1.19611", shot: shot);
+        var made = _store.Create(_dirs.Saves, Make.Run(turn: turn, day: day), kind, "1.1.19611", shot: shot, largeShot: largeShot);
 
         _now = _now.AddMinutes(1);
 
@@ -31,6 +31,26 @@ public sealed class LibraryTests : IDisposable
     }
 
     private static Limits NoLimits => new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+    // ===== Pictures =====
+
+    [Fact]
+    public void A_backup_keeps_its_full_size_picture_beside_the_small_one()
+    {
+        var meta = Create(shot: new byte[] { 1 }, largeShot: new byte[] { 2, 2 });
+        var folder = Path.Combine(_dirs.Backups, "Save_A", meta.Id);
+
+        Assert.Equal(new byte[] { 2, 2 }, File.ReadAllBytes(Path.Combine(folder, BackupStore.LargeShotFile)));
+        Assert.Equal(new byte[] { 1 }, File.ReadAllBytes(Path.Combine(folder, BackupStore.ShotFile)));
+    }
+
+    [Fact]
+    public void A_full_size_picture_without_the_small_one_is_not_kept()
+    {
+        var meta = Create(largeShot: new byte[] { 2 });
+
+        Assert.False(File.Exists(Path.Combine(_dirs.Backups, "Save_A", meta.Id, BackupStore.LargeShotFile)));
+    }
 
     // ===== Recycle bin =====
 
@@ -284,17 +304,26 @@ public sealed class LibraryTests : IDisposable
     [Fact]
     public void Stats_round_trip_through_backup_json_and_item_changes_are_biggest_first()
     {
-        var then = new SaveStats(new Meter(80, 100), new Meter(50, 100), new Meter(60, 100), new Meter(30, 100), 120, 4, new Dictionary<int, int> { [1] = 5, [2] = 10 }, "Rain");
+        var then = new SaveStats(new Meter(80, 100), new Meter(50, 100), new Meter(60, 100), new Meter(30, 100), 120, 4, new Dictionary<int, int> { [1] = 5, [2] = 10 });
         var now = then with { Items = new Dictionary<int, int> { [1] = 4, [3] = 7 } };
         var meta = Make.Backup(BackupKind.Morning, 1) with { Stats = then };
 
         var read = BackupMeta.Parse(meta.Id, meta.Stem, meta.ToJson())!.Stats!;
 
         Assert.Equal(new Meter(80, 100), read.Health);
-        Assert.Equal(120, read.Money);
+        Assert.Equal(new Meter(50, 100), read.Satiety);
+        Assert.Equal(120, read.PlanningPoints);
+        Assert.Equal(4, read.SurvivalPoints);
         Assert.Equal(15, read.ItemTotal);
-        Assert.Equal("Rain", read.Journal);
         Assert.Equal(new[] { (2, -10), (3, 7), (1, -1) }, SaveStats.ItemChanges(then, now));
+    }
+
+    [Fact]
+    public void Stats_kept_before_Planning_Points_were_read_count_as_unread_so_the_backup_is_read_again()
+    {
+        const string older = "{\"stats\":{\"health\":[80,100],\"fullness\":[50,100],\"money\":120,\"points\":4,\"items\":{\"1\":5},\"journal\":\"Rain\"}}";
+
+        Assert.Null(SaveStats.Read(JsonDocument.Parse(older).RootElement, "stats"));
     }
 
     [Theory]
@@ -312,13 +341,13 @@ public sealed class LibraryTests : IDisposable
     [Fact]
     public void The_view_carries_portraits_stars_notes_pictures_and_stats()
     {
-        var stats = new SaveStats(new Meter(80, 100), default, default, default, 5, 2, new Dictionary<int, int> { [1] = 3 }, "");
+        var stats = new SaveStats(new Meter(80, 100), new Meter(40, 100), default, default, 5, 2, new Dictionary<int, int> { [1] = 3 });
         var meta = Create(shot: new byte[] { 1 }) with { Stats = stats };
         var screen = new Screen(new[] { View("Save_A") }, new[] { _store.Of("Save_A")[0] with { Stats = stats } }, new Dictionary<string, DateTime>(), "/b", "F8", false)
         {
             Notes = new Dictionary<string, RunNote> { ["Save_A"] = RunNote.Empty with { IsPinned = true, Note = "hi", PlayedSeconds = 90 } },
             Survivors = new Dictionary<int, Survivor> { [4] = new("Ruth", "露丝", "Portrait_Player4.webp", "BackGround_Player4.jpg") },
-            Settings = new Dictionary<string, string> { ["Keep.BinDays"] = "30", ["Not.Listed"] = "x" },
+            Settings = new Dictionary<string, string> { ["Keep.TrashDays"] = "30", ["Not.Listed"] = "x" },
             Disk = new Dictionary<string, SaveDisk> { ["Save_A"] = new(4096, _now.AddHours(-2)) },
             NowUtc = _now,
             InRunStem = "Save_A",
@@ -341,7 +370,11 @@ public sealed class LibraryTests : IDisposable
         Assert.True(backup.GetProperty("auto").GetBoolean());
         Assert.Equal(80, backup.GetProperty("stats").GetProperty("health")[0].GetInt32());
         Assert.Equal(3, backup.GetProperty("stats").GetProperty("items").GetInt32());
-        Assert.Equal("30", root.GetProperty("settings").GetProperty("Keep.BinDays").GetString());
+        Assert.Equal(40, backup.GetProperty("stats").GetProperty("satiety")[0].GetInt32());
+        Assert.Equal(5, backup.GetProperty("stats").GetProperty("planning").GetInt32());
+        Assert.Equal(2, backup.GetProperty("stats").GetProperty("survival").GetInt32());
+        Assert.False(backup.GetProperty("stats").TryGetProperty("money", out _));
+        Assert.Equal("30", root.GetProperty("settings").GetProperty("Keep.TrashDays").GetString());
         Assert.False(root.GetProperty("settings").TryGetProperty("Not.Listed", out _));
         Assert.Equal(meta.Id, backup.GetProperty("id").GetString());
     }
@@ -371,7 +404,7 @@ public sealed class LibraryTests : IDisposable
     [Fact]
     public void The_detail_lists_items_per_save_with_their_names_and_the_games_snapshots()
     {
-        var stats = new SaveStats(default, default, default, default, 0, 0, new Dictionary<int, int> { [7] = 2 }, "");
+        var stats = new SaveStats(default, default, default, default, 0, 0, new Dictionary<int, int> { [7] = 2 });
         var meta = Make.Backup(BackupKind.Morning, 1) with { Stats = stats };
         var detail = new RunDetail(
             "Save_A",
@@ -379,7 +412,7 @@ public sealed class LibraryTests : IDisposable
             new[] { meta, Make.Backup(BackupKind.Quit, 2) },
             new[] { new GameSnap("Save_A.snap1.bytes", false, new Progress(1, 4, 0), 100, Make.Start, null) },
             new[] { "file:///photo.jpg" },
-            new Dictionary<int, Phrase> { [7] = new("Wood", "木头") });
+            new Dictionary<int, ItemInfo> { [7] = new("Wood", "木头", "Res/Item/wood.png") });
 
         var root = JsonDocument.Parse(PageModel.Detail(detail)).RootElement;
 
@@ -387,6 +420,7 @@ public sealed class LibraryTests : IDisposable
         Assert.Equal(2, root.GetProperty("items").GetProperty(meta.Id).GetProperty("7").GetInt32());
         Assert.Equal(1, root.GetProperty("items").EnumerateObject().Count());
         Assert.Equal("木头", root.GetProperty("names").GetProperty("7")[1].GetString());
+        Assert.Equal("Res/Item/wood.png", root.GetProperty("names").GetProperty("7")[2].GetString());
         Assert.Equal(5, root.GetProperty("snaps")[0].GetProperty("day").GetInt32());
         Assert.Equal("file:///photo.jpg", root.GetProperty("photos")[0].GetString());
     }

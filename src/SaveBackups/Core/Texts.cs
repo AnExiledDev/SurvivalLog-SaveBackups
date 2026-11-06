@@ -52,7 +52,7 @@ public static class Texts
 
     public static readonly Phrase BinDeleted = new("Deleted for good.", "已永久删除。");
 
-    public static readonly Phrase BinEmptied = new("The bin is empty. {0} backup(s) deleted for good.", "回收站已清空，永久删除了 {0} 个备份。");
+    public static readonly Phrase BinEmptied = new("The trash is empty. {0} backup(s) deleted for good.", "回收站已清空，永久删除了 {0} 个备份。");
 
     public static readonly Phrase SettingRefused = new("That setting could not be changed: {0}", "无法修改这项设置：{0}");
 

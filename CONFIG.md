@@ -29,7 +29,7 @@ The value is a Unity key name, for example `F8`, `F11`, `Insert` or `Keypad5`.
 
 ## Keep
 
-How many backups of each kind every save keeps, and how older ones are thinned. Imported backups are never removed by these counts. When a new backup is made, older ones of the same kind go to the bin. Pinned backups are never removed and do not count. `0` keeps them all.
+How many backups of each kind every save keeps, and how older ones are thinned. Imported backups are never removed by these counts. When a new backup is made, older ones of the same kind go to the trash. Pinned backups are never removed and do not count. `0` keeps them all.
 
 | Setting | Default | What it does |
 | --- | --- | --- |
@@ -43,16 +43,16 @@ How many backups of each kind every save keeps, and how older ones are thinned. 
 | `Ending` | `3` | Backups made at an ending. |
 | `Timer` | `6` | Timer backups. |
 | `KeepAllDays` | `3` | Every backup of the last this many days of play is kept. Older automatic backups are thinned to one a day. `0` turns thinning off. |
-| `DailyDays` | `14` | After `KeepAllDays`, one backup a day is kept for this many more days of play. Thinned backups go to the bin. |
+| `DailyDays` | `14` | After `KeepAllDays`, one backup a day is kept for this many more days of play. Thinned backups go to the trash. |
 | `PerLoop` | `true` | Past `DailyDays`, keep the last backup of each loop. `false` lets the counts above take them. |
-| `MaxTotalMB` | `2048` | Most space all backups and the bin together may take, in MB. Past it, the bin is emptied oldest first, then the oldest backups go, automatic ones before your own. Pinned backups and each save's newest backup are always kept. `0` means no limit. |
-| `BinDays` | `30` | Days a removed backup, or a deleted save's backups, stay in the bin before they are deleted for good. `0` keeps them until you empty the bin. |
+| `MaxTotalMB` | `2048` | Most space all backups and the trash together may take, in MB. Past it, the trash is emptied oldest first, then the oldest backups go, automatic ones before your own. Pinned backups and each save's newest backup are always kept. `0` means no limit. |
+| `TrashDays` | `30` | Days a removed backup, or a deleted save's backups, stay in the trash before they are deleted for good. `0` keeps them until you empty the trash. |
 
 ## Screen
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `ReplaceLoadScreen` | `true` | The title screen's Load button opens the save manager. Its Game's own list button opens the game's list. `false` keeps the game's list. |
+| `ReplaceLoadScreen` | `true` | The title screen's Load button opens the save manager. Its Default Load screen button opens the game's list. `false` keeps the game's list. |
 | `WarnWhenBehind` | `true` | Warn on the title screen when a save is older than its last backup, as when Steam Cloud put back an older copy. |
 | `ShowGameSnapshots` | `true` | Show the game's own day snapshots of a save in the save manager, where each can be loaded as a new save. |
 

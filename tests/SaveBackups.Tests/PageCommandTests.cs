@@ -82,8 +82,8 @@ public sealed class PageCommandTests
     }
 
     [Theory]
-    [InlineData("Keep.BinDays", "14", "14")]
-    [InlineData("Keep.BinDays", " 7 ", "7")]
+    [InlineData("Keep.TrashDays", "14", "14")]
+    [InlineData("Keep.TrashDays", " 7 ", "7")]
     [InlineData("Backups.OnTimer", "true", "true")]
     [InlineData("Backups.Folder", "D:/Backups/SL", "D:/Backups/SL")]
     [InlineData("Backups.SecondFolder", "", "")]
@@ -94,9 +94,9 @@ public sealed class PageCommandTests
     }
 
     [Theory]
-    [InlineData("Keep.BinDays", "400")]
-    [InlineData("Keep.BinDays", "-1")]
-    [InlineData("Keep.BinDays", "1.5")]
+    [InlineData("Keep.TrashDays", "400")]
+    [InlineData("Keep.TrashDays", "-1")]
+    [InlineData("Keep.TrashDays", "1.5")]
     [InlineData("Backups.TimerMinutes", "2")]
     [InlineData("Backups.OnTimer", "yes")]
     [InlineData("Backups.Folder", "relative/path")]

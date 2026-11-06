@@ -1,5 +1,5 @@
 Name: Save Backups
-Summary: Automatic backups of every save, out of Steam Cloud's reach, each with a picture of the game. The Load button opens a save manager with survivor portraits and a timeline: compare a backup with now, restore it as a new save or in place, and undo deletes from the bin. Back up now from the pause menu, plus export, import and a Steam Cloud check.
+Summary: Automatic backups of every save, out of Steam Cloud's reach, each with a picture of the game. The Load button opens a save manager with survivor portraits and a timeline: compare a backup with now, restore it as a new save or in place, and undo deletes from the trash. Back up now from the pause menu, plus export, import and a Steam Cloud check.
 
 Description (BBCode):
 The game keeps one copy of each save, and Steam Cloud can quietly put back an older one. Save Backups copies your save each morning, when you quit, before a rebirth, an expedition or a zombie wave, and at an ending, into a folder Steam Cloud never touches, with a picture of where you were. The title screen's Load button then opens a save manager where you can see every backup of every save on a timeline and put any of them back.
@@ -7,12 +7,12 @@ The game keeps one copy of each save, and Steam Cloud can quietly put back an ol
 [size=5]Main features[/size]
 [list]
 [*][b]Automatic backups[/b]: each morning right after the game's own save, when you quit or close the game, right before a rebirth, an expedition or a zombie wave, when a run reaches an ending, and on a timer if you want. Every file of the save is copied and checked.[/*]
-[*][b]Pictures and portraits[/b]: each backup made while you play takes a small picture of the game, and each save shows its survivor's portrait.[/*]
+[*][b]Pictures and portraits[/b]: each backup made while you play takes a picture of the game, which you can click to see full size, and each save shows its survivor's portrait.[/*]
 [*][b]Pause menu[/b]: Backups of this run opens the save manager over your run, and Back up now saves and backs it up.[/*]
-[*][b]Timeline[/b]: a save's backups and the game's own day snapshots, grouped by day. Click one to see its picture, your survivor's health, fullness, mood, stamina, money and items then and how they changed, and the game's journal for that day.[/*]
+[*][b]Timeline[/b]: a save's backups and the game's own day snapshots, grouped by day. Click one to see its picture, your survivor's health, satiety, mood, stamina, Planning Points, Survival Points and items then and how they changed.[/*]
 [*][b]Compare with now[/b]: what changed between a backup and the save as it is now, item by item.[/*]
 [*][b]Restore[/b]: load a backup as a new save next to the original, or replace the save. The save as it is gets a backup of its own first.[/*]
-[*][b]Bin[/b]: removed backups and deleted saves wait 30 days in the bin, where you can put them back.[/*]
+[*][b]Trash[/b]: removed backups and deleted saves wait 30 days in the trash, where you can put them back.[/*]
 [*][b]Saves[/b]: search, sort, filter, pin, rename, write notes, duplicate a save, and turn any of the game's day snapshots into a save of its own.[/*]
 [*][b]Export and import[/b]: export one backup or a whole save to a .slsave file you can keep or share. Put .slsave files or loose save files in SaveBackups\Import and press Import to see what each holds and bring it in.[/*]
 [*][b]Steam Cloud check[/b]: if a save is suddenly behind its own last backup, the save manager shows both days side by side so you can keep either.[/*]
@@ -34,7 +34,7 @@ Backups are kept in [font=Courier New]AppData\LocalLow\LLS\SLGame\SaveBackups[/f
 [list]
 [*]In a run, the save manager can't load a save, start a new game, or restore over, rename or delete the run you are playing. Those wait for the title screen.[/*]
 [*]A copied save starts without the original's ending snapshots, so it cannot jump back to one of the original's endings.[/*]
-[*]Pictures are taken only while you play. Backups made on the title screen, and older ones, have none.[/*]
+[*]Pictures are taken only while you play. Backups made on the title screen, and older ones, have none. Older backups have only a small picture.[/*]
 [*]A save you rolled back on purpose with the game's own tools can show the Steam Cloud warning once; keep the day you want and it clears.[/*]
 [/list]
 
@@ -78,9 +78,9 @@ Open source under MIT: [url=https://github.com/AnExiledDev/SurvivalLog-SaveBacku
 [size=5]主要功能[/size]
 [list]
 [*][b]自动备份[/b]：每天早上游戏自动存档之后、返回标题画面或关闭游戏时、重生之前、出发探索之前、尸潮开始之前、到达结局时，也可以按游玩时间定时备份。存档的所有文件都会复制并校验。[/*]
-[*][b]画面与头像[/b]：游玩时的每次备份都会拍一张游戏画面的小图，每个存档都显示角色头像。[/*]
+[*][b]画面与头像[/b]：游玩时的每次备份都会拍下游戏画面，点开可以看大图，每个存档都显示角色头像。[/*]
 [*][b]暂停菜单[/b]：「本局备份」在游戏中打开存档管理，「立即备份」会先存档再备份。[/*]
-[*][b]时间线[/b]：存档的备份和游戏自带的每日快照按天排列。点开任意一个，可以看到当时的画面、角色的健康、饱腹、心情、体力、金钱和物品以及之后的变化，还有当天的游戏日志。[/*]
+[*][b]时间线[/b]：存档的备份和游戏自带的每日快照按天排列。点开任意一个，可以看到当时的画面、角色的健康、饱腹、心情、体力、信念点、生存点和物品以及之后的变化。[/*]
 [*][b]与当前对比[/b]：逐个物品列出备份与当前存档之间的变化。[/*]
 [*][b]恢复[/b]：把备份读取为原存档旁边的新存档，或直接覆盖原存档。动手之前会先把当前存档备份一次。[/*]
 [*][b]回收站[/b]：移除的备份和删除的存档会在回收站里保留 30 天，期间可以找回。[/*]
@@ -105,7 +105,7 @@ Open source under MIT: [url=https://github.com/AnExiledDev/SurvivalLog-SaveBacku
 [list]
 [*]游戏进行中，存档管理不能读取存档、开始新游戏，也不能覆盖、重命名或删除正在玩的存档，这些需回到标题画面。[/*]
 [*]复制出的新存档不带原存档的结局快照，所以不能跳回原存档的结局。[/*]
-[*]只有游玩时的备份会拍下画面。在标题画面做的备份以及较早的备份没有画面。[/*]
+[*]只有游玩时的备份会拍下画面。在标题画面做的备份以及较早的备份没有画面。较早的备份只有小图。[/*]
 [*]用游戏自带功能主动回退的存档可能会提示一次 Steam 云检查，保留你想要的那一天即可。[/*]
 [/list]
 

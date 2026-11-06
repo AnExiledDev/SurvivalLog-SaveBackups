@@ -4,20 +4,21 @@ using System.IO;
 using System.Linq;
 using ExiledToolkit.Game;
 using ExiledToolkit.Kit;
+using ExiledToolkit.Web;
 using GameCore.HotUpdate;
 using SaveBackups.Core;
 
 namespace SaveBackups.Adapters;
 
 /// <summary>
-/// Reads what is inside saves with the game's own reader: the survivor's meters, money, points and items, the game's
-/// day and round snapshots, and the game's tables for survivor pictures and item names. All of it on the main thread;
+/// Reads what is inside saves with the game's own reader: the survivor's meters, Planning Points, survival points and
+/// items, the game's day and round snapshots, and the game's tables for survivor pictures and item names and pictures. All of it on the main thread;
 /// every read fails soft to null or an empty list.
 /// </summary>
 internal static class SaveReader
 {
     // Config_Attr ids: the value and its most.
-    private const int Fullness = 1;
+    private const int Satiety = 1;
     private const int Mood = 2;
     private const int Stamina = 3;
     private const int Health = 4;
@@ -33,7 +34,7 @@ internal static class SaveReader
         {
             var manager = GameSingleton.Existing<GameSaveManager>();
 
-            return manager != null && manager.IsInBattle ? Of(manager.GetGameSave()?.CurSave) : null;
+            return manager != null && manager.IsInBattle ? Of(manager.GetGameSave()) : null;
         }
         catch (Exception)
         {
@@ -46,7 +47,7 @@ internal static class SaveReader
     {
         try
         {
-            return File.Exists(path) ? Of(Read(path)?.CurSave) : null;
+            return File.Exists(path) ? Of(Read(path)) : null;
         }
         catch (Exception)
         {
@@ -56,7 +57,10 @@ internal static class SaveReader
 
     public static GameSaveData? Read(string path) => MemoryPackToolsExpand.DeserializeObject<GameSaveData>(TemporaryFile.ReadFileBytes(path));
 
-    public static SaveStats? Of(SaveChildData? child)
+    public static SaveStats? Of(GameSaveData? save) => save == null ? null : Of(save.CurSave, save.FaithPoint);
+
+    /// <summary>The stats of one day of a run; <paramref name="planningPoints"/> come from the whole save, which holds them for every loop.</summary>
+    public static SaveStats? Of(SaveChildData? child, int planningPoints)
     {
         var lead = child?.LeadingRole;
 
@@ -88,17 +92,19 @@ internal static class SaveReader
 
         return new SaveStats(
             Meter(attrs, Health),
-            Meter(attrs, Fullness),
+            Meter(attrs, Satiety),
             Meter(attrs, Mood),
             Meter(attrs, Stamina),
-            lead.Money,
+            planningPoints,
             child.SurvivalPoint,
-            items,
-            Journal(child));
+            items);
     }
 
-    /// <summary>The game's own day and round snapshots of a run, oldest day first, the round snapshot last.</summary>
-    public static List<GameSnap> Snaps(string saveFolder, string stem, int turn)
+    /// <summary>
+    /// The game's own day and round snapshots of a run, oldest day first, the round snapshot last. A day snapshot holds
+    /// only the day, and going back to it keeps the run's Planning Points as they are, so it shows <paramref name="planningNow"/>.
+    /// </summary>
+    public static List<GameSnap> Snaps(string saveFolder, string stem, int turn, int planningNow)
     {
         var snaps = new List<GameSnap>();
 
@@ -117,7 +123,7 @@ internal static class SaveReader
 
                     if (child == null) continue;
 
-                    snaps.Add(new GameSnap(name, true, new Progress(round!.TurnIndex + 1, child.Day, child.GameTime), info.Length, info.LastWriteTimeUtc, Of(child)));
+                    snaps.Add(new GameSnap(name, true, new Progress(round!.TurnIndex + 1, child.Day, child.GameTime), info.Length, info.LastWriteTimeUtc, Of(round.Save)));
                 }
                 else if (name.Contains(SnapMark, StringComparison.OrdinalIgnoreCase))
                 {
@@ -126,7 +132,7 @@ internal static class SaveReader
 
                     if (child == null) continue;
 
-                    snaps.Add(new GameSnap(name, false, new Progress(turn, child.Day, child.GameTime), info.Length, info.LastWriteTimeUtc, Of(child)));
+                    snaps.Add(new GameSnap(name, false, new Progress(turn, child.Day, child.GameTime), info.Length, info.LastWriteTimeUtc, Of(child, planningNow)));
                 }
             }
             catch (Exception)
@@ -225,9 +231,11 @@ internal static class SaveReader
         return survivors;
     }
 
-    public static Dictionary<int, Phrase> ItemNames(IEnumerable<int> ids)
+    /// <summary>Each item's names, and its picture when the game's web icons have been indexed (<see cref="WebIcons"/>).</summary>
+    public static Dictionary<int, ItemInfo> Items(IEnumerable<int> ids)
     {
-        var names = new Dictionary<int, Phrase>();
+        var names = new Dictionary<int, ItemInfo>();
+        var icons = WebIcons.Icons;
         var config = GameSingleton.Existing<ConfigManager>();
         var table = config?._Config_Item_Dict;
 
@@ -245,7 +253,9 @@ internal static class SaveReader
 
                 var en = Text(config, row.ItemName, LanguageType.English) ?? "#" + id;
 
-                names[id] = new Phrase(en, Text(config, row.ItemName, LanguageType.Chinese) ?? NonEmpty(row.ItemName_Local) ?? en);
+                var zh = Text(config, row.ItemName, LanguageType.Chinese) ?? NonEmpty(row.ItemName_Local) ?? en;
+
+                names[id] = new ItemInfo(en, zh, icons.Resolve(GameNames.NonEmpty(row.WebIcon) ?? GameNames.NonEmpty(row.Icon)) ?? "");
             }
             catch (Exception)
             {
@@ -301,20 +311,6 @@ internal static class SaveReader
         var max = attrs.ContainsKey(id + MaxOffset) ? attrs[id + MaxOffset] : 0;
 
         return new Meter(value, max);
-    }
-
-    private static string Journal(SaveChildData child)
-    {
-        try
-        {
-            var text = GameSaveManager.GetDayDescription(child, child.Day);
-
-            return string.IsNullOrWhiteSpace(text) ? "" : text.Trim();
-        }
-        catch (Exception)
-        {
-            return "";
-        }
     }
 
     /// <summary>The game's text for a key in one language, trimmed for the page; null when it has none.</summary>

@@ -21,6 +21,9 @@ public sealed partial class BackupStore
     private const string RunNoteFile = "run.json";
     public const string ShotFile = "shot.jpg";
 
+    /// <summary>The same picture at full size, for the save manager's enlarged view; backups made before 0.4 have none.</summary>
+    public const string LargeShotFile = "shot-large.jpg";
+
     private readonly string _root;
     private readonly Func<DateTime> _utcNow;
 
@@ -57,7 +60,7 @@ public sealed partial class BackupStore
     /// picture when there is one. With <paramref name="verify"/>, every copy is read back and compared with the save
     /// file before the backup counts as made.
     /// </summary>
-    public Result<BackupMeta> Create(string saveFolder, RunFacts run, BackupKind kind, string gameVersion, string dayText = "", byte[]? shot = null, bool verify = false, SaveStats? stats = null)
+    public Result<BackupMeta> Create(string saveFolder, RunFacts run, BackupKind kind, string gameVersion, string dayText = "", byte[]? shot = null, bool verify = false, SaveStats? stats = null, byte[]? largeShot = null)
     {
         var stem = RunFiles.Stem(run.FileName);
 
@@ -94,6 +97,7 @@ public sealed partial class BackupStore
             }
 
             if (shot is { Length: > 0 }) File.WriteAllBytes(Path.Combine(partial, ShotFile), shot);
+            if (shot is { Length: > 0 } && largeShot is { Length: > 0 }) File.WriteAllBytes(Path.Combine(partial, LargeShotFile), largeShot);
 
             var meta = new BackupMeta(id, stem, kind, created, run, bytes, gameVersion, IsPinned: false) { DayText = dayText ?? "", Stats = stats, HasShot = shot is { Length: > 0 } };
 

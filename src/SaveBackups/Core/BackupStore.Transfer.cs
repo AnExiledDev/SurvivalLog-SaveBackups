@@ -123,8 +123,9 @@ public sealed partial class BackupStore
 
                     WriteEntry(zip, stem + "/" + meta.Id + "/" + BackupMeta.FileName, shown.ToJson());
 
-                    if (pick.WithExtras && File.Exists(Path.Combine(folder, ShotFile)))
-                        zip.CreateEntryFromFile(Path.Combine(folder, ShotFile), stem + "/" + meta.Id + "/" + ShotFile, CompressionLevel.Optimal);
+                    foreach (var picture in new[] { ShotFile, LargeShotFile })
+                        if (pick.WithExtras && File.Exists(Path.Combine(folder, picture)))
+                            zip.CreateEntryFromFile(Path.Combine(folder, picture), stem + "/" + meta.Id + "/" + picture, CompressionLevel.Optimal);
                 }
 
                 if (pick.Now is { } now && pick.SaveFolder != null && IsSafeId(now.Id))
@@ -397,7 +398,7 @@ public sealed partial class BackupStore
             if (!ids.Contains(parts[1])) ids.Add(parts[1]);
 
             if (parts[2] == BackupMeta.FileName) hasMeta.Add(parts[1]);
-            else if (parts[2] != ShotFile && !RunFiles.Belongs(stem, parts[2])) return (null, null, "it holds a file that is not part of the save: " + parts[2]);
+            else if (parts[2] != ShotFile && parts[2] != LargeShotFile && !RunFiles.Belongs(stem, parts[2])) return (null, null, "it holds a file that is not part of the save: " + parts[2]);
 
             if (string.Equals(parts[2], RunFiles.MainFile(stem), StringComparison.OrdinalIgnoreCase)) hasMain.Add(parts[1]);
 

@@ -9,45 +9,48 @@ namespace SaveBackups.Core;
 public readonly record struct Meter(int Value, int Max);
 
 /// <summary>
-/// How the survivor and home stood in one save: the meters, money, survival points and every item counted by its
-/// config id (carried and stored together). Read from a save file by the game's own reader, kept in backup.json so a
-/// backup is read once.
+/// How the survivor and home stood in one save: the meters, the Planning Points loop rewards are bought with, the
+/// survival points the end-of-day cards are bought with, and every item counted by its config id (carried and stored
+/// together). Read from a save file by the game's own reader, kept in backup.json so a backup is read once.
 /// </summary>
 public sealed record SaveStats(
     Meter Health,
-    Meter Fullness,
+    Meter Satiety,
     Meter Mood,
     Meter Stamina,
-    int Money,
-    int Points,
-    IReadOnlyDictionary<int, int> Items,
-    string Journal)
+    int PlanningPoints,
+    int SurvivalPoints,
+    IReadOnlyDictionary<int, int> Items)
 {
+    private const string PlanningKey = "planning";
+
     public int ItemTotal => Items.Values.Sum();
 
     public void Write(Utf8JsonWriter json, string name)
     {
         json.WriteStartObject(name);
         WriteMeter(json, "health", Health);
-        WriteMeter(json, "fullness", Fullness);
+        WriteMeter(json, "satiety", Satiety);
         WriteMeter(json, "mood", Mood);
         WriteMeter(json, "stamina", Stamina);
-        json.WriteNumber("money", Money);
-        json.WriteNumber("points", Points);
+        json.WriteNumber(PlanningKey, PlanningPoints);
+        json.WriteNumber("survival", SurvivalPoints);
         json.WriteNumber("itemTotal", ItemTotal);
         json.WriteStartObject("items");
 
         foreach (var pair in Items.OrderBy(pair => pair.Key)) json.WriteNumber(pair.Key.ToString(System.Globalization.CultureInfo.InvariantCulture), pair.Value);
 
         json.WriteEndObject();
-        if (Journal.Length > 0) json.WriteString("journal", Journal);
         json.WriteEndObject();
     }
 
-    /// <summary>The stats from a backup.json "stats" object, or null when it is missing or not one.</summary>
+    /// <summary>
+    /// The stats from a backup.json "stats" object, or null when it is missing, not one, or written before Planning
+    /// Points were kept (null makes the save manager read the backup's save again and keep the full stats).
+    /// </summary>
     public static SaveStats? Read(JsonElement root, string name)
     {
-        if (!root.TryGetProperty(name, out var stats) || stats.ValueKind != JsonValueKind.Object) return null;
+        if (!root.TryGetProperty(name, out var stats) || stats.ValueKind != JsonValueKind.Object || !stats.TryGetProperty(PlanningKey, out _)) return null;
 
         var items = new Dictionary<int, int>();
 
@@ -60,13 +63,12 @@ public sealed record SaveStats(
 
         return new SaveStats(
             ReadMeter(stats, "health"),
-            ReadMeter(stats, "fullness"),
+            ReadMeter(stats, "satiety"),
             ReadMeter(stats, "mood"),
             ReadMeter(stats, "stamina"),
-            Number(stats, "money"),
-            Number(stats, "points"),
-            items,
-            stats.TryGetProperty("journal", out var journal) && journal.ValueKind == JsonValueKind.String ? journal.GetString() ?? "" : "");
+            Number(stats, PlanningKey),
+            Number(stats, "survival"),
+            items);
     }
 
     /// <summary>What changed in the home between two saves: item ids with how many more (plus) or fewer (minus), biggest change first.</summary>

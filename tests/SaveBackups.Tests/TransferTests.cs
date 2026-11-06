@@ -23,9 +23,9 @@ public sealed class TransferTests : IDisposable
         _other.Dispose();
     }
 
-    private BackupMeta Create(BackupKind kind = BackupKind.Morning)
+    private BackupMeta Create(BackupKind kind = BackupKind.Morning, byte[]? shot = null, byte[]? largeShot = null)
     {
-        var made = _store.Create(_dirs.Saves, Make.Run(), kind, "1.1.19611");
+        var made = _store.Create(_dirs.Saves, Make.Run(), kind, "1.1.19611", shot: shot, largeShot: largeShot);
 
         return Assert.IsType<Result<BackupMeta>.Done>(made).Value;
     }
@@ -128,6 +128,23 @@ public sealed class TransferTests : IDisposable
         Assert.Equal("snap", File.ReadAllText(Path.Combine(_other.Backups, "Save_A", meta.Id, "Save_A.snap1.bytes")));
         Assert.Empty(Directory.GetFiles(ImportFolder, "*" + BackupStore.ExportExtension));
         Assert.Single(Directory.GetFiles(Path.Combine(ImportFolder, BackupStore.ImportedFolder)));
+    }
+
+    [Fact]
+    public void An_exported_backup_takes_both_its_pictures_along()
+    {
+        _dirs.Write("Save_A.bytes", "main");
+        var meta = Create(shot: new byte[] { 1 }, largeShot: new byte[] { 2, 2 });
+
+        var path = Assert.IsType<Result<string>.Done>(_store.Export("Save_A", meta.Id, _store.ExportsPath)).Value;
+        Directory.CreateDirectory(ImportFolder);
+        File.Copy(path, Path.Combine(ImportFolder, Path.GetFileName(path)));
+
+        var outcome = Assert.Single(_otherStore.ImportAll(ImportFolder));
+
+        Assert.True(outcome.IsDone, outcome.Why);
+        Assert.Equal(new byte[] { 2, 2 }, File.ReadAllBytes(Path.Combine(_other.Backups, "Save_A", meta.Id, BackupStore.LargeShotFile)));
+        Assert.Equal(new byte[] { 1 }, File.ReadAllBytes(Path.Combine(_other.Backups, "Save_A", meta.Id, BackupStore.ShotFile)));
     }
 
     [Fact]

@@ -69,17 +69,20 @@ public sealed record Screen(
     public DateTime NowUtc { get; init; } = DateTime.UtcNow;
 }
 
+/// <summary>An item's names and its picture, a path under the game's WebUI folder ("" when the game has none).</summary>
+public sealed record ItemInfo(string En, string Zh, string Icon);
+
 /// <summary>One of the game's own snapshots of a run: a day snapshot (rebirth can go back to it) or the round snapshot.</summary>
 public sealed record GameSnap(string File, bool IsRound, Progress Progress, long Bytes, DateTime WrittenUtc, SaveStats? Stats);
 
-/// <summary>What the detail view of one run needs beyond the list: the save's stats now, the game's snapshots, ending photos and item names.</summary>
+/// <summary>What the detail view of one run needs beyond the list: the save's stats now, the game's snapshots, ending photos and the items' names and pictures.</summary>
 public sealed record RunDetail(
     string Stem,
     SaveStats? Now,
     IReadOnlyList<BackupMeta> Backups,
     IReadOnlyList<GameSnap> Snaps,
     IReadOnlyList<string> Photos,
-    IReadOnlyDictionary<int, Phrase> ItemNames);
+    IReadOnlyDictionary<int, ItemInfo> Items);
 
 /// <summary>
 /// The save manager's view as JSON, written straight from the screen. Each run lists its backups newest first and a
@@ -223,7 +226,7 @@ public static class PageModel
         return Encoding.UTF8.GetString(buffer.ToArray());
     }
 
-    /// <summary>The detail view's extra data for one run. Items are listed per save by id, with names for every id that appears.</summary>
+    /// <summary>The detail view's extra data for one run. Items are listed per save by id, with names and a picture for every id that appears.</summary>
     public static string Detail(RunDetail detail)
     {
         using var buffer = new MemoryStream();
@@ -240,11 +243,12 @@ public static class PageModel
             json.WriteEndObject();
             json.WriteStartObject("names");
 
-            foreach (var pair in detail.ItemNames.OrderBy(pair => pair.Key))
+            foreach (var pair in detail.Items.OrderBy(pair => pair.Key))
             {
                 json.WriteStartArray(pair.Key.ToString(CultureInfo.InvariantCulture));
                 json.WriteStringValue(pair.Value.En);
                 json.WriteStringValue(pair.Value.Zh);
+                json.WriteStringValue(pair.Value.Icon);
                 json.WriteEndArray();
             }
 
@@ -363,18 +367,17 @@ public static class PageModel
         json.WriteEndArray();
     }
 
-    /// <summary>The stats the page shows: meters as [value, max], money, points, the item count and the journal line.</summary>
+    /// <summary>The stats the page shows: meters as [value, max], Planning Points, survival points and the item count.</summary>
     private static void WriteStats(Utf8JsonWriter json, string name, SaveStats stats, bool withItems)
     {
         json.WriteStartObject(name);
         WriteMeter(json, "health", stats.Health);
-        WriteMeter(json, "fullness", stats.Fullness);
+        WriteMeter(json, "satiety", stats.Satiety);
         WriteMeter(json, "mood", stats.Mood);
         WriteMeter(json, "stamina", stats.Stamina);
-        json.WriteNumber("money", stats.Money);
-        json.WriteNumber("points", stats.Points);
+        json.WriteNumber("planning", stats.PlanningPoints);
+        json.WriteNumber("survival", stats.SurvivalPoints);
         json.WriteNumber("items", stats.ItemTotal);
-        json.WriteString("journal", stats.Journal);
         json.WriteEndObject();
 
         if (withItems) WriteItems(json, name + "Items", stats);

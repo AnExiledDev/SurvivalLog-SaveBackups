@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.0
+
+- New save manager look: your saves on the left, the selected save's backups and day snapshots in the middle, and the picked backup with its stats on the right.
+- Pictures are now taken at full size as well as small. Click any picture to see it large. Older backups show their small picture.
+- The bin is now called the trash. Its setting is now `TrashDays`; a value you set for `BinDays` before goes back to 30 days, so set it again if you changed it.
+- Your survivor's stats now show Satiety instead of fullness, and Planning Points and Survival Points side by side. Money and the game's journal are no longer shown.
+- Compare with now shows each item's icon.
+- The button to the game's own list is now 「Default Load screen」.
+- Made for Survival Log 1.1.20719.
+
 ## 0.3.2
 
 - Now uses Exiled's Toolkit for its shared parts, so it needs Exiled's Toolkit 0.19.0 or newer.

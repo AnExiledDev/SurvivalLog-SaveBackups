@@ -51,7 +51,7 @@ public static class SettingKeys
         new SettingKey("Keep", "DailyDays", SettingType.Number, 0, 365),
         new SettingKey("Keep", "PerLoop", SettingType.Flag),
         new SettingKey("Keep", "MaxTotalMB", SettingType.Number, 0, 1000000),
-        new SettingKey("Keep", "BinDays", SettingType.Number, 0, 365),
+        new SettingKey("Keep", "TrashDays", SettingType.Number, 0, 365),
         new SettingKey("Screen", "ReplaceLoadScreen", SettingType.Flag),
         new SettingKey("Screen", "WarnWhenBehind", SettingType.Flag),
         new SettingKey("Screen", "ShowGameSnapshots", SettingType.Flag),
