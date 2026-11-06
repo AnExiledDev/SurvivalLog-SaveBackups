@@ -40,8 +40,8 @@ public sealed record SaveStats(
     int SurvivalPoints,
     IReadOnlyDictionary<int, int> Items)
 {
-    // Kept since stats read Life at the game's scale; stats kept without it are read again.
-    private const string LifeKey = "life";
+    // Kept since stats read the full most of each meter (LiveMax); stats kept without it are read again.
+    private const string LifeKey = "lifeFullMax";
     private const string PlanningKey = "planning";
 
     public int ItemTotal => Items.Values.Sum();
@@ -65,8 +65,8 @@ public sealed record SaveStats(
     }
 
     /// <summary>
-    /// The stats from a backup.json "stats" object, or null when it is missing, not one, or written before Life was
-    /// kept at the game's scale (null makes the save manager read the backup's save again and keep the full stats).
+    /// The stats from a backup.json "stats" object, or null when it is missing, not one, or written before the full most of
+    /// each meter was kept (null makes the save manager read the backup's save again and keep the full stats).
     /// </summary>
     public static SaveStats? Read(JsonElement root, string name)
     {

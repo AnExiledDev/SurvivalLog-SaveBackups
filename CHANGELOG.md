@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.2
+
+- Your survivor's stats now show their real most, such as Life 89 / 130, instead of always out of 100. The game raises the most over a run, and a save keeps only the starting 100, so Save Backups now notes the real most in the save while you play. Saves and backups made before show the value alone, until the save is next saved in game.
+- Made for Survival Log 1.1.20719.
+
 ## 0.4.1
 
 - Your survivor's stats now show the right numbers: Life, Satiety, Morale and Stamina out of 100, as the game's own bars do. Life is the bar the game shows (it showed the hidden Fitness before), and Mood is now called Morale, as in the game. Backups made before are read again the first time you open them.

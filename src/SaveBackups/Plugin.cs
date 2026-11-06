@@ -19,7 +19,7 @@ namespace SaveBackups;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.savebackups";
-    private const string Version = "0.4.1";
+    private const string Version = "0.4.2";
     private const long Megabyte = 1024L * 1024L;
 
     /// <summary>Exiled's Toolkit: its shared helpers, toasts, live settings, typing watch and pause menu buttons all come from it.</summary>

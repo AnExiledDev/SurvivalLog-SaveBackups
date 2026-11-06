@@ -18,7 +18,7 @@ namespace SaveBackups.Adapters;
 internal static class SaveReader
 {
     // AttrName ids of the four bars on the game's HUD, and the offset to each one's most. Life is Vitality; Health (4)
-    // is Fitness, which the game does not show.
+    // is Fitness, which the game does not show. The most a save keeps is only the base; the full one is in LiveMax.
     private const int Satiety = 1;
     private const int Mood = 2;
     private const int Stamina = 3;
@@ -90,13 +90,14 @@ internal static class SaveReader
         }
 
         var attrs = lead.AttrDict;
+        var counters = child.GameCounterDict;
         var scale = Scale();
 
         return new SaveStats(
-            Meter(attrs, Life, scale),
-            Meter(attrs, Satiety, scale),
-            Meter(attrs, Mood, scale),
-            Meter(attrs, Stamina, scale),
+            Meter(attrs, counters, Life, scale),
+            Meter(attrs, counters, Satiety, scale),
+            Meter(attrs, counters, Mood, scale),
+            Meter(attrs, counters, Stamina, scale),
             planningPoints,
             child.SurvivalPoint,
             items);
@@ -305,12 +306,15 @@ internal static class SaveReader
         }
     }
 
-    private static Meter Meter(Il2CppSystem.Collections.Generic.Dictionary<int, int>? attrs, int id, float scale)
+    private static Meter Meter(Il2CppSystem.Collections.Generic.Dictionary<int, int>? attrs, Il2CppSystem.Collections.Generic.Dictionary<string, int>? counters,
+        int id, float scale)
     {
         if (attrs == null) return default;
 
         var value = attrs.ContainsKey(id) ? attrs[id] : 0;
-        var max = attrs.ContainsKey(id + MaxOffset) ? attrs[id + MaxOffset] : 0;
+        var key = LiveMax.Key(id + MaxOffset);
+        var isKept = counters != null && counters.ContainsKey(key);
+        var max = LiveMax.Known(isKept, isKept ? counters![key] : 0);
 
         return Core.Meter.FromSave(value, max, scale);
     }

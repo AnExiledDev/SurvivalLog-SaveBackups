@@ -1174,7 +1174,7 @@
     var now = nowStats && nowStats[key] ? nowStats[key][0] : null;
     var tick = !isNowPoint && now != null ? '<u style="left:calc(' + Math.min(100, now / max * 100) + '% - 1px)"></u>' : '';
     return '<div class="meter"><span class="ml">' + esc(tf('st', key)) + '</span><div class="mt"><i style="width:' + Math.min(100, v[0] / max * 100) + '%;background:' + METER_COLORS[key] + '"></i>' + tick + '</div>' +
-      '<span class="mv">' + Math.round(v[0]) + ' / ' + (v[1] || '-') + nowCompare(isNowPoint, v[0], now) + '</span></div>';
+      '<span class="mv">' + Math.round(v[0]) + (v[1] ? ' / ' + v[1] : '') + nowCompare(isNowPoint, v[0], now) + '</span></div>';
   }
 
   function tile(key, stats, nowStats, isNowPoint) {

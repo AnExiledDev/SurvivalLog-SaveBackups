@@ -46,6 +46,15 @@ public sealed class Ticker : MonoBehaviour
         {
             ReportFailure(ex);
         }
+
+        try
+        {
+            LiveMaxes.Tick();
+        }
+        catch (Exception ex)
+        {
+            ReportFailure(ex);
+        }
     }
 
     private static void ReportFailure(Exception ex)

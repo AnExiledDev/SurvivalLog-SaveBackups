@@ -334,6 +334,51 @@ public sealed class LibraryTests : IDisposable
         Assert.Null(SaveStats.Read(JsonDocument.Parse(raw).RootElement, "stats"));
     }
 
+    [Fact]
+    public void Stats_kept_with_only_the_saves_base_most_count_as_unread_so_the_backup_is_read_again()
+    {
+        // Kept by 0.4.1: Life under "life", its most the save's base 100 whatever buffs the survivor had.
+        const string baseMost = "{\"stats\":{\"life\":[89,100],\"satiety\":[100,100],\"mood\":[60,100],\"stamina\":[100,100],\"planning\":12,\"survival\":3,\"items\":{}}}";
+
+        Assert.Null(SaveStats.Read(JsonDocument.Parse(baseMost).RootElement, "stats"));
+    }
+
+    [Fact]
+    public void The_full_most_survives_being_kept_in_backup_json()
+    {
+        var stats = new SaveStats(new Meter(89, 130), new Meter(100, 115), new Meter(60, 100), new Meter(100, 120), 12, 3, new Dictionary<int, int>());
+        using var buffer = new System.IO.MemoryStream();
+
+        using (var json = new Utf8JsonWriter(buffer))
+        {
+            json.WriteStartObject();
+            stats.Write(json, "stats");
+            json.WriteEndObject();
+        }
+
+        var read = SaveStats.Read(JsonDocument.Parse(buffer.ToArray()).RootElement, "stats");
+
+        Assert.NotNull(read);
+        Assert.Equal(new Meter(89, 130), read!.Life);
+        Assert.Equal(new Meter(100, 120), read.Stamina);
+    }
+
+    [Theory]
+    [InlineData(true, 130, 130)]
+    [InlineData(false, 0, 0)]
+    [InlineData(true, 0, 0)]
+    public void A_most_is_known_only_when_one_was_kept(bool isKept, int kept, int known) => Assert.Equal(known, LiveMax.Known(isKept, kept));
+
+    [Fact]
+    public void A_most_that_is_not_known_holds_the_value_at_nothing()
+    {
+        // A save made before the full most was kept: Life 120 of a raised most shows as 120, not cut to a guessed 100.
+        Assert.Equal(new Meter(120, 0), Meter.FromSave(120000, LiveMax.Known(false, 0), 1000f));
+    }
+
+    [Fact]
+    public void The_writer_and_reader_of_the_full_most_agree_on_its_key() => Assert.Equal("SaveBackups.Max.105", LiveMax.Key(105));
+
     [Theory]
     [InlineData(60000, 100, 60)]
     [InlineData(59500, 100, 60)]
