@@ -26,7 +26,7 @@ The game keeps one copy of each save, and Steam Cloud can quietly put back an ol
 
 The save manager and messages follow the game's language, English or Simplified Chinese.
 
-Save Backups adds no data of its own to your saves. You can remove it at any time; your saves stay as they are and the backups stay in their folder.
+The only thing Save Backups writes into a save is your survivor's highest Life, Satiety, Morale and Stamina, so the save manager can show them; the game ignores those numbers without the mod. You can remove it at any time; your saves stay as they are and the backups stay in their folder.
 
 ## Hotkeys
 
@@ -49,6 +49,7 @@ Steam Cloud only syncs `Saves`, so the backups stay on this PC. Copy the folder 
 - Pictures are taken only while you play. Backups made on the title screen, and those from before 0.3.0, have none. Backups from before 0.4.0 have only the small picture.
 - The Steam Cloud check compares the loop and day the game's save list shows with the newest backup. A save you rolled back on purpose with the game's own tools can show it once; **Dismiss** clears it.
 - Backups from earlier game versions can be restored, but the game decides whether it can still read them.
+- Saves and backups made before 0.4.2 show Life, Satiety, Morale and Stamina without their highest value, until the save is next saved in game.
 
 ## Requirements
 
