@@ -114,7 +114,7 @@
     madeYou: ['made by you', '手动'],
     byGame: ['kept by the game', '由游戏保存'],
     oldWarn: ['Made on game version {0}, and you are playing {1}. It may not load as it did.', '这是游戏版本 {0} 时的备份，当前版本是 {1}，读取后可能和原来不一样。'],
-    st: { health: ['Health', '健康'], satiety: ['Satiety', '饱腹'], mood: ['Mood', '心情'], stamina: ['Stamina', '体力'], planning: ['Planning Points', '信念点'], survival: ['Survival Points', '生存点'], items: ['Items', '物品'], day: ['Day', '天数'] },
+    st: { life: ['Life', '生命'], satiety: ['Satiety', '饱腹'], mood: ['Morale', '心态'], stamina: ['Stamina', '体力'], planning: ['Planning Points', '信念点'], survival: ['Survival Points', '生存点'], items: ['Items', '物品'], day: ['Day', '天数'] },
 
     kinds: {
       now: ['Now', '现在'],
@@ -262,6 +262,8 @@
     snapsRow: ['Show the game\'s day snapshots', '显示游戏的每日快照', 'Adds the Day snapshots tab to each save.', '在每个存档里显示「每日快照」标签。'],
     replaceScreen: ['Open the save manager from the Load button', '点击「读取」时打开存档管理', 'Off opens the default Load screen.', '关闭后打开默认的读取画面。'],
     toasts: ['A message for each automatic backup', '每次自动备份时显示提示', '', ''],
+    uiScale: ['Window size', '窗口大小', 'From 75 to 200. 0 follows the UI size set in Exiled\'s Toolkit.', '范围 75 到 200。0 表示跟随 Exiled\'s Toolkit 的界面大小。'],
+    percent: ['%', '%'],
 
     footOk: ['All {0} saves are backed up. Newest backup: {1}, {2}.', '全部 {0} 个存档都有备份。最新备份：{1}，{2}。'],
     footSome: ['{0} of {1} saves are backed up. Newest backup: {2}, {3}.', '{1} 个存档中有 {0} 个已备份。最新备份：{2}，{3}。'],
@@ -700,8 +702,8 @@
     now: '#8fc7bf', morning: '#FFC83A', expedition: '#8fc7bf', wave: '#ff5a5a', rebirth: '#c9a4ff', ending: '#EBA308',
     manual: '#ffffff', quit: '#9a9a9a', timer: '#d8b070', safety: '#6f6a60', imported: '#4fa8ff', snap: '#6f8fb8', round: '#6f8fb8'
   };
-  var METER_COLORS = { health: '#e06a5a', satiety: '#d8b070', mood: '#c9a4ff', stamina: '#8fc7bf' };
-  var METERS = ['health', 'satiety', 'mood', 'stamina'];
+  var METER_COLORS = { life: '#e06a5a', satiety: '#d8b070', mood: '#c9a4ff', stamina: '#8fc7bf' };
+  var METERS = ['life', 'satiety', 'mood', 'stamina'];
   var TILES = ['planning', 'survival', 'items'];
   var SORTS = ['played', 'days', 'survivor', 'name'];
   var FILTERS = ['all', 'live', 'end', 'warn'];
@@ -1396,6 +1398,7 @@
     var keyText = ui.isListening ? t('keyPress') : !key || key === 'None' ? t('keyNone') : key;
     var rows = [['Backups.TakePictures', TEXT.pics], ['Backups.Verify', TEXT.verify], ['Screen.WarnWhenBehind', TEXT.warnBehind], ['Screen.ShowGameSnapshots', TEXT.snapsRow], ['Screen.ReplaceLoadScreen', TEXT.replaceScreen], ['Toasts.AutoBackupToasts', TEXT.toasts]];
     return setHero(3, '') + '<div class="row notog">' + lab(TEXT.keyRow) + '<div class="ctl"><button class="keycap' + (ui.isListening ? ' listen' : '') + '" data-act="listen" data-key="1">' + esc(keyText) + '</button></div></div>' +
+      '<div class="row notog">' + lab(TEXT.uiScale) + '<div class="ctl">' + num('Interface.UiScale', 64) + '<span>' + esc(t('percent')) + '</span></div></div>' +
       rows.map(function (x) { return '<div class="row">' + tog(x[0]) + lab(x[1]) + '<div></div></div>'; }).join('');
   }
 

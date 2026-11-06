@@ -6,7 +6,25 @@ using System.Text.Json;
 namespace SaveBackups.Core;
 
 /// <summary>A number the survivor has and the most it can be (0 when the game keeps no most).</summary>
-public readonly record struct Meter(int Value, int Max);
+public readonly record struct Meter(int Value, int Max)
+{
+    /// <summary>The scale the game keeps a meter's value at in a save when it does not say (GameKey.Attr_ScalingRatio).</summary>
+    public const float DefaultScale = 1000f;
+
+    /// <summary>
+    /// A meter as the game shows it from the numbers a save keeps: the value is stored times <paramref name="scale"/>
+    /// (60 Life is kept as 60000) and the most as it is. The value is rounded, as the game's own bars do, and held to the
+    /// most, as the game holds it when it reads the value.
+    /// </summary>
+    public static Meter FromSave(int stored, int max, float scale)
+    {
+        if (!(scale > 0)) scale = DefaultScale;
+
+        var value = (int)Math.Round(stored / (double)scale, MidpointRounding.AwayFromZero);
+
+        return new Meter(max > 0 ? Math.Clamp(value, 0, max) : Math.Max(0, value), max);
+    }
+}
 
 /// <summary>
 /// How the survivor and home stood in one save: the meters, the Planning Points loop rewards are bought with, the
@@ -14,7 +32,7 @@ public readonly record struct Meter(int Value, int Max);
 /// together). Read from a save file by the game's own reader, kept in backup.json so a backup is read once.
 /// </summary>
 public sealed record SaveStats(
-    Meter Health,
+    Meter Life,
     Meter Satiety,
     Meter Mood,
     Meter Stamina,
@@ -22,6 +40,8 @@ public sealed record SaveStats(
     int SurvivalPoints,
     IReadOnlyDictionary<int, int> Items)
 {
+    // Kept since stats read Life at the game's scale; stats kept without it are read again.
+    private const string LifeKey = "life";
     private const string PlanningKey = "planning";
 
     public int ItemTotal => Items.Values.Sum();
@@ -29,7 +49,7 @@ public sealed record SaveStats(
     public void Write(Utf8JsonWriter json, string name)
     {
         json.WriteStartObject(name);
-        WriteMeter(json, "health", Health);
+        WriteMeter(json, LifeKey, Life);
         WriteMeter(json, "satiety", Satiety);
         WriteMeter(json, "mood", Mood);
         WriteMeter(json, "stamina", Stamina);
@@ -45,12 +65,12 @@ public sealed record SaveStats(
     }
 
     /// <summary>
-    /// The stats from a backup.json "stats" object, or null when it is missing, not one, or written before Planning
-    /// Points were kept (null makes the save manager read the backup's save again and keep the full stats).
+    /// The stats from a backup.json "stats" object, or null when it is missing, not one, or written before Life was
+    /// kept at the game's scale (null makes the save manager read the backup's save again and keep the full stats).
     /// </summary>
     public static SaveStats? Read(JsonElement root, string name)
     {
-        if (!root.TryGetProperty(name, out var stats) || stats.ValueKind != JsonValueKind.Object || !stats.TryGetProperty(PlanningKey, out _)) return null;
+        if (!root.TryGetProperty(name, out var stats) || stats.ValueKind != JsonValueKind.Object || !stats.TryGetProperty(LifeKey, out _)) return null;
 
         var items = new Dictionary<int, int>();
 
@@ -62,7 +82,7 @@ public sealed record SaveStats(
         }
 
         return new SaveStats(
-            ReadMeter(stats, "health"),
+            ReadMeter(stats, LifeKey),
             ReadMeter(stats, "satiety"),
             ReadMeter(stats, "mood"),
             ReadMeter(stats, "stamina"),

@@ -56,6 +56,12 @@ How many backups of each kind every save keeps, and how older ones are thinned. 
 | `WarnWhenBehind` | `true` | Warn on the title screen when a save is older than its last backup, as when Steam Cloud put back an older copy. |
 | `ShowGameSnapshots` | `true` | Show the game's own day snapshots of a save in the save manager, where each can be loaded as a new save. |
 
+## Interface
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| `UiScale` | `0` | How big the save manager is drawn, in percent, from 75 to 200. At `0` it follows the UI size set in Exiled's Toolkit (its `UiScale`). The save manager nearly fills the screen, so past about 105 it is drawn only as big as still fits. |
+
 ## Toasts
 
 | Setting | Default | What it does |

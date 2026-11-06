@@ -17,11 +17,12 @@ namespace SaveBackups.Adapters;
 /// </summary>
 internal static class SaveReader
 {
-    // Config_Attr ids: the value and its most.
+    // AttrName ids of the four bars on the game's HUD, and the offset to each one's most. Life is Vitality; Health (4)
+    // is Fitness, which the game does not show.
     private const int Satiety = 1;
     private const int Mood = 2;
     private const int Stamina = 3;
-    private const int Health = 4;
+    private const int Life = 5;
     private const int MaxOffset = 100;
 
     private const string SnapMark = ".snap";
@@ -89,12 +90,13 @@ internal static class SaveReader
         }
 
         var attrs = lead.AttrDict;
+        var scale = Scale();
 
         return new SaveStats(
-            Meter(attrs, Health),
-            Meter(attrs, Satiety),
-            Meter(attrs, Mood),
-            Meter(attrs, Stamina),
+            Meter(attrs, Life, scale),
+            Meter(attrs, Satiety, scale),
+            Meter(attrs, Mood, scale),
+            Meter(attrs, Stamina, scale),
             planningPoints,
             child.SurvivalPoint,
             items);
@@ -303,14 +305,27 @@ internal static class SaveReader
         }
     }
 
-    private static Meter Meter(Il2CppSystem.Collections.Generic.Dictionary<int, int>? attrs, int id)
+    private static Meter Meter(Il2CppSystem.Collections.Generic.Dictionary<int, int>? attrs, int id, float scale)
     {
         if (attrs == null) return default;
 
         var value = attrs.ContainsKey(id) ? attrs[id] : 0;
         var max = attrs.ContainsKey(id + MaxOffset) ? attrs[id + MaxOffset] : 0;
 
-        return new Meter(value, max);
+        return Core.Meter.FromSave(value, max, scale);
+    }
+
+    /// <summary>The scale the game stores meter values at, from the game; the usual one if it cannot be read.</summary>
+    private static float Scale()
+    {
+        try
+        {
+            return GameKey.Attr_ScalingRatio;
+        }
+        catch (Exception)
+        {
+            return Core.Meter.DefaultScale;
+        }
     }
 
     /// <summary>The game's text for a key in one language, trimmed for the page; null when it has none.</summary>

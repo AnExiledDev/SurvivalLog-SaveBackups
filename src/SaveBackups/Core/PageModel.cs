@@ -371,7 +371,7 @@ public static class PageModel
     private static void WriteStats(Utf8JsonWriter json, string name, SaveStats stats, bool withItems)
     {
         json.WriteStartObject(name);
-        WriteMeter(json, "health", stats.Health);
+        WriteMeter(json, "life", stats.Life);
         WriteMeter(json, "satiety", stats.Satiety);
         WriteMeter(json, "mood", stats.Mood);
         WriteMeter(json, "stamina", stats.Stamina);

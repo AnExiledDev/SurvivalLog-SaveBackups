@@ -310,7 +310,7 @@ public sealed class LibraryTests : IDisposable
 
         var read = BackupMeta.Parse(meta.Id, meta.Stem, meta.ToJson())!.Stats!;
 
-        Assert.Equal(new Meter(80, 100), read.Health);
+        Assert.Equal(new Meter(80, 100), read.Life);
         Assert.Equal(new Meter(50, 100), read.Satiety);
         Assert.Equal(120, read.PlanningPoints);
         Assert.Equal(4, read.SurvivalPoints);
@@ -324,6 +324,36 @@ public sealed class LibraryTests : IDisposable
         const string older = "{\"stats\":{\"health\":[80,100],\"fullness\":[50,100],\"money\":120,\"points\":4,\"items\":{\"1\":5},\"journal\":\"Rain\"}}";
 
         Assert.Null(SaveStats.Read(JsonDocument.Parse(older).RootElement, "stats"));
+    }
+
+    [Fact]
+    public void Stats_kept_with_the_save_files_raw_numbers_count_as_unread_so_the_backup_is_read_again()
+    {
+        const string raw = "{\"stats\":{\"health\":[60000,100],\"satiety\":[80000,100],\"mood\":[70000,100],\"stamina\":[50000,100],\"planning\":12,\"survival\":3,\"items\":{}}}";
+
+        Assert.Null(SaveStats.Read(JsonDocument.Parse(raw).RootElement, "stats"));
+    }
+
+    [Theory]
+    [InlineData(60000, 100, 60)]
+    [InlineData(59500, 100, 60)]
+    [InlineData(59499, 100, 59)]
+    [InlineData(0, 100, 0)]
+    public void A_meter_in_a_save_is_kept_at_a_thousand_times_its_value(int stored, int max, int shown)
+    {
+        Assert.Equal(new Meter(shown, max), Meter.FromSave(stored, max, 1000f));
+    }
+
+    [Fact]
+    public void A_meter_over_its_most_shows_at_its_most_as_the_game_reads_it()
+    {
+        Assert.Equal(new Meter(100, 100), Meter.FromSave(137730, 100, 1000f));
+    }
+
+    [Fact]
+    public void A_scale_the_game_did_not_give_falls_back_to_a_thousand()
+    {
+        Assert.Equal(new Meter(83, 100), Meter.FromSave(83000, 100, 0f));
     }
 
     [Theory]
@@ -368,7 +398,7 @@ public sealed class LibraryTests : IDisposable
         Assert.Equal(7200, run.GetProperty("lastPlayedAgo").GetInt64());
         Assert.True(backup.GetProperty("shot").GetBoolean());
         Assert.True(backup.GetProperty("auto").GetBoolean());
-        Assert.Equal(80, backup.GetProperty("stats").GetProperty("health")[0].GetInt32());
+        Assert.Equal(80, backup.GetProperty("stats").GetProperty("life")[0].GetInt32());
         Assert.Equal(3, backup.GetProperty("stats").GetProperty("items").GetInt32());
         Assert.Equal(40, backup.GetProperty("stats").GetProperty("satiety")[0].GetInt32());
         Assert.Equal(5, backup.GetProperty("stats").GetProperty("planning").GetInt32());

@@ -10,7 +10,7 @@ The game keeps one copy of each save, and Steam Cloud can quietly put back an ol
 - **Pictures**: each backup made while you play takes a picture of the game, so you can see where you were. Click a picture to see it full size. Each save also shows its survivor's portrait.
 - **Pause menu buttons**: **Backups of this run** opens the save manager over the run you are playing, and **Back up now** saves the run and backs it up.
 - **Save manager**: the Load button on the title screen opens your saves, each with its survivor, loop, day and play time. Search, sort, filter, pin a save to the top, rename it or write a note on it. **Default Load screen** opens the game's normal Load screen.
-- **Timeline**: a save's backups and the game's own day snapshots on one timeline, grouped by day, with the save as it is now on top. Click one to see its picture, how your survivor stood then (health, satiety, mood, stamina, Planning Points, Survival Points and items) and what changed since.
+- **Timeline**: a save's backups and the game's own day snapshots on one timeline, grouped by day, with the save as it is now on top. Click one to see its picture, how your survivor stood then (Life, Satiety, Morale, Stamina, Planning Points, Survival Points and items) and what changed since.
 - **Compare with now**: what changed between a backup and the save as it is now, item by item.
 - **Restore**: load any backup as a new save next to the original, or replace the save with it. The save as it is gets a backup of its own first, and if that backup cannot be made, nothing is changed.
 - **Snapshots as new saves**: any of the game's own day snapshots can become a save of its own.

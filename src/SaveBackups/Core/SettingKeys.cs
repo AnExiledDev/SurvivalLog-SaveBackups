@@ -57,6 +57,7 @@ public static class SettingKeys
         new SettingKey("Screen", "ShowGameSnapshots", SettingType.Flag),
         new SettingKey("Toasts", "AutoBackupToasts", SettingType.Flag),
         new SettingKey("Controls", "BackupKey", SettingType.Key),
+        new SettingKey("Interface", "UiScale", SettingType.Number, 0, 200),
     };
 
     private static readonly Dictionary<string, SettingKey> ById = Index();

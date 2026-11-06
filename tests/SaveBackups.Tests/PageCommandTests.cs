@@ -88,6 +88,8 @@ public sealed class PageCommandTests
     [InlineData("Backups.Folder", "D:/Backups/SL", "D:/Backups/SL")]
     [InlineData("Backups.SecondFolder", "", "")]
     [InlineData("Controls.BackupKey", "F8", "F8")]
+    [InlineData("Interface.UiScale", "0", "0")]
+    [InlineData("Interface.UiScale", "150", "150")]
     public void A_setting_the_page_may_change_parses_with_its_value(string id, string value, string stored)
     {
         Assert.Equal(new PageCommand.Set(id, stored), Parse("set|" + id + "|" + Uri.EscapeDataString(value)));
@@ -103,6 +105,7 @@ public sealed class PageCommandTests
     [InlineData("Backups.Folder", "D:/a\"b")]
     [InlineData("Backups.Folder", "D:/a:b")]
     [InlineData("Controls.BackupKey", "F8; rm")]
+    [InlineData("Interface.UiScale", "201")]
     [InlineData("General.Secret", "1")]
     public void A_setting_outside_its_range_or_not_offered_is_refused(string id, string value)
     {

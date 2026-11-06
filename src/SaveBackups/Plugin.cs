@@ -19,15 +19,22 @@ namespace SaveBackups;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.savebackups";
-    private const string Version = "0.4.0";
+    private const string Version = "0.4.1";
     private const long Megabyte = 1024L * 1024L;
 
     /// <summary>Exiled's Toolkit: its shared helpers, toasts, live settings, typing watch and pause menu buttons all come from it.</summary>
     private const string ToolkitGuid = "com.dev.survivallog.exiledtoolkit";
     private const string ToolkitVersion = ">=0.19.0";
 
+    /// <summary>The name the page script hands its window to the Toolkit's UI size with.</summary>
+    private const string UiSizeName = "SaveBackups";
+
     public override void Load()
     {
+        ModUiSize.Bind(Config, UiSizeName, description:
+            "How big the save manager is drawn, in percent, from 75 to 200. At 0 it follows the UI size set in Exiled's Toolkit (its UiScale). The save manager nearly fills the screen, so past about 105 it is drawn only as big as still fits.\n" +
+            "存档管理的显示大小（百分比），范围 75 到 200。设为 0 时跟随 Exiled's Toolkit 的界面大小设置（它的 UiScale）。存档管理几乎占满屏幕，所以超过 105 左右后只会以能完整显示的最大尺寸显示。");
+
         var backupKey = Config.Bind("Controls", "BackupKey", KeyCode.None,
             "Key that saves the run you are playing and backs it up, like the Back up now button in the pause menu. It works only in a run, when the game could save. None, the default, leaves it unbound.\n" +
             "在游戏中按下此键会先保存当前存档，再备份它，与暂停菜单里的「立即备份」按钮相同。只在可以存档的时候有效。默认为 None，即不绑定按键。");
