@@ -26,7 +26,7 @@ The game keeps one copy of each save, and Steam Cloud can quietly put back an ol
 
 The save manager and messages follow the game's language, English or Simplified Chinese.
 
-The only thing Save Backups writes into a save is your survivor's highest Life, Satiety, Morale and Stamina, so the save manager can show them; the game ignores those numbers without the mod. You can remove it at any time; your saves stay as they are and the backups stay in their folder.
+The only thing Save Backups writes into a save is the most your survivor's Life, Satiety, Morale and Stamina can reach, so the save manager can show it; those numbers stay in the save if you remove the mod, and the game ignores them. You can remove it at any time; your saves stay as they are and the backups stay in their folder.
 
 ## Hotkeys
 
@@ -49,7 +49,7 @@ Steam Cloud only syncs `Saves`, so the backups stay on this PC. Copy the folder 
 - Pictures are taken only while you play. Backups made on the title screen, and those from before 0.3.0, have none. Backups from before 0.4.0 have only the small picture.
 - The Steam Cloud check compares the loop and day the game's save list shows with the newest backup. A save you rolled back on purpose with the game's own tools can show it once; **Dismiss** clears it.
 - Backups from earlier game versions can be restored, but the game decides whether it can still read them.
-- Saves and backups made before 0.4.2 show Life, Satiety, Morale and Stamina without their highest value, until the save is next saved in game.
+- Saves and backups made before 0.4.2 show Life, Satiety, Morale and Stamina without the most they can reach, until the save is next saved in game.
 
 ## Requirements
 
@@ -75,7 +75,7 @@ Settings live in `BepInEx\config\com.dev.survivallog.savebackups.cfg`, created t
 
 ## Troubleshooting
 
-Check `BepInEx\LogOutput.log` for `===== Save Backups 0.2.3 started`, followed by `backup key` and the key set (`None` when unbound). Every backup, restore and delete, and anything that went wrong, is in `BepInEx\save-backups.log`, which survives restarts.
+Check `BepInEx\LogOutput.log` for `===== Save Backups 0.4.3 started`, followed by `backup key` and the key set (`None` when unbound). Every backup, restore and delete, and anything that went wrong, is in `BepInEx\save-backups.log`, which survives restarts.
 
 If the pause menu has no **Back up now** button, check that Exiled's Toolkit 0.19.0 or newer is installed: it places the button. If the Load button opens the game's list, check that `ReplaceLoadScreen` is `true`, and look in the log for a line starting with `could not hook`.
 

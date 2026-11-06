@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.3
+
+- Fixed: a restore that could not finish (a file held open by Steam Cloud or antivirus) could leave a save without its main file. The save now always keeps a file that loads, and no half-copied files are left behind.
+- Fixed: the second copy (`SecondFolder`) could remove backups in that folder that it did not make, such as another PC's. It now only ever removes its own.
+- Fixed: putting back a deleted save whose files were still there replaced them without a safety backup. Any save whose file is there now gets one first.
+- Fixed: a save missing from the game's list but still on disk counted down its trash days, and imported backups of a save you never copied in were removed after 30 days. Both now stay.
+- Fixed: after a rebirth, or a restore to an earlier day, the replayed days got no morning or wave backup. They do now.
+- A backup's details are now written so that a crash in the middle can no longer hide it from the list.
+- `TakePictures` now says it takes a picture at full size as well as small.
+- Made for Survival Log 1.1.20719.
+
 ## 0.4.2
 
 - Your survivor's stats now show their real most, such as Life 89 / 130, instead of always out of 100. The game raises the most over a run, and a save keeps only the starting 100, so Save Backups now notes the real most in the save while you play. Saves and backups made before show the value alone, until the save is next saved in game.

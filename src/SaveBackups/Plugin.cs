@@ -19,7 +19,7 @@ namespace SaveBackups;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.savebackups";
-    private const string Version = "0.4.2";
+    private const string Version = "0.4.3";
     private const long Megabyte = 1024L * 1024L;
 
     /// <summary>Exiled's Toolkit: its shared helpers, toasts, live settings, typing watch and pause menu buttons all come from it.</summary>
@@ -71,8 +71,8 @@ public sealed class Plugin : BasePlugin
                 "开启 OnTimer 时，两次定时备份之间的游玩分钟数。",
                 new AcceptableValueRange<int>(5, 240)));
         var takePictures = Config.Bind("Backups", "TakePictures", true,
-            "Take a small picture of the game with each backup made while you play, shown in the save manager.\n" +
-            "游玩时每次备份都会拍一张游戏画面的小图，在存档管理中显示。");
+            "Take a picture of the game with each backup made while you play, shown in the save manager.\n" +
+            "游玩时每次备份都会拍一张游戏画面，在存档管理中显示。");
         var verify = Config.Bind("Backups", "Verify", true,
             "Read each backup back and compare it with the save before it counts as made. A copy that does not match is not kept.\n" +
             "每次备份后都会读回并与存档比对，一致才算完成。不一致的副本不会保留。");

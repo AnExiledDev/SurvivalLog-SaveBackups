@@ -24,7 +24,7 @@ The value is a Unity key name, for example `F8`, `F11`, `Insert` or `Keypad5`.
 | `AtEnding` | `true` | Back up the run when it reaches an ending and the game saved your choice, so you can restore it and try another ending. |
 | `OnTimer` | `false` | Also back up the run after every `TimerMinutes` minutes of play. The game saves first. |
 | `TimerMinutes` | `20` | Minutes of play between timer backups, from 5 to 240. |
-| `TakePictures` | `true` | Take a small picture of the game with each backup made while you play, shown in the save manager. |
+| `TakePictures` | `true` | Take a picture of the game with each backup made while you play, shown in the save manager. |
 | `Verify` | `true` | Read each backup back and compare it with the save before it counts as made. A copy that does not match is not kept. |
 
 ## Keep

@@ -61,6 +61,18 @@ public sealed class ModelTests
     }
 
     [Fact]
+    public void After_a_rebirth_a_replayed_day_gets_its_morning_backup_again()
+    {
+        var existing = new[] { Make.Backup(BackupKind.Morning, 10, turn: 1, day: 18), Make.Backup(BackupKind.Wave, 20, turn: 1, day: 18) };
+        var day18 = new Progress(1, 18, 0);
+        var rebirth = Make.Start.AddMinutes(30);
+
+        Assert.False(Repeats.IsRepeat(BackupKind.Morning, day18, existing, Make.Start.AddHours(1), rebirth));
+        Assert.False(Repeats.IsRepeat(BackupKind.Wave, day18, existing, Make.Start.AddHours(1), rebirth));
+        Assert.True(Repeats.IsRepeat(BackupKind.Morning, day18, existing, Make.Start.AddHours(1), Make.Start));
+    }
+
+    [Fact]
     public void A_wave_backup_is_one_per_day_and_an_expedition_one_only_skips_a_quick_retry()
     {
         var wave = new[] { Make.Backup(BackupKind.Wave, 0, turn: 1, day: 4) };

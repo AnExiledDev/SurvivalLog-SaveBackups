@@ -96,6 +96,23 @@ public sealed class BackupStoreTests : IDisposable
     }
 
     [Fact]
+    public void A_restore_that_fails_partway_still_leaves_the_main_file_and_no_temporary_copies()
+    {
+        _dirs.Write("Save_A.bytes", "day 3");
+        _dirs.Write("Save_A.snap1.bytes", "snapshot");
+        var meta = Create();
+
+        _dirs.Write("Save_A.bytes", "day 4");
+        File.Delete(Path.Combine(_dirs.Saves, "Save_A.snap1.bytes"));
+        // A folder where the snapshot goes makes its move fail after the main file is in.
+        Directory.CreateDirectory(Path.Combine(_dirs.Saves, "Save_A.snap1.bytes"));
+
+        Assert.IsType<Result<Unit>.Failed>(_store.Restore("Save_A", meta.Id, _dirs.Saves));
+        Assert.True(_dirs.Has("Save_A.bytes"));
+        Assert.Empty(Directory.GetFiles(_dirs.Saves, "*" + BackupStore.TempSuffix));
+    }
+
+    [Fact]
     public void Restore_brings_back_a_run_whose_files_are_gone()
     {
         _dirs.Write("Save_A.bytes", "kept");

@@ -169,8 +169,9 @@ public sealed partial class BackupStore
 
     /// <summary>
     /// Puts a backup's files in place of the run's files in <paramref name="saveFolder"/>: the backup's copies go in
-    /// under temporary names, then the run's present files are deleted, then the copies take their names. Run files
-    /// the backup does not have (a snapshot made after it) are removed, so the run is exactly as backed up.
+    /// under temporary names, then each copy replaces its file in one step, then run files the backup does not have
+    /// (a snapshot made after it) are removed, so the run is exactly as backed up. The main file is never deleted
+    /// first, so a restore that fails partway still leaves a save that loads, and no temporary copies are left behind.
     /// </summary>
     public Result<Unit> Restore(string stem, string id, string saveFolder)
     {
@@ -205,18 +206,22 @@ public sealed partial class BackupStore
 
         try
         {
-            foreach (var name in RunFiles.In(saveFolder, stem)) File.Delete(Path.Combine(saveFolder, name));
-
             // The game's .bak of the main file would be read if the main file failed to load, so it must not be older than the backup.
             TryDeleteFile(Path.Combine(saveFolder, RunFiles.MainFile(stem) + ".bak"));
 
             foreach (var name in staged) File.Move(Path.Combine(saveFolder, name + TempSuffix), Path.Combine(saveFolder, name), overwrite: true);
+
+            var kept = staged.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var name in RunFiles.In(saveFolder, stem).Where(name => !kept.Contains(name))) File.Delete(Path.Combine(saveFolder, name));
 
             return Result.Done(new Unit());
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             // The safety backup made before the restore still holds the run as it was.
+            foreach (var name in staged) TryDeleteFile(Path.Combine(saveFolder, name + TempSuffix));
+
             return Result.Failed<Unit>(ex.Message);
         }
     }
@@ -250,7 +255,7 @@ public sealed partial class BackupStore
 
         try
         {
-            File.WriteAllText(Path.Combine(RunFolder(stem), id, BackupMeta.FileName), (meta with { IsPinned = isPinned }).ToJson());
+            WriteMeta(Path.Combine(RunFolder(stem), id, BackupMeta.FileName), meta with { IsPinned = isPinned });
 
             return Result.Done(new Unit());
         }
@@ -269,7 +274,7 @@ public sealed partial class BackupStore
 
         try
         {
-            File.WriteAllText(Path.Combine(RunFolder(stem), id, BackupMeta.FileName), (meta with { Note = Notes.Clean(note) }).ToJson());
+            WriteMeta(Path.Combine(RunFolder(stem), id, BackupMeta.FileName), meta with { Note = Notes.Clean(note) });
 
             return Result.Done(new Unit());
         }
@@ -377,6 +382,13 @@ public sealed partial class BackupStore
 
     public bool HasShot(string stem, string id) => IsSafeId(stem) && IsSafeId(id) && File.Exists(ShotPath(stem, id));
 
+    /// <summary>Writes a backup.json through a temporary file, so a write cut short never leaves a backup that cannot be read.</summary>
+    private static void WriteMeta(string path, BackupMeta meta)
+    {
+        File.WriteAllText(path + TempSuffix, meta.ToJson());
+        File.Move(path + TempSuffix, path, overwrite: true);
+    }
+
     /// <summary>Rewrites a backup's backup.json, as with stats read after it was made.</summary>
     public Result<Unit> Rewrite(BackupMeta meta)
     {
@@ -386,7 +398,7 @@ public sealed partial class BackupStore
 
         try
         {
-            File.WriteAllText(path, meta.ToJson());
+            WriteMeta(path, meta);
 
             return Result.Done(new Unit());
         }

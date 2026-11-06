@@ -30,6 +30,9 @@ public sealed partial class BackupStore
     public const string BinFolder = "Bin";
     private const string BinnedFile = "binned.json";
 
+    /// <summary>Written into every backup folder the second copy makes, so it only ever removes its own.</summary>
+    public const string MirroredFile = "mirrored.json";
+
     public string BinPath => Path.Combine(_root, BinFolder);
 
     private string BinItem(string stem, string id) => Path.Combine(BinPath, stem, id);
@@ -155,14 +158,14 @@ public sealed partial class BackupStore
         ReadNote(stem).DeletedAt == null ? Result.Done(new Unit()) : UpdateNote(stem, note => note with { DeletedAt = null });
 
     /// <summary>
-    /// Deletes a deleted save's backups for good, and its folder when none are left. Pinned backups stay unless
-    /// <paramref name="isPinnedToo"/>. Returns how many went.
+    /// Deletes a deleted save's backups for good, and its folder when none are left. Pinned and imported backups stay
+    /// unless <paramref name="isPinnedToo"/>. Returns how many went.
     /// </summary>
     public int DeleteRunForever(string stem, bool isPinnedToo)
     {
         if (!IsSafeId(stem) || !IsRunFolder(stem)) return 0;
 
-        var removed = Of(stem).Where(meta => isPinnedToo || !meta.IsPinned).Count(meta => DeleteForever(meta.Stem, meta.Id) is Result<Unit>.Done);
+        var removed = Of(stem).Where(meta => isPinnedToo || (!meta.IsPinned && meta.Kind != BackupKind.Imported)).Count(meta => DeleteForever(meta.Stem, meta.Id) is Result<Unit>.Done);
 
         if (Of(stem).Count == 0) TryDeleteFolder(RunFolder(stem));
 
@@ -177,7 +180,9 @@ public sealed partial class BackupStore
         var cutoff = _utcNow().AddDays(-days);
         var removed = Bin().Where(entry => entry.BinnedUtc < cutoff).Count(entry => DeleteFromBin(entry.Meta.Stem, entry.Meta.Id) is Result<Unit>.Done);
 
-        foreach (var pair in DeletedRuns().Where(pair => pair.Value < cutoff).ToList()) removed += DeleteRunForever(pair.Key, isPinnedToo: false);
+        // A run backed up again after it left the list is in use somewhere, so its days do not count.
+        foreach (var pair in DeletedRuns().Where(pair => pair.Value < cutoff && !Of(pair.Key).Any(meta => meta.CreatedUtc > pair.Value)).ToList())
+            removed += DeleteRunForever(pair.Key, isPinnedToo: false);
 
         return removed;
     }
@@ -185,7 +190,8 @@ public sealed partial class BackupStore
     /// <summary>
     /// Copies every backup not yet in <paramref name="secondRoot"/> there, each through a ".partial" folder, with its
     /// run's run.json. A backup in the second copy that is gone from a run still here is removed there too, so the
-    /// copy follows the limits; a run gone from here entirely is left alone there. Returns how many were copied.
+    /// copy follows the limits, but only a folder the copy made itself (it holds <see cref="MirroredFile"/>): backups
+    /// someone else keeps in that folder are never touched. A run gone from here entirely is left alone there. Returns how many were copied.
     /// </summary>
     public Result<int> Mirror(string secondRoot)
     {
@@ -219,6 +225,7 @@ public sealed partial class BackupStore
                     foreach (var file in Directory.EnumerateFiles(Path.Combine(RunFolder(meta.Stem), meta.Id)))
                         File.Copy(file, Path.Combine(partial, Path.GetFileName(file)), overwrite: true);
 
+                    File.WriteAllText(Path.Combine(partial, MirroredFile), "{}");
                     Directory.Move(partial, target);
                     copied++;
                 }
@@ -231,7 +238,7 @@ public sealed partial class BackupStore
 
                 if (File.Exists(note)) File.Copy(note, Path.Combine(mirrorRun, RunNoteFile), overwrite: true);
 
-                foreach (var old in Directory.EnumerateDirectories(mirrorRun).Where(folder => !ids.Contains(Path.GetFileName(folder))).ToList())
+                foreach (var old in Directory.EnumerateDirectories(mirrorRun).Where(folder => !ids.Contains(Path.GetFileName(folder)) && File.Exists(Path.Combine(folder, MirroredFile))).ToList())
                     TryDeleteFolder(old);
             }
 

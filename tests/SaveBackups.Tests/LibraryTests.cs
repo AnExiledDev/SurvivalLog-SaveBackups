@@ -118,6 +118,33 @@ public sealed class LibraryTests : IDisposable
     }
 
     [Fact]
+    public void An_imported_backup_of_a_deleted_save_is_kept_after_the_bin_days()
+    {
+        var imported = Create(day: 1);
+        Create(day: 2);
+        Assert.IsType<Result<Unit>.Done>(_store.Rewrite(imported with { Kind = BackupKind.Imported }));
+
+        _store.MarkDeleted("Save_A", _now);
+        _now = _now.AddDays(31);
+
+        Assert.Equal(1, _store.ExpireBin(30));
+        Assert.Equal(imported.Id, Assert.Single(_store.Of("Save_A")).Id);
+    }
+
+    [Fact]
+    public void A_deleted_save_backed_up_again_since_does_not_run_out_its_days()
+    {
+        Create(day: 1);
+        _store.MarkDeleted("Save_A", _now);
+        _now = _now.AddDays(2);
+        Create(day: 2);
+        _now = _now.AddDays(31);
+
+        Assert.Equal(0, _store.ExpireBin(30));
+        Assert.Equal(2, _store.Of("Save_A").Count);
+    }
+
+    [Fact]
     public void A_save_back_in_the_list_is_no_longer_counted_as_deleted()
     {
         Create();
@@ -230,6 +257,24 @@ public sealed class LibraryTests : IDisposable
         Assert.Equal(0, Assert.IsType<Result<int>.Done>(_store.Mirror(second)).Value);
         Assert.False(Directory.Exists(Path.Combine(second, "Save_A", dropped.Id)));
         Assert.True(new BackupStore(second, () => _now).Find("Save_A", kept.Id)!.IsPinned);
+    }
+
+    [Fact]
+    public void The_second_copy_never_removes_backups_it_did_not_make()
+    {
+        var second = Path.Combine(_dirs.Root, "Second");
+        var theirs = Path.Combine(second, "Save_A", "20200101-000000-morning");
+        Directory.CreateDirectory(theirs);
+        File.WriteAllText(Path.Combine(theirs, "Save_A.bytes"), "someone else's");
+        var dropped = Create(day: 1);
+        Create(day: 2);
+
+        _store.Mirror(second);
+        _store.Delete("Save_A", dropped.Id);
+        _store.Mirror(second);
+
+        Assert.True(File.Exists(Path.Combine(theirs, "Save_A.bytes")));
+        Assert.False(Directory.Exists(Path.Combine(second, "Save_A", dropped.Id)));
     }
 
     [Fact]

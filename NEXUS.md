@@ -2,7 +2,7 @@ Name: Save Backups
 Summary: Automatic backups of every save, out of Steam Cloud's reach, each with a picture of the game. The Load button opens a save manager with survivor portraits and a timeline: compare a backup with now, restore it as a new save or in place, and undo deletes from the trash. Back up now from the pause menu, plus export, import and a Steam Cloud check.
 
 Description (BBCode):
-[center][img]https://sldb.core-directive.com/media/save/1-save-safe.png[/img][/center]
+[center][img]https://sldb.core-directive.com/media/save/2-changes-stay.png[/img][/center]
 
 The game keeps one copy of each save, and Steam Cloud can quietly put back an older one. Save Backups copies your save each morning, when you quit, before a rebirth, an expedition or a zombie wave, and at an ending, into a folder Steam Cloud never touches, with a picture of where you were. The title screen's Load button then opens a save manager where you can see every backup of every save on a timeline and put any of them back.
 
@@ -30,7 +30,7 @@ The game keeps one copy of each save, and Steam Cloud can quietly put back an ol
 
 Works in English and Chinese.
 
-Backups are kept in [font=Courier New]AppData\LocalLow\LLS\SLGame\SaveBackups[/font], next to the game's Saves folder. Steam Cloud only syncs Saves, so the backups stay on this PC. The only thing it writes into a save is your survivor's highest Life, Satiety, Morale and Stamina, so the save manager can show them; the game ignores those numbers without the mod, and you can remove it at any time.
+Backups are kept in [font=Courier New]AppData\LocalLow\LLS\SLGame\SaveBackups[/font], next to the game's Saves folder. Steam Cloud only syncs Saves, so the backups stay on this PC. The only thing it writes into a save is the most your survivor's Life, Satiety, Morale and Stamina can reach, so the save manager can show it. Those numbers stay in the save if you remove the mod, and the game ignores them, so you can remove it at any time.
 
 [size=5]Known issues[/size]
 [list]
@@ -38,7 +38,7 @@ Backups are kept in [font=Courier New]AppData\LocalLow\LLS\SLGame\SaveBackups[/f
 [*]A copied save starts without the original's ending snapshots, so it cannot jump back to one of the original's endings.[/*]
 [*]Pictures are taken only while you play. Backups made on the title screen, and older ones, have none. Older backups have only a small picture.[/*]
 [*]A save you rolled back on purpose with the game's own tools can show the Steam Cloud warning once; keep the day you want and it clears.[/*]
-[*]Saves and backups made before you installed the mod show Life, Satiety, Morale and Stamina without their highest value, until the save is next saved in game.[/*]
+[*]Saves and backups made before you installed the mod show Life, Satiety, Morale and Stamina without the most they can reach, until the save is next saved in game.[/*]
 [/list]
 
 [center][img]https://sldb.core-directive.com/img/mods-banner.jpg[/img]
@@ -102,7 +102,7 @@ Open source under MIT: [url=https://github.com/AnExiledDev/SurvivalLog-SaveBacku
 
 支持英文和中文。
 
-备份保存在 [font=Courier New]AppData\LocalLow\LLS\SLGame\SaveBackups[/font]，与游戏的 Saves 文件夹相邻。Steam 云只同步 Saves，所以备份只留在这台电脑上。它只往存档里写入角色生命、饱腹、心态和体力的上限，供存档管理显示；没有本模组时游戏会忽略这些数字，你可以随时移除它。
+备份保存在 [font=Courier New]AppData\LocalLow\LLS\SLGame\SaveBackups[/font]，与游戏的 Saves 文件夹相邻。Steam 云只同步 Saves，所以备份只留在这台电脑上。它只往存档里写入角色生命、饱腹、心态和体力的上限，供存档管理显示；移除本模组后这些数字仍留在存档里，但游戏会忽略它们，所以你可以随时移除它。
 
 [size=5]已知问题[/size]
 [list]

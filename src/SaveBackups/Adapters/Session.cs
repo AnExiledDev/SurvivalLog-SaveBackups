@@ -438,8 +438,11 @@ internal sealed class Session
                     {
                         var isMarked = notes.TryGetValue(stem, out var note) && note.DeletedAt != null;
 
-                        if (!listed.Contains(stem) && !isMarked) store.MarkDeleted(stem, DateTime.UtcNow);
-                        else if (listed.Contains(stem) && isMarked) store.MarkListed(stem);
+                        // A save whose main file is still there is not gone, whatever the list says (Steam Cloud can put back an older list).
+                        var isKept = listed.Contains(stem) || (saveFolder != null && File.Exists(Path.Combine(saveFolder, RunFiles.MainFile(stem))));
+
+                        if (!isKept && !isMarked) store.MarkDeleted(stem, DateTime.UtcNow);
+                        else if (isKept && isMarked) store.MarkListed(stem);
                     }
                 }
 
@@ -576,7 +579,7 @@ internal sealed class Session
         _worker.Run(
             () =>
             {
-                if (Repeats.IsRepeat(kind, facts.Progress, store.Of(stem), DateTime.UtcNow)) return (Made: (Result<BackupMeta>?)null, Mirror: (Result<int>?)null);
+                if (Repeats.IsRepeat(kind, facts.Progress, store.Of(stem), DateTime.UtcNow, store.SettledAt(stem))) return (Made: (Result<BackupMeta>?)null, Mirror: (Result<int>?)null);
 
                 var made = store.Create(saveFolder, facts, kind, version, dayText, shot?.Small, verify, stats, shot?.Large);
                 Result<int>? mirror = null;
@@ -870,8 +873,8 @@ internal sealed class Session
     }
 
     /// <summary>
-    /// A backup's files in place of the run's. A listed run gets a safety backup first; a deleted one has no files to
-    /// keep, and goes back into the game's list once its files are in place.
+    /// A backup's files in place of the run's. Whenever the run's main file is on disk it gets a safety backup first,
+    /// listed or not; a deleted run goes back into the game's list once its files are in place.
     /// </summary>
     private void Restore(string stem, string id, bool isDeleted)
     {
@@ -895,7 +898,9 @@ internal sealed class Session
 
                 if (backup == null) return (Backup: (BackupMeta?)null, Result: Result.Failed<Unit>("no backup " + id));
 
-                if (listed != null && store.Create(saveFolder, listed, BackupKind.Safety, version) is Result<BackupMeta>.Failed safety)
+                var isOnDisk = File.Exists(Path.Combine(saveFolder, RunFiles.MainFile(stem)));
+
+                if (isOnDisk && store.Create(saveFolder, listed ?? backup.Run, BackupKind.Safety, version) is Result<BackupMeta>.Failed safety)
                     return (Backup: backup, Result: Result.Failed<Unit>("the safety backup failed, nothing was changed: " + safety.Why));
 
                 var restored = store.Restore(stem, id, saveFolder);

@@ -8,16 +8,19 @@ namespace SaveBackups.Core;
 /// reload, a second pass of the day change), so a morning backup is skipped when the run already has one for that day
 /// of that loop; a wave backup likewise, since one day can start more than one wave. An expedition backup is skipped
 /// when the run got one on the same day less than <see cref="ExpeditionGap"/> ago, because the game asks to set out
-/// again when the first try is refused (a locked map, missing items).
+/// again when the first try is refused (a locked map, missing items). Backups made before the run was last settled (a
+/// rebirth or a restore took it back) belong to a timeline the run left, so they never count.
 /// </summary>
 public static class Repeats
 {
     public static readonly TimeSpan ExpeditionGap = TimeSpan.FromMinutes(3);
 
-    public static bool IsRepeat(BackupKind kind, Progress progress, IReadOnlyList<BackupMeta> existing, DateTime utcNow)
+    public static bool IsRepeat(BackupKind kind, Progress progress, IReadOnlyList<BackupMeta> existing, DateTime utcNow, DateTime? settledUtc = null)
     {
         foreach (var meta in existing)
         {
+            if (settledUtc != null && meta.CreatedUtc <= settledUtc) continue;
+
             if (meta.Kind != kind || meta.Run.Progress.Turn != progress.Turn || meta.Run.Progress.Day != progress.Day) continue;
 
             switch (kind)
