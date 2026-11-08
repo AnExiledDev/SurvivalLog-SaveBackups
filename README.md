@@ -56,6 +56,7 @@ Steam Cloud only syncs `Saves`, so the backups stay on this PC. Copy the folder 
 - Survival Log 1.1.20719. Built on this version; a game update can break it until the mod is updated.
 - The [BepInEx Pack for Survival Log](https://www.nexusmods.com/survivallog/mods/12), the BepInEx 6 (IL2CPP) build for the game.
 - [Exiled's Toolkit](https://github.com/AnExiledDev/SurvivalLog-ExiledToolkit) 0.19.0 or newer. Save Backups does not load without it. It shows the mod's messages as toasts, sizes the save manager to the Toolkit's UI size, and applies settings changed on the Mod Manager's Mods screen without a restart.
+- Optional: [Mod Manager](https://www.nexusmods.com/survivallog/mods/73). With it, you can change every setting in game on its Mods screen and see what each one does, without opening the config file.
 
 ## Install
 
