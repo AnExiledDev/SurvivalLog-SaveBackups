@@ -128,6 +128,7 @@
       ending: ['Ending', '结局'],
       imported: ['Imported', '导入'],
       timer: ['Timer', '定时'],
+      update: ['Before mod updates', '模组更新前'],
       snap: ['Day snapshot', '每日快照'],
       round: ['Start of the loop', '本轮开始']
     },
@@ -232,6 +233,7 @@
       ending: ['At an ending', '到达结局时', 'So you can go back and try another ending.', '方便回去尝试其他结局。'],
       quit: ['When you quit', '退出时', 'To the title screen or out of the game.', '回到标题画面或退出游戏时。'],
       timer: ['On a timer', '定时备份', 'Real minutes, counted only while you play.', '现实时间，只在游玩时计时。'],
+      update: ['Before mod updates', '模组更新前', 'When the Mod Manager installs updates.', 'Mod Manager 安装更新时。'],
       manual: ['Your own backups', '手动备份', 'Back up now, here or in the pause menu.', '这里或暂停菜单里的「立即备份」。'],
       safety: ['Before a restore or delete', '恢复或删除前', 'So any step here can be undone.', '这里的任何操作都能撤销。']
     },
@@ -700,7 +702,7 @@
   var DEFAULT_CROP = ['250% auto', '50% 10%'];
   var KIND_COLORS = {
     now: '#8fc7bf', morning: '#FFC83A', expedition: '#8fc7bf', wave: '#ff5a5a', rebirth: '#c9a4ff', ending: '#EBA308',
-    manual: '#ffffff', quit: '#9a9a9a', timer: '#d8b070', safety: '#6f6a60', imported: '#4fa8ff', snap: '#6f8fb8', round: '#6f8fb8'
+    manual: '#ffffff', quit: '#9a9a9a', timer: '#d8b070', update: '#a0c86e', safety: '#6f6a60', imported: '#4fa8ff', snap: '#6f8fb8', round: '#6f8fb8'
   };
   var METER_COLORS = { life: '#e06a5a', satiety: '#d8b070', mood: '#c9a4ff', stamina: '#8fc7bf' };
   var METERS = ['life', 'satiety', 'mood', 'stamina'];
@@ -715,6 +717,7 @@
     ['ending', 'Backups.AtEnding', 'Keep.Ending'],
     ['quit', 'Backups.OnQuit', 'Keep.Quit'],
     ['timer', 'Backups.OnTimer', 'Keep.Timer'],
+    ['update', 'Backups.BeforeModUpdates', 'Keep.Update'],
     ['manual', '', 'Keep.Manual'],
     ['safety', '', 'Keep.Safety']
   ];

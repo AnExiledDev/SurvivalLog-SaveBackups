@@ -1,3 +1,4 @@
+using System;
 using SaveBackups.Core;
 using Xunit;
 
@@ -22,6 +23,33 @@ public sealed class RetentionTests
         var doomed = Retention.Plan(all, NoLimits with { Morning = 2 });
 
         Assert.Equal(new[] { all[0] }, doomed);
+    }
+
+    [Fact]
+    public void Backups_before_mod_updates_keep_their_own_newest_n()
+    {
+        // Installing updates often must not push out the run's other backups, nor keep every update backup forever.
+        var all = new[]
+        {
+            Make.Backup(BackupKind.Update, 1),
+            Make.Backup(BackupKind.Update, 2),
+            Make.Backup(BackupKind.Morning, 3),
+            Make.Backup(BackupKind.Update, 4),
+        };
+
+        var doomed = Retention.Plan(all, NoLimits with { Update = 2 });
+
+        Assert.Equal(new[] { all[0] }, doomed);
+    }
+
+    [Fact]
+    public void Every_kind_of_backup_has_a_limit()
+    {
+        var limits = NoLimits with { Update = 7 };
+
+        foreach (var kind in Enum.GetValues<BackupKind>()) limits.For(kind);
+
+        Assert.Equal(7, limits.For(BackupKind.Update));
     }
 
     [Fact]

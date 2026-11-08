@@ -134,4 +134,10 @@ public sealed class PageCommandTests
         Assert.False(PageCommand.IsOurs("slmod|unpackall|ready"));
         Assert.IsType<PageCommand.Unknown>(PageCommand.Parse("slmod|unpackall|ready"));
     }
+
+    [Theory]
+    [InlineData("Backups.BeforeModUpdates", SettingType.Flag)]
+    [InlineData("Keep.Update", SettingType.Number)]
+    public void The_settings_tab_may_change_the_mod_update_backup_settings(string id, SettingType type) =>
+        Assert.Equal(type, SettingKeys.Find(id)?.Type);
 }

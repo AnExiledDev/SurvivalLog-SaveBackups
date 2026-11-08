@@ -19,7 +19,7 @@ namespace SaveBackups;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.savebackups";
-    private const string Version = "0.4.3";
+    private const string Version = "0.5.0";
     private const long Megabyte = 1024L * 1024L;
 
     /// <summary>Exiled's Toolkit: its shared helpers, toasts, live settings, typing watch and pause menu buttons all come from it.</summary>
@@ -62,6 +62,9 @@ public sealed class Plugin : BasePlugin
         var atEnding = Config.Bind("Backups", "AtEnding", true,
             "Back up the run when it reaches an ending and the game saved your choice, so you can restore it and try another ending.\n" +
             "存档到达结局、游戏保存你的选择时备份，之后可以恢复它去尝试其他结局。");
+        var beforeModUpdates = Config.Bind("Backups", "BeforeModUpdates", true,
+            "Back up your saves when the Mod Manager is about to install mod updates: the run you are playing, or every save on the title screen.\n" +
+            "Mod Manager 安装模组更新之前备份存档：游戏中备份当前存档，在标题画面则备份所有存档。");
         var onTimer = Config.Bind("Backups", "OnTimer", false,
             "Also back up the run after every TimerMinutes minutes of play. The game saves first.\n" +
             "每游玩 TimerMinutes 分钟也备份一次当前存档。备份前会先让游戏存档。");
@@ -85,6 +88,7 @@ public sealed class Plugin : BasePlugin
         var keepWave = Keep(Config, "Wave", 5, "backups made before a zombie wave", "尸潮前的备份");
         var keepEnding = Keep(Config, "Ending", 3, "backups made at an ending", "结局时的备份");
         var keepTimer = Keep(Config, "Timer", 6, "timer backups", "定时备份");
+        var keepUpdate = Keep(Config, "Update", 5, "backups made before mod updates", "模组更新前的备份");
         var keepAllDays = Config.Bind("Keep", "KeepAllDays", 3,
             "Every backup of the last this many days of play is kept. Older automatic backups are thinned to one a day (see DailyDays). 0 turns thinning off.\n" +
             "最近这么多个游戏日的备份全部保留。更早的自动备份会精简为每天一个（见 DailyDays）。设为 0 表示不精简。");
@@ -137,7 +141,7 @@ public sealed class Plugin : BasePlugin
                 Math.Max(0, keepWave.Value),
                 Math.Max(0, keepEnding.Value),
                 Math.Max(0, keepTimer.Value),
-                Math.Max(0, maxTotal.Value) * Megabyte) { Thin = new Thinning(Math.Max(0, keepAllDays.Value), Math.Max(0, dailyDays.Value), perLoop.Value) })
+                Math.Max(0, maxTotal.Value) * Megabyte) { Thin = new Thinning(Math.Max(0, keepAllDays.Value), Math.Max(0, dailyDays.Value), perLoop.Value), Update = Math.Max(0, keepUpdate.Value) })
         {
             FolderSetting = folder.Value.Trim(),
             OnTimer = onTimer.Value,
@@ -147,6 +151,7 @@ public sealed class Plugin : BasePlugin
             Verify = verify.Value,
             WarnWhenBehind = warnWhenBehind.Value,
             ShowGameSnapshots = showGameSnapshots.Value,
+            BeforeModUpdates = beforeModUpdates.Value,
             BinDays = Math.Max(0, binDays.Value),
         };
 
@@ -197,6 +202,7 @@ public sealed class Plugin : BasePlugin
 
         log.Write($"===== Save Backups {Version} started");
         Hooks.Session = session;
+        UpdateBackup.Log = log.Write;
         Hooks.Apply(hooks);
         LiveSettings.Watch(backupKey, key =>
         {
@@ -204,8 +210,8 @@ public sealed class Plugin : BasePlugin
             log.Write($"backup key {key}");
         });
         LiveSettings.Watch(() => session.UseSettings(Read()),
-            folder, secondFolder, onMorning, onQuit, beforeRebirth, beforeExpedition, beforeWave, atEnding, onTimer, timerMinutes, takePictures, verify,
-            keepMorning, keepQuit, keepRebirth, keepManual, keepSafety, keepExpedition, keepWave, keepEnding, keepTimer, keepAllDays, dailyDays, perLoop, maxTotal, binDays,
+            folder, secondFolder, onMorning, onQuit, beforeRebirth, beforeExpedition, beforeWave, atEnding, beforeModUpdates, onTimer, timerMinutes, takePictures, verify,
+            keepMorning, keepQuit, keepRebirth, keepManual, keepSafety, keepExpedition, keepWave, keepEnding, keepTimer, keepUpdate, keepAllDays, dailyDays, perLoop, maxTotal, binDays,
             replaceLoadScreen, warnWhenBehind, showGameSnapshots, autoToasts);
         session.Start();
         AddPauseButtons(session);

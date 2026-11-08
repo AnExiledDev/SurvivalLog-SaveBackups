@@ -21,6 +21,9 @@ public sealed record Limits(int Morning, int Quit, int Rebirth, int Manual, int 
 {
     public Thinning Thin { get; init; } = Thinning.Off;
 
+    /// <summary>Backups made before the Mod Manager installs mod updates.</summary>
+    public int Update { get; init; } = 5;
+
     public int For(BackupKind kind) => kind switch
     {
         BackupKind.Morning => Morning,
@@ -32,6 +35,7 @@ public sealed record Limits(int Morning, int Quit, int Rebirth, int Manual, int 
         BackupKind.Wave => Wave,
         BackupKind.Ending => Ending,
         BackupKind.Timer => Timer,
+        BackupKind.Update => Update,
         BackupKind.Imported => 0,
         _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
     };

@@ -300,6 +300,40 @@ internal sealed class Session
         BackUp(facts, BackupKind.Ending, isAsked: false);
     }
 
+    /// <summary>
+    /// The Mod Manager is about to install mod updates: the run being played is saved (when the game allows it) and
+    /// backed up, or on the title screen every save on disk. The copies run on the worker. How many were started.
+    /// </summary>
+    public int ModUpdatesStarting()
+    {
+        if (!_settings.BeforeModUpdates) return 0;
+
+        if (GameSaves.CurrentFile() != null)
+        {
+            if (SaveForBackup() is not { } facts) return 0;
+
+            BackUp(facts, BackupKind.Update, isAsked: false);
+
+            return 1;
+        }
+
+        if (_game.SaveFolder() is not { } saveFolder || !_game.HasHistory()) return 0;
+
+        var started = 0;
+
+        foreach (var run in _game.History())
+        {
+            if (!File.Exists(Path.Combine(saveFolder, run.FileName))) continue;
+
+            BackUp(run, BackupKind.Update, isAsked: false);
+            started++;
+        }
+
+        _log($"before mod updates: {started} saves to back up");
+
+        return started;
+    }
+
     /// <summary>Saves the run when the game would itself, else writes out what it queued; the run's facts after.</summary>
     private RunFacts? SaveForBackup()
     {

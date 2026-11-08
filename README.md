@@ -6,7 +6,7 @@ The game keeps one copy of each save, and Steam Cloud can quietly put back an ol
 
 ## Features
 
-- **Automatic backups**: each morning right after the game's own save, when you quit to the title screen or close the game, right before a rebirth rolls the run back, right before an expedition, right before a zombie wave (once a day), when a run reaches an ending, and, if you turn it on, every few minutes of play. A backup copies every file of the save, its rebirth day snapshots included, and is read back and checked before it counts.
+- **Automatic backups**: each morning right after the game's own save, when you quit to the title screen or close the game, right before a rebirth rolls the run back, right before an expedition, right before a zombie wave (once a day), when a run reaches an ending, right before the Mod Manager installs mod updates, and, if you turn it on, every few minutes of play. A backup copies every file of the save, its rebirth day snapshots included, and is read back and checked before it counts.
 - **Pictures**: each backup made while you play takes a picture of the game, so you can see where you were. Click a picture to see it full size. Each save also shows its survivor's portrait.
 - **Pause menu buttons**: **Backups of this run** opens the save manager over the run you are playing, and **Back up now** saves the run and backs it up.
 - **Save manager**: the Load button on the title screen opens your saves, each with its survivor, loop, day and play time. Search, sort, filter, pin a save to the top, rename it or write a note on it. **Default Load screen** opens the game's normal Load screen.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.0
+
+- New: when the Mod Manager is about to install mod updates, your saves are backed up first: the run you are playing, or every save when you are on the title screen. These backups show as "Before mod updates" and keep their own count (`Keep.Update`, 5). Turn it off with `BeforeModUpdates`. It needs a Mod Manager version that asks for it.
+- Made for Survival Log 1.1.20719.
+
 ## 0.4.3
 
 - Fixed: a restore that could not finish (a file held open by Steam Cloud or antivirus) could leave a save without its main file. The save now always keeps a file that loads, and no half-copied files are left behind.

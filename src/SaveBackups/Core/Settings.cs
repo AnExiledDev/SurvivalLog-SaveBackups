@@ -33,6 +33,9 @@ public sealed record Settings(
 
     public bool ShowGameSnapshots { get; init; } = true;
 
+    /// <summary>Back up the saves when the Mod Manager is about to install mod updates.</summary>
+    public bool BeforeModUpdates { get; init; } = true;
+
     /// <summary>Days the recycle bin keeps what is put in it; 0 keeps it until emptied.</summary>
     public int BinDays { get; init; } = 30;
 }

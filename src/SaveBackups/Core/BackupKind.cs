@@ -34,6 +34,9 @@ public enum BackupKind
 
     /// <summary>Every few minutes of play, while a run is open.</summary>
     Timer,
+
+    /// <summary>Asked for by the Mod Manager right before it installs mod updates.</summary>
+    Update,
 }
 
 public static class BackupKinds
@@ -47,7 +50,7 @@ public static class BackupKinds
     public static bool ShowsProgress(BackupKind kind) => kind != BackupKind.Safety;
 
     /// <summary>Kinds the run's own play makes, as opposed to ones the player asked for or the mod made around a change.</summary>
-    public static bool IsAutomatic(BackupKind kind) => kind is BackupKind.Morning or BackupKind.Quit or BackupKind.Rebirth or BackupKind.Expedition or BackupKind.Wave or BackupKind.Ending or BackupKind.Timer;
+    public static bool IsAutomatic(BackupKind kind) => kind is BackupKind.Morning or BackupKind.Quit or BackupKind.Rebirth or BackupKind.Expedition or BackupKind.Wave or BackupKind.Ending or BackupKind.Timer or BackupKind.Update;
 
     /// <summary>The kinds made often enough to thin out with age. Rebirths and endings are rare and each one matters, so they keep only their own number.</summary>
     public static bool Thins(BackupKind kind) => kind is BackupKind.Morning or BackupKind.Quit or BackupKind.Expedition or BackupKind.Wave or BackupKind.Timer;
