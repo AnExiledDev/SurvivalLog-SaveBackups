@@ -34,7 +34,7 @@ internal static class Hooks
         Patch(typeof(GirlLineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at the girl line's ending are not made");
         Patch(typeof(WarehouseLineEndingManager), "OnEndingEventConfirmed", nameof(BeforeEndingConfirm), nameof(AfterEndingConfirm), "backups at the warehouse line's ending are not made");
         // RA_LoadGame is compiled into Trigger_RA_LoadGame, so a patch on RA_LoadGame itself never runs.
-        Patch(typeof(Reducer_Web_MainUI), "Trigger_RA_LoadGame", nameof(OnLoadButton), null, "the Load button opens the game's own list");
+        Patch(typeof(Reducer_Web_MainUI), "Trigger_RA_LoadGame", nameof(OnLoadButton), null, "the Load button opens the game's list");
     }
 
     private static void Patch(Type type, string method, string? prefix, string? postfix, string without) =>

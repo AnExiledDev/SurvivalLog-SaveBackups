@@ -23,7 +23,7 @@
 
 ## 0.4.1
 
-- Your survivor's stats now show the right numbers: Life, Satiety, Morale and Stamina out of 100, as the game's own bars do. Life is the bar the game shows (it showed the hidden Fitness before), and Mood is now called Morale, as in the game. Backups made before are read again the first time you open them.
+- Your survivor's stats now show the right numbers: Life, Satiety, Morale and Stamina out of 100, as the game's bars do. Life is the bar the game shows (it showed the hidden Fitness before), and Mood is now called Morale, as in the game. Backups made before are read again the first time you open them.
 - New setting `UiScale` sets how big the save manager is drawn, from 75 to 200 percent. At 0 it follows Exiled's Toolkit's UI size. You can also change it in the Settings tab.
 
 ## 0.4.0
@@ -33,7 +33,7 @@
 - The bin is now called the trash. Its setting is now `TrashDays`; a value you set for `BinDays` before goes back to 30 days, so set it again if you changed it.
 - Your survivor's stats now show Satiety instead of fullness, and Planning Points and Survival Points side by side. Money and the game's journal are no longer shown.
 - Compare with now shows each item's icon.
-- The button to the game's own list is now 「Default Load screen」.
+- The button to the game's list is now 「Default Load screen」.
 - Made for Survival Log 1.1.20719.
 
 ## 0.3.2
@@ -53,7 +53,7 @@
 - Each save shows its survivor's portrait, the same picture as on the new game screen.
 - Pause menu: 「Backups of this run」 opens the save manager over your run, and 「Back up now」 saves and backs up the run. The run you are playing can't be restored over, renamed or deleted from there; everything else works.
 - The backup key is now unbound by default, since the pause menu has a button for it. Set `BackupKey` to bring it back.
-- Timeline: a save's backups and the game's own day snapshots on one timeline, grouped by day, with the save as it is now on top.
+- Timeline: a save's backups and the game's day snapshots on one timeline, grouped by day, with the save as it is now on top.
 - Click a backup to see its picture, its day, how your survivor stood then (health, fullness, mood, stamina, money, planning points, items) and how that changed since, the game's journal for that day, and its buttons right under the heading.
 - Compare with now: what changed between a backup and the save as it is now, item by item.
 - Restore asks whether to load the backup as a new save or replace the save. The save as it is gets a backup of its own first either way.
@@ -72,7 +72,7 @@
 
 ## 0.2.3
 
-- New look for the save manager, in the game's own font.
+- New look for the save manager, in the game's font.
 - Each save shows its survivor, a status badge, loop and day, how many backups it has and when the last one was made.
 - Click a backup to see it on the right: its day, its note, its size, and the buttons for it.
 - A dot by each backup shows its kind, with a key above the list.
@@ -82,7 +82,7 @@
 
 ## 0.2.2
 
-- 「Read save file」 on the title screen now opens the save manager instead of the game's own list.
+- 「Read save file」 on the title screen now opens the save manager instead of the game's list.
 - Fixed an error at the title screen when the game had not finished reading its saves yet.
 - Made for Survival Log 1.1.20151.
 

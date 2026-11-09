@@ -7,7 +7,7 @@ using SaveBackups.Core;
 namespace SaveBackups.Adapters;
 
 /// <summary>
-/// Keeps the survivor's full most of each meter (base plus every buff, as the game's own bars read it) in the open run's
+/// Keeps the survivor's full most of each meter (base plus every buff, as the game's bars read it) in the open run's
 /// counter map, once a second, so the next save the game writes carries it (<see cref="LiveMax"/>).
 /// </summary>
 internal static class LiveMaxes

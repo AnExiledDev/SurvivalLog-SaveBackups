@@ -9,7 +9,7 @@ using ExiledToolkit.Kit;
 
 namespace SaveBackups.Core;
 
-/// <summary>A run in the game's save list, with the texts the game's own Load screen shows for it, read on the main thread.</summary>
+/// <summary>A run in the game's save list, with the texts the game's Load screen shows for it, read on the main thread.</summary>
 public sealed record RunView(
     string FileName,
     string Name,
@@ -72,7 +72,7 @@ public sealed record Screen(
 /// <summary>An item's names and its picture, a path under the game's WebUI folder ("" when the game has none).</summary>
 public sealed record ItemInfo(string En, string Zh, string Icon);
 
-/// <summary>One of the game's own snapshots of a run: a day snapshot (rebirth can go back to it) or the round snapshot.</summary>
+/// <summary>One of the game's snapshots of a run: a day snapshot (rebirth can go back to it) or the round snapshot.</summary>
 public sealed record GameSnap(string File, bool IsRound, Progress Progress, long Bytes, DateTime WrittenUtc, SaveStats? Stats);
 
 /// <summary>What the detail view of one run needs beyond the list: the save's stats now, the game's snapshots, ending photos and the items' names and pictures.</summary>

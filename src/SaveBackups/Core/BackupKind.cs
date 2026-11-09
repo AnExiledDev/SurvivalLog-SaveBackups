@@ -5,7 +5,7 @@ namespace SaveBackups.Core;
 /// <summary>Why a backup was made. The name is written into the backup's folder name and its backup.json.</summary>
 public enum BackupKind
 {
-    /// <summary>The start of a new day in a run, right after the game's own morning save.</summary>
+    /// <summary>The start of a new day in a run, right after the game's morning save.</summary>
     Morning,
 
     /// <summary>Quit to the title screen or out of the game during a run.</summary>

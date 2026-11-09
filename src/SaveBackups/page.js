@@ -1099,7 +1099,7 @@
     return html;
   }
 
-  // Every point a save can go back to on the open tab: the save right now and its backups, or the game's own day
+  // Every point a save can go back to on the open tab: the save right now and its backups, or the game's day
   // snapshots, newest first.
   function points(run) {
     var d = detailOf(run);

@@ -6,14 +6,14 @@ The game keeps one copy of each save, and Steam Cloud can quietly put back an ol
 
 ## Features
 
-- **Automatic backups**: each morning right after the game's own save, when you quit to the title screen or close the game, right before a rebirth rolls the run back, right before an expedition, right before a zombie wave (once a day), when a run reaches an ending, right before the Mod Manager installs mod updates, and, if you turn it on, every few minutes of play. A backup copies every file of the save, its rebirth day snapshots included, and is read back and checked before it counts.
+- **Automatic backups**: each morning right after the game's save, when you quit to the title screen or close the game, right before a rebirth rolls the run back, right before an expedition, right before a zombie wave (once a day), when a run reaches an ending, right before the Mod Manager installs mod updates, and, if you turn it on, every few minutes of play. A backup copies every file of the save, its rebirth day snapshots included, and is read back and checked before it counts.
 - **Pictures**: each backup made while you play takes a picture of the game, so you can see where you were. Click a picture to see it full size. Each save also shows its survivor's portrait.
 - **Pause menu buttons**: **Backups of this run** opens the save manager over the run you are playing, and **Back up now** saves the run and backs it up.
 - **Save manager**: the Load button on the title screen opens your saves, each with its survivor, loop, day and play time. Search, sort, filter, pin a save to the top, rename it or write a note on it. **Default Load screen** opens the game's normal Load screen.
-- **Timeline**: a save's backups and the game's own day snapshots on one timeline, grouped by day, with the save as it is now on top. Click one to see its picture, how your survivor stood then (Life, Satiety, Morale, Stamina, Planning Points, Survival Points and items) and what changed since.
+- **Timeline**: a save's backups and the game's day snapshots on one timeline, grouped by day, with the save as it is now on top. Click one to see its picture, how your survivor stood then (Life, Satiety, Morale, Stamina, Planning Points, Survival Points and items) and what changed since.
 - **Compare with now**: what changed between a backup and the save as it is now, item by item.
 - **Restore**: load any backup as a new save next to the original, or replace the save with it. The save as it is gets a backup of its own first, and if that backup cannot be made, nothing is changed.
-- **Snapshots as new saves**: any of the game's own day snapshots can become a save of its own.
+- **Snapshots as new saves**: any of the game's day snapshots can become a save of its own.
 - **Duplicate and export**: duplicate a save, export one backup to a `.slsave` file, or export a whole save with every backup. To bring one in, put `.slsave` files or loose save files in `SaveBackups\Import` and press **Import**: it lists what each file holds before you add it.
 - **Trash**: removed backups and deleted saves wait in the trash for 30 days, where you can put them back or delete them for good.
 - **Thinning**: every backup of the last 3 days of play is kept, then one a day for 14 more days, then the last one of each loop. Thinned backups go to the trash. Pinned backups are never touched, and each kind of backup also has a number kept.
@@ -47,7 +47,7 @@ Steam Cloud only syncs `Saves`, so the backups stay on this PC. Copy the folder 
 - A copied save starts without the game's ending snapshots of the original, so it cannot jump back to one of the original's endings.
 - A game snapshot comes back as a new save, not in place of the save it belongs to.
 - Pictures are taken only while you play. Backups made on the title screen, and those from before 0.3.0, have none. Backups from before 0.4.0 have only the small picture.
-- The Steam Cloud check compares the loop and day the game's save list shows with the newest backup. A save you rolled back on purpose with the game's own tools can show it once; **Dismiss** clears it.
+- The Steam Cloud check compares the loop and day the game's save list shows with the newest backup. A save you rolled back on purpose with the game's tools can show it once; **Dismiss** clears it.
 - Backups from earlier game versions can be restored, but the game decides whether it can still read them.
 - Saves and backups made before 0.4.2 show Life, Satiety, Morale and Stamina without the most they can reach, until the save is next saved in game.
 

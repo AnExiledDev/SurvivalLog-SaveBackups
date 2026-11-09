@@ -94,7 +94,7 @@ internal sealed class GameSaves
         return manager != null && manager.IsInBattle ? manager.GetGameSave()?.CurSave?.PendingEndingChoiceEventId ?? 0 : 0;
     }
 
-    /// <summary>The game's own journal line for the day the run is on, or "" when it has none.</summary>
+    /// <summary>The game's journal line for the day the run is on, or "" when it has none.</summary>
     public string DayText()
     {
         try
@@ -118,7 +118,7 @@ internal sealed class GameSaves
     /// <summary>
     /// Makes files copied from a backup into a run of their own. Each file names its run inside it, and the game
     /// saves to the name it reads there, so a copy left as it is would save over the run it came from. The main
-    /// file and the snapshots are read with the game's own reader, given the new name and written back. A snapshot
+    /// file and the snapshots are read with the game's reader, given the new name and written back. A snapshot
     /// that cannot be rewritten is deleted (the game would refuse it anyway). Gives null when it worked, or why not.
     /// </summary>
     public string? MakeOwnRun(string saveFolder, string newFile, IReadOnlyList<string> copied)
@@ -279,7 +279,7 @@ internal sealed class GameSaves
 
     /// <summary>
     /// The runs in the save list as the manager shows them from inside a run, where the Load screen's list is not
-    /// built: names and progress from the list itself, and no texts of the game's own.
+    /// built: names and progress from the list itself, and no texts of the game's.
     /// </summary>
     public List<RunView> HistoryRuns()
     {
@@ -355,7 +355,7 @@ internal sealed class GameSaves
         }
     }
 
-    /// <summary>The game's own delete; the reason is the game's words when it refuses.</summary>
+    /// <summary>The game's delete; the reason is the game's words when it refuses.</summary>
     public (bool IsDone, string Why) Delete(string fileName)
     {
         var manager = Manager;
@@ -400,7 +400,7 @@ internal sealed class GameSaves
         return false;
     }
 
-    /// <summary>Starts the run, as the game's own Load button does.</summary>
+    /// <summary>Starts the run, as the game's Load button does.</summary>
     public static void Enter(string fileName) => Reducer_Web_MainUI.EnterSaveByFileName(fileName);
 
     private static RunFacts Facts(string fileName, string name, HistoryChild child) =>

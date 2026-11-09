@@ -27,7 +27,7 @@ public sealed record BackupMeta(
     /// <summary>The player's own words about the backup, empty when there are none.</summary>
     public string Note { get; init; } = "";
 
-    /// <summary>The game's own line for the day the run was on, on morning backups; empty on the others.</summary>
+    /// <summary>The game's line for the day the run was on, on morning backups; empty on the others.</summary>
     public string DayText { get; init; } = "";
 
     /// <summary>How the survivor and home stood in the backup, once read; null until then.</summary>

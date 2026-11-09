@@ -8,10 +8,10 @@ The game keeps one copy of each save, and Steam Cloud can quietly put back an ol
 
 [size=5]Main features[/size]
 [list]
-[*][b]Automatic backups[/b]: each morning right after the game's own save, when you quit or close the game, right before a rebirth, an expedition or a zombie wave, when a run reaches an ending, right before the Mod Manager installs mod updates, and on a timer if you want. Every file of the save is copied and checked.[/*]
+[*][b]Automatic backups[/b]: each morning right after the game's save, when you quit or close the game, right before a rebirth, an expedition or a zombie wave, when a run reaches an ending, right before the Mod Manager installs mod updates, and on a timer if you want. Every file of the save is copied and checked.[/*]
 [*][b]Pictures and portraits[/b]: each backup made while you play takes a picture of the game, which you can click to see full size, and each save shows its survivor's portrait.[/*]
 [*][b]Pause menu[/b]: Backups of this run opens the save manager over your run, and Back up now saves and backs it up.[/*]
-[*][b]Timeline[/b]: a save's backups and the game's own day snapshots, grouped by day. Click one to see its picture, your survivor's Life, Satiety, Morale, Stamina, Planning Points, Survival Points and items then and how they changed.[/*]
+[*][b]Timeline[/b]: a save's backups and the game's day snapshots, grouped by day. Click one to see its picture, your survivor's Life, Satiety, Morale, Stamina, Planning Points, Survival Points and items then and how they changed.[/*]
 [*][b]Compare with now[/b]: what changed between a backup and the save as it is now, item by item.[/*]
 [*][b]Restore[/b]: load a backup as a new save next to the original, or replace the save. The save as it is gets a backup of its own first.[/*]
 [*][b]Trash[/b]: removed backups and deleted saves wait 30 days in the trash, where you can put them back.[/*]
@@ -37,7 +37,7 @@ Backups are kept in [font=Courier New]AppData\LocalLow\LLS\SLGame\SaveBackups[/f
 [*]In a run, the save manager can't load a save, start a new game, or restore over, rename or delete the run you are playing. Those wait for the title screen.[/*]
 [*]A copied save starts without the original's ending snapshots, so it cannot jump back to one of the original's endings.[/*]
 [*]Pictures are taken only while you play. Backups made on the title screen, and older ones, have none. Older backups have only a small picture.[/*]
-[*]A save you rolled back on purpose with the game's own tools can show the Steam Cloud warning once; keep the day you want and it clears.[/*]
+[*]A save you rolled back on purpose with the game's tools can show the Steam Cloud warning once; keep the day you want and it clears.[/*]
 [*]Saves and backups made before you installed the mod show Life, Satiety, Morale and Stamina without the most they can reach, until the save is next saved in game.[/*]
 [/list]
 

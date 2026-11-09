@@ -14,9 +14,9 @@ The value is a Unity key name, for example `F8`, `F11`, `Insert` or `Keypad5`.
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `Folder` | empty | Folder the backups are kept in. Empty keeps them in the game's own folder (`LocalLow\LLS\SLGame\SaveBackups`), next to `Saves` but out of Steam Cloud. |
+| `Folder` | empty | Folder the backups are kept in. Empty keeps them in the game's folder (`LocalLow\LLS\SLGame\SaveBackups`), next to `Saves` but out of Steam Cloud. |
 | `SecondFolder` | empty | A second folder that gets a copy of every backup, such as another drive or a synced folder. Empty keeps one copy. |
-| `OnMorning` | `true` | Back up the run each morning, right after the game's own save. |
+| `OnMorning` | `true` | Back up the run each morning, right after the game's save. |
 | `OnQuit` | `true` | Back up the run when you quit to the title screen or close the game. |
 | `BeforeRebirth` | `true` | Back up the run right before a rebirth rolls it back. |
 | `BeforeExpedition` | `true` | Back up the run right before the survivor sets out on an expedition. The game saves first when it can. |
@@ -56,7 +56,7 @@ How many backups of each kind every save keeps, and how older ones are thinned. 
 | --- | --- | --- |
 | `ReplaceLoadScreen` | `true` | The title screen's Load button opens the save manager. Its Default Load screen button opens the game's list. `false` keeps the game's list. |
 | `WarnWhenBehind` | `true` | Warn on the title screen when a save is older than its last backup, as when Steam Cloud put back an older copy. |
-| `ShowGameSnapshots` | `true` | Show the game's own day snapshots of a save in the save manager, where each can be loaded as a new save. |
+| `ShowGameSnapshots` | `true` | Show the game's day snapshots of a save in the save manager, where each can be loaded as a new save. |
 
 ## Interface
 

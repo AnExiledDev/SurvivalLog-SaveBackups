@@ -9,7 +9,7 @@ namespace SaveBackups.Core;
 /// The files on disk that make up one run. The game keeps a run as Save_X.bytes plus files named after it: the round
 /// file (Save_X.round.bytes), the rebirth day snapshots (Save_X.snap0.bytes to snap5) and the ending snapshots
 /// (Save_X.bytes.ending.N). A backup copies all of them, so a restored run's snapshots match its main file. The
-/// game's own .bak copy of the main file and its half-written temp files are left out.
+/// game's .bak copy of the main file and its half-written temp files are left out.
 /// </summary>
 public static class RunFiles
 {

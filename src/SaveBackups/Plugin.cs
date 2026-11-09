@@ -39,13 +39,13 @@ public sealed class Plugin : BasePlugin
             "Key that saves the run you are playing and backs it up, like the Back up now button in the pause menu. It works only in a run, when the game could save. None, the default, leaves it unbound.\n" +
             "在游戏中按下此键会先保存当前存档，再备份它，与暂停菜单里的「立即备份」按钮相同。只在可以存档的时候有效。默认为 None，即不绑定按键。");
         var folder = Config.Bind("Backups", "Folder", "",
-            "Folder the backups are kept in. Empty, the default, keeps them in the game's own folder (LocalLow/LLS/SLGame/SaveBackups), next to Saves but out of Steam Cloud.\n" +
+            "Folder the backups are kept in. Empty, the default, keeps them in the game's folder (LocalLow/LLS/SLGame/SaveBackups), next to Saves but out of Steam Cloud.\n" +
             "备份存放的文件夹。留空（默认）则放在游戏自己的文件夹（LocalLow/LLS/SLGame/SaveBackups），与 Saves 相邻，但不会被 Steam 云同步。");
         var secondFolder = Config.Bind("Backups", "SecondFolder", "",
             "A second folder that gets a copy of every backup, such as another drive or a synced folder. Empty, the default, keeps one copy.\n" +
             "第二个文件夹，每个备份都会再复制一份到这里，例如另一块硬盘或同步文件夹。留空（默认）则只保留一份。");
         var onMorning = Config.Bind("Backups", "OnMorning", true,
-            "Back up the run each morning, right after the game's own save.\n" +
+            "Back up the run each morning, right after the game's save.\n" +
             "每天早上游戏自动存档后，备份当前存档。");
         var onQuit = Config.Bind("Backups", "OnQuit", true,
             "Back up the run when you quit to the title screen or close the game.\n" +
@@ -105,13 +105,13 @@ public sealed class Plugin : BasePlugin
             "Days a removed backup, or a deleted save's backups, stay in the trash before they are deleted for good. 0 keeps them until you empty the trash.\n" +
             "被移除的备份以及已删除存档的备份在回收站中保留的天数，之后永久删除。设为 0 表示一直保留，直到手动清空回收站。");
         var replaceLoadScreen = Config.Bind("Screen", "ReplaceLoadScreen", true,
-            "The title screen's Load button opens the save manager, with every save's backups. Its Default Load screen button opens the game's own list. False keeps the game's list.\n" +
+            "The title screen's Load button opens the save manager, with every save's backups. Its Default Load screen button opens the game's list. False keeps the game's list.\n" +
             "标题画面的「读取存档」按钮会打开存档管理，显示每个存档的备份。其中的「默认读取画面」按钮可打开游戏原本的列表。设为 false 则使用游戏原本的列表。");
         var warnWhenBehind = Config.Bind("Screen", "WarnWhenBehind", true,
             "Warn on the title screen when a save is older than its last backup, as when Steam Cloud put back an older copy.\n" +
             "当某个存档比它最近的备份更旧时（例如 Steam 云同步换回了旧存档），在标题画面提醒。");
         var showGameSnapshots = Config.Bind("Screen", "ShowGameSnapshots", true,
-            "Show the game's own day snapshots of a save in the save manager, where each can be copied out as a new save.\n" +
+            "Show the game's day snapshots of a save in the save manager, where each can be copied out as a new save.\n" +
             "在存档管理中显示游戏自带的每日快照，每个快照都可以复制为新存档。");
         var autoToasts = Config.Bind("Toasts", "AutoBackupToasts", false,
             "Show a message for every automatic backup, not only for the ones you make.\n" +

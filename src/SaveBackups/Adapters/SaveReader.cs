@@ -11,7 +11,7 @@ using SaveBackups.Core;
 namespace SaveBackups.Adapters;
 
 /// <summary>
-/// Reads what is inside saves with the game's own reader: the survivor's meters, Planning Points, survival points and
+/// Reads what is inside saves with the game's reader: the survivor's meters, Planning Points, survival points and
 /// items, the game's day and round snapshots, and the game's tables for survivor pictures and item names and pictures. All of it on the main thread;
 /// every read fails soft to null or an empty list.
 /// </summary>
@@ -104,7 +104,7 @@ internal static class SaveReader
     }
 
     /// <summary>
-    /// The game's own day and round snapshots of a run, oldest day first, the round snapshot last. A day snapshot holds
+    /// The game's day and round snapshots of a run, oldest day first, the round snapshot last. A day snapshot holds
     /// only the day, and going back to it keeps the run's Planning Points as they are, so it shows <paramref name="planningNow"/>.
     /// </summary>
     public static List<GameSnap> Snaps(string saveFolder, string stem, int turn, int planningNow)
@@ -150,7 +150,7 @@ internal static class SaveReader
     /// <summary>
     /// Turns one of the run's snapshots into the save <paramref name="newFile"/>, written next to it. A day snapshot
     /// holds only the day; it goes in place of the run's day, and the run's points and faith stay as they are now, as
-    /// the game's own rebirth does. A round snapshot holds the whole save. Gives null when it worked, or why not.
+    /// the game's rebirth does. A round snapshot holds the whole save. Gives null when it worked, or why not.
     /// </summary>
     public static string? SnapshotAsNew(string saveFolder, string stem, string snapFile, string newFile, out int day)
     {

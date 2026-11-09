@@ -13,7 +13,7 @@ public readonly record struct Meter(int Value, int Max)
 
     /// <summary>
     /// A meter as the game shows it from the numbers a save keeps: the value is stored times <paramref name="scale"/>
-    /// (60 Life is kept as 60000) and the most as it is. The value is rounded, as the game's own bars do, and held to the
+    /// (60 Life is kept as 60000) and the most as it is. The value is rounded, as the game's bars do, and held to the
     /// most, as the game holds it when it reads the value.
     /// </summary>
     public static Meter FromSave(int stored, int max, float scale)
@@ -29,7 +29,7 @@ public readonly record struct Meter(int Value, int Max)
 /// <summary>
 /// How the survivor and home stood in one save: the meters, the Planning Points loop rewards are bought with, the
 /// survival points the end-of-day cards are bought with, and every item counted by its config id (carried and stored
-/// together). Read from a save file by the game's own reader, kept in backup.json so a backup is read once.
+/// together). Read from a save file by the game's reader, kept in backup.json so a backup is read once.
 /// </summary>
 public sealed record SaveStats(
     Meter Life,

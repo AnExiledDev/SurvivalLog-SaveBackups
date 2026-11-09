@@ -982,7 +982,7 @@ internal sealed class Session
             });
     }
 
-    /// <summary>A safety backup first, then the game's own delete; the backups stay and show under Deleted saves.</summary>
+    /// <summary>A safety backup first, then the game's delete; the backups stay and show under Deleted saves.</summary>
     private void DeleteSave(string stem)
     {
         var saveFolder = _game.SaveFolder();
@@ -1444,7 +1444,7 @@ internal sealed class Session
             });
     }
 
-    /// <summary>One of the game's own snapshots of the run, written as a new save in the game's list.</summary>
+    /// <summary>One of the game's snapshots of the run, written as a new save in the game's list.</summary>
     private void SnapshotAsNew(string stem, string file)
     {
         var saveFolder = _game.SaveFolder();

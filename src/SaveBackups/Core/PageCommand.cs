@@ -24,7 +24,7 @@ public abstract record PageCommand
     /// <summary>The manager's close button.</summary>
     public sealed record Close : PageCommand;
 
-    /// <summary>Load this save, as the game's own Load button would.</summary>
+    /// <summary>Load this save, as the game's Load button would.</summary>
     public sealed record Load(string FileName) : PageCommand;
 
     /// <summary>Back up this run now.</summary>
@@ -47,7 +47,7 @@ public abstract record PageCommand
     /// <summary>Open the backup folder in the file explorer, or one run's folder in it.</summary>
     public sealed record OpenFolder(string Stem = "") : PageCommand;
 
-    /// <summary>Close the manager and open the game's own save list.</summary>
+    /// <summary>Close the manager and open the game's save list.</summary>
     public sealed record GameList : PageCommand;
 
     /// <summary>The player read the "save went backwards" warning for this run and wants it gone.</summary>
@@ -80,10 +80,10 @@ public abstract record PageCommand
     /// <summary>Copy the run's save as it is now as a new save.</summary>
     public sealed record Duplicate(string Stem) : PageCommand;
 
-    /// <summary>The run's details the list does not carry: its stats now, the game's own snapshots, ending photos and item names.</summary>
+    /// <summary>The run's details the list does not carry: its stats now, the game's snapshots, ending photos and item names.</summary>
     public sealed record Detail(string Stem) : PageCommand;
 
-    /// <summary>Copy one of the game's own snapshots of the run out as a new save.</summary>
+    /// <summary>Copy one of the game's snapshots of the run out as a new save.</summary>
     public sealed record SnapshotAsNew(string Stem, string File) : PageCommand;
 
     public sealed record BinPutBack(string Stem, string Id) : PageCommand;

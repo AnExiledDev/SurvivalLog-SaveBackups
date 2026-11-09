@@ -485,7 +485,7 @@ public sealed partial class BackupStore
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            // Left for the next restore or the game's own cleanup.
+            // Left for the next restore or the game's cleanup.
         }
     }
 }
