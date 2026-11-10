@@ -12,11 +12,11 @@ public sealed class ModelTests
     private static JsonElement Json(Screen screen) => JsonDocument.Parse(PageModel.Json(screen)).RootElement;
 
     [Fact]
-    public void The_backup_before_mod_updates_is_off_until_turned_on()
+    public void The_backup_before_mod_updates_is_on_for_a_new_install()
     {
         var settings = new Settings("/b", true, true, true, true, true, true, true, true, new Limits(1, 1, 1, 1, 1, 1, 1, 1, 1, 0));
 
-        Assert.False(settings.BeforeModUpdates);
+        Assert.True(settings.BeforeModUpdates);
     }
 
     [Fact]

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.2
+
+- The backup before mod updates (`BeforeModUpdates`) is on for a new install again. Turn it off in the save manager's Settings tab, on the Mod Manager's Mods screen or in the config file. A setting you already saved is kept.
+- Made for Survival Log 1.1.20719.
+
 ## 0.5.1
 
 - The backup before mod updates (`BeforeModUpdates`) is now off for a new install. Turn it on in the save manager's Settings tab, on the Mod Manager's Mods screen or in the config file. A setting you already saved is kept.
@@ -7,7 +12,7 @@
 
 ## 0.5.0
 
-- New: when the Mod Manager is about to install mod updates, your saves are backed up first: the run you are playing, or every save when you are on the title screen. These backups show as "Before mod updates" and keep their own count (`Keep.Update`, 5). Turn it on with `BeforeModUpdates`. It needs a Mod Manager version that asks for it.
+- New: when the Mod Manager is about to install mod updates, your saves are backed up first: the run you are playing, or every save when you are on the title screen. These backups show as "Before mod updates" and keep their own count (`Keep.Update`, 5). Turn it off with `BeforeModUpdates`. It needs a Mod Manager version that asks for it.
 - Made for Survival Log 1.1.20719.
 
 ## 0.4.3
