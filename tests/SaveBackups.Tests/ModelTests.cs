@@ -12,6 +12,14 @@ public sealed class ModelTests
     private static JsonElement Json(Screen screen) => JsonDocument.Parse(PageModel.Json(screen)).RootElement;
 
     [Fact]
+    public void The_backup_before_mod_updates_is_off_until_turned_on()
+    {
+        var settings = new Settings("/b", true, true, true, true, true, true, true, true, new Limits(1, 1, 1, 1, 1, 1, 1, 1, 1, 0));
+
+        Assert.False(settings.BeforeModUpdates);
+    }
+
+    [Fact]
     public void Backups_of_runs_not_in_the_list_show_as_deleted_saves()
     {
         var listed = Make.Backup(BackupKind.Morning, 1, stem: "Save_A");

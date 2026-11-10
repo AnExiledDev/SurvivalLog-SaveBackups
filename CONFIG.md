@@ -22,7 +22,7 @@ The value is a Unity key name, for example `F8`, `F11`, `Insert` or `Keypad5`.
 | `BeforeExpedition` | `true` | Back up the run right before the survivor sets out on an expedition. The game saves first when it can. |
 | `BeforeWave` | `true` | Back up the run right before a zombie wave starts, once a day. The game saves first when it can. |
 | `AtEnding` | `true` | Back up the run when it reaches an ending and the game saved your choice, so you can restore it and try another ending. |
-| `BeforeModUpdates` | `true` | Back up your saves when the Mod Manager is about to install mod updates: the run you are playing (the game saves first when it can), or every save when you are on the title screen. |
+| `BeforeModUpdates` | `false` | Back up your saves when the Mod Manager is about to install mod updates: the run you are playing (the game saves first when it can), or every save when you are on the title screen. |
 | `OnTimer` | `false` | Also back up the run after every `TimerMinutes` minutes of play. The game saves first. |
 | `TimerMinutes` | `20` | Minutes of play between timer backups, from 5 to 240. |
 | `TakePictures` | `true` | Take a picture of the game with each backup made while you play, shown in the save manager. |

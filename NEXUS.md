@@ -8,7 +8,7 @@ The game keeps one copy of each save, and Steam Cloud can quietly put back an ol
 
 [size=5]Main features[/size]
 [list]
-[*][b]Automatic backups[/b]: each morning right after the game's save, when you quit or close the game, right before a rebirth, an expedition or a zombie wave, when a run reaches an ending, right before the Mod Manager installs mod updates, and on a timer if you want. Every file of the save is copied and checked.[/*]
+[*][b]Automatic backups[/b]: each morning right after the game's save, when you quit or close the game, right before a rebirth, an expedition or a zombie wave, when a run reaches an ending, and, if you turn them on, right before the Mod Manager installs mod updates and on a timer. Every file of the save is copied and checked.[/*]
 [*][b]Pictures and portraits[/b]: each backup made while you play takes a picture of the game, which you can click to see full size, and each save shows its survivor's portrait.[/*]
 [*][b]Pause menu[/b]: Backups of this run opens the save manager over your run, and Back up now saves and backs it up.[/*]
 [*][b]Timeline[/b]: a save's backups and the game's day snapshots, grouped by day. Click one to see its picture, your survivor's Life, Satiety, Morale, Stamina, Planning Points, Survival Points and items then and how they changed.[/*]
@@ -81,7 +81,7 @@ Open source under MIT: [url=https://github.com/AnExiledDev/SurvivalLog-SaveBacku
 
 [size=5]主要功能[/size]
 [list]
-[*][b]自动备份[/b]：每天早上游戏自动存档之后、返回标题画面或关闭游戏时、重生之前、出发探索之前、尸潮开始之前、到达结局时、Mod Manager 安装模组更新之前，也可以按游玩时间定时备份。存档的所有文件都会复制并校验。[/*]
+[*][b]自动备份[/b]：每天早上游戏自动存档之后、返回标题画面或关闭游戏时、重生之前、出发探索之前、尸潮开始之前、到达结局时；也可以开启在 Mod Manager 安装模组更新之前备份，或按游玩时间定时备份。存档的所有文件都会复制并校验。[/*]
 [*][b]画面与头像[/b]：游玩时的每次备份都会拍下游戏画面，点开可以看大图，每个存档都显示角色头像。[/*]
 [*][b]暂停菜单[/b]：「本局备份」在游戏中打开存档管理，「立即备份」会先存档再备份。[/*]
 [*][b]时间线[/b]：存档的备份和游戏自带的每日快照按天排列。点开任意一个，可以看到当时的画面、角色的生命、饱腹、心态、体力、信念点、生存点和物品以及之后的变化。[/*]

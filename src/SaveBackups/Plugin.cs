@@ -19,7 +19,7 @@ namespace SaveBackups;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.savebackups";
-    private const string Version = "0.5.0";
+    private const string Version = "0.5.1";
     private const long Megabyte = 1024L * 1024L;
 
     /// <summary>Exiled's Toolkit: its shared helpers, toasts, live settings, typing watch and pause menu buttons all come from it.</summary>
@@ -62,7 +62,7 @@ public sealed class Plugin : BasePlugin
         var atEnding = Config.Bind("Backups", "AtEnding", true,
             "Back up the run when it reaches an ending and the game saved your choice, so you can restore it and try another ending.\n" +
             "存档到达结局、游戏保存你的选择时备份，之后可以恢复它去尝试其他结局。");
-        var beforeModUpdates = Config.Bind("Backups", "BeforeModUpdates", true,
+        var beforeModUpdates = Config.Bind("Backups", "BeforeModUpdates", false,
             "Back up your saves when the Mod Manager is about to install mod updates: the run you are playing, or every save on the title screen.\n" +
             "Mod Manager 安装模组更新之前备份存档：游戏中备份当前存档，在标题画面则备份所有存档。");
         var onTimer = Config.Bind("Backups", "OnTimer", false,
