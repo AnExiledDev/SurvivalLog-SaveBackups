@@ -106,10 +106,38 @@ public sealed class PageCommandTests
     [InlineData("Backups.Folder", "D:/a:b")]
     [InlineData("Controls.BackupKey", "F8; rm")]
     [InlineData("Interface.UiScale", "201")]
-    [InlineData("General.Secret", "1")]
-    public void A_setting_outside_its_range_or_not_offered_is_refused(string id, string value)
+    [InlineData("Keep.Morning", "")]
+    [InlineData("Keep.Morning", "ten")]
+    [InlineData("Controls.BackupKey", "")]
+    public void A_value_its_setting_does_not_take_is_refused_with_what_was_typed(string id, string value)
     {
-        Assert.IsType<PageCommand.Unknown>(Parse("set|" + id + "|" + Uri.EscapeDataString(value)));
+        // Its own command, so the window is told to put the saved value back instead of waiting on an answer forever.
+        var command = Parse("set|" + id + "|" + Uri.EscapeDataString(value));
+
+        Assert.Equal(new PageCommand.BadSetting(SettingKeys.Find(id)!, value), command);
+    }
+
+    [Fact]
+    public void A_setting_the_page_does_not_offer_is_unknown()
+    {
+        Assert.IsType<PageCommand.Unknown>(Parse("set|General.Secret|1"));
+    }
+
+    [Fact]
+    public void A_refused_number_says_the_range_its_box_takes()
+    {
+        var timer = SettingKeys.Find("Backups.TimerMinutes")!;
+
+        Assert.Equal("Type a whole number from 5 to 240. The setting was not changed.", Texts.BadValue(timer, isChinese: false));
+        Assert.Equal("请输入 5 到 240 之间的整数，设置未更改。", Texts.BadValue(timer, isChinese: true));
+    }
+
+    [Fact]
+    public void A_refused_folder_or_key_says_what_its_box_takes()
+    {
+        Assert.Contains("folder path", Texts.BadValue(SettingKeys.Find("Backups.Folder")!, isChinese: false));
+        Assert.Contains("文件夹路径", Texts.BadValue(SettingKeys.Find("Backups.SecondFolder")!, isChinese: true));
+        Assert.Contains("key", Texts.BadValue(SettingKeys.Find("Controls.BackupKey")!, isChinese: false));
     }
 
     [Theory]

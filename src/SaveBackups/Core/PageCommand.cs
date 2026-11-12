@@ -98,6 +98,9 @@ public abstract record PageCommand
     /// <summary>Change one setting (<see cref="SettingKeys"/>).</summary>
     public sealed record Set(string Id, string Value) : PageCommand;
 
+    /// <summary>A value typed in a settings box that its setting does not take; the box goes back to the saved value.</summary>
+    public sealed record BadSetting(SettingKey Key, string Typed) : PageCommand;
+
     /// <summary>Start a new game, as the title screen's New Game button does.</summary>
     public sealed record NewGame : PageCommand;
 
@@ -174,7 +177,7 @@ public abstract record PageCommand
             ("bindel", 3) => new BinDelete(parts[1], parts[2]),
             ("binrundel", 2) => new BinDeleteRun(parts[1]),
             ("binempty", 1) => new BinEmpty(),
-            ("set", 3) when SettingKeys.Find(parts[1]) is { } key && Unescape(parts[2]) is { } raw && SettingKeys.Normalize(key, raw) is { } value => new Set(key.Id, value),
+            ("set", 3) when SettingKeys.Find(parts[1]) is { } key && Unescape(parts[2]) is { } raw => SettingKeys.Normalize(key, raw) is { } value ? new Set(key.Id, value) : new BadSetting(key, raw),
             ("newgame", 1) => new NewGame(),
             ("backupnow", 1) => new BackUpNow(),
             ("openinrun", 1) => new OpenInRun(),

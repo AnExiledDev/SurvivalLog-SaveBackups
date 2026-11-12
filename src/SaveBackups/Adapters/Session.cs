@@ -870,12 +870,17 @@ internal sealed class Session
             case PageCommand.Set set:
                 SetSetting(set.Id, set.Value);
                 break;
+            case PageCommand.BadSetting bad:
+                RefuseSetting(bad);
+                break;
             case PageCommand.Typing typing:
                 if (typing.IsTyping && _isOpen) _keyboard.Claim();
                 else _keyboard.Release();
                 break;
             case PageCommand.Unknown unknown:
+                // What the page sends with step() waits on an answer; without one the window stays busy and ignores Esc.
                 _log("page said: " + unknown.Text);
+                _page.Done();
                 break;
             default:
                 throw new InvalidOperationException("unhandled page command " + command);
@@ -1260,6 +1265,19 @@ internal sealed class Session
             _log($"setting {id} = {value} refused: {why}");
             _page.Toast(Texts.Format(Texts.SettingRefused, GameLanguage.IsChinese(), why), ToastKind.Warning);
         }
+
+        Refresh();
+    }
+
+    /// <summary>
+    /// A settings box held a value its setting does not take. Redrawing puts the saved value back in the box; a box
+    /// left blank goes back quietly, anything typed gets a toast saying what the box takes.
+    /// </summary>
+    private void RefuseSetting(PageCommand.BadSetting bad)
+    {
+        _log($"setting {bad.Key.Id} = \"{bad.Typed}\" refused: not a value it takes");
+
+        if (bad.Typed.Trim().Length > 0) _page.Toast(Texts.BadValue(bad.Key, GameLanguage.IsChinese()), ToastKind.Warning);
 
         Refresh();
     }

@@ -68,5 +68,22 @@ public static class Texts
 
     public static readonly Phrase InRunBlocked = new("Not while you are playing this save. Quit to the title screen first.", "正在游玩这个存档时不能这样做。请先返回标题画面。");
 
+    public static readonly Phrase NotANumber = new("Type a whole number from {0} to {1}. The setting was not changed.", "请输入 {0} 到 {1} 之间的整数，设置未更改。");
+
+    public static readonly Phrase NotAFolder = new("Type a full folder path, like D:/Backups. The setting was not changed.", "请输入完整的文件夹路径，例如 D:/Backups，设置未更改。");
+
+    public static readonly Phrase NotAKey = new("Pick one key, like F8. The setting was not changed.", "请选择一个按键，例如 F8，设置未更改。");
+
+    public static readonly Phrase NotAValue = new("That value doesn't work for this setting. The setting was not changed.", "这个值不适用于这项设置，设置未更改。");
+
     public static string Format(Phrase phrase, bool isChinese, params object[] args) => string.Format(phrase.Pick(isChinese), args);
+
+    /// <summary>What a settings box takes, for when the player typed something its setting does not take.</summary>
+    public static string BadValue(SettingKey key, bool isChinese) => key.Type switch
+    {
+        SettingType.Number => Format(NotANumber, isChinese, key.Min, key.Max),
+        SettingType.Folder => NotAFolder.Pick(isChinese),
+        SettingType.Key => NotAKey.Pick(isChinese),
+        _ => NotAValue.Pick(isChinese),
+    };
 }
