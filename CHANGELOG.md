@@ -38,7 +38,7 @@
 
 ## 0.4.1
 
-- Your survivor's stats now show the right numbers: Life, Satiety, Morale and Stamina out of 100, as the game's bars do. Life is the bar the game shows (it showed the hidden Fitness before), and Mood is now called Morale, as in the game. Backups made before are read again the first time you open them.
+- Your survivor's stats now show the right numbers: Life, Satiety, Morale and Stamina out of 100, like the game's bars. Life is the bar the game shows (it showed the hidden Fitness before), and Mood is now called Morale, the game's name for it. Backups made before are read again the first time you open them.
 - New setting `UiScale` sets how big the save manager is drawn, from 75 to 200 percent. At 0 it follows Exiled's Toolkit's UI size. You can also change it in the Settings tab.
 
 ## 0.4.0
