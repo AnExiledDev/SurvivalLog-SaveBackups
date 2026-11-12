@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.3
+
+- Clearer wording in the settings, the save manager and the messages.
+- Made for Survival Log 1.1.20719.
+
 ## 0.5.2
 
 - The backup before mod updates (`BeforeModUpdates`) is on for a new install again. Turn it off in the save manager's Settings tab, on the Mod Manager's Mods screen or in the config file. A setting you already saved is kept.
@@ -28,7 +33,7 @@
 
 ## 0.4.2
 
-- Your survivor's stats now show their real most, such as Life 89 / 130, instead of always out of 100. The game raises the most over a run, and a save keeps only the starting 100, so Save Backups now notes the real most in the save while you play. Saves and backups made before show the value alone, until the save is next saved in game.
+- Your survivor's stats now show their real maximum, such as Life 89 / 130, instead of always out of 100. The game raises the maximum over a run, and a save keeps only the starting 100, so Save Backups now records the real maximum in the save while you play. Saves and backups made before show the value alone, until the save is next saved in game.
 - Made for Survival Log 1.1.20719.
 
 ## 0.4.1
@@ -40,10 +45,10 @@
 
 - New save manager look: your saves on the left, the selected save's backups and day snapshots in the middle, and the picked backup with its stats on the right.
 - Pictures are now taken at full size as well as small. Click any picture to see it large. Older backups show their small picture.
-- The bin is now called the trash. Its setting is now `TrashDays`; a value you set for `BinDays` before goes back to 30 days, so set it again if you changed it.
+- The bin is now called the trash. Its setting is now `TrashDays`. A value you set for `BinDays` before goes back to 30 days, so set it again if you changed it.
 - Your survivor's stats now show Satiety instead of fullness, and Planning Points and Survival Points side by side. Money and the game's journal are no longer shown.
 - Compare with now shows each item's icon.
-- The button to the game's list is now 「Default Load screen」.
+- The button to the game's normal Load screen is now **Default Load screen**.
 - Made for Survival Log 1.1.20719.
 
 ## 0.3.2
@@ -53,7 +58,7 @@
 
 ## 0.3.1
 
-- 「Backups of this run」 and 「Back up now」 in the pause menu are now placed by Exiled's Toolkit, along with every other mod's menu buttons. The pause menu no longer runs off the screen when several mods add buttons to it.
+- **Backups of this run** and **Back up now** in the pause menu are now placed by Exiled's Toolkit, along with every other mod's menu buttons. The pause menu no longer runs off the screen when several mods add buttons to it.
 - Exiled's Toolkit 0.14.0 or newer is now required.
 - Made for Survival Log 1.1.20151.
 
@@ -61,7 +66,7 @@
 
 - Pictures: each backup made while you play takes a small picture of the game, shown in the timeline and the save manager. `TakePictures` turns it off.
 - Each save shows its survivor's portrait, the same picture as on the new game screen.
-- Pause menu: 「Backups of this run」 opens the save manager over your run, and 「Back up now」 saves and backs up the run. The run you are playing can't be restored over, renamed or deleted from there; everything else works.
+- Pause menu: **Backups of this run** opens the save manager over your run, and **Back up now** saves and backs up the run. The run you are playing can't be restored over, renamed or deleted from there. Everything else works.
 - The backup key is now unbound by default, since the pause menu has a button for it. Set `BackupKey` to bring it back.
 - Timeline: a save's backups and the game's day snapshots on one timeline, grouped by day, with the save as it is now on top.
 - Click a backup to see its picture, its day, how your survivor stood then (health, fullness, mood, stamina, money, planning points, items) and how that changed since, the game's journal for that day, and its buttons right under the heading.
@@ -92,7 +97,7 @@
 
 ## 0.2.2
 
-- 「Read save file」 on the title screen now opens the save manager instead of the game's list.
+- **Read save file** on the title screen now opens the save manager instead of the game's list.
 - Fixed an error at the title screen when the game had not finished reading its saves yet.
 - Made for Survival Log 1.1.20151.
 
@@ -106,7 +111,7 @@
 
 - Copy as new save: any backup, a deleted save's included, can become a save of its own next to the original. The original save is not changed.
 - Export a backup to a single `.slsave` file in `SaveBackups\Exports`, to keep it safe or give it to a friend.
-- Import: put `.slsave` files in `SaveBackups\Import` and press 「Import」 in the save manager. Each one shows up under its save as an imported backup.
+- Import: put `.slsave` files in `SaveBackups\Import` and press **Import** in the save manager. Each one shows up under its save as an imported backup.
 - Add a note to any backup, so you can tell them apart later.
 - Search your saves by name, survivor or note, and filter the list to saves in progress, finished saves or saves with backups.
 - New automatic backups right before an expedition, right before a zombie wave and when a run reaches an ending, each with its own setting and its own number kept.
@@ -121,7 +126,7 @@
 - Press F8 in a run to save and back it up yourself.
 - The title screen's Load button opens a save manager: load a save, back it up, delete it, or restore any of its backups.
 - Before a restore or a delete, the save as it is gets a backup of its own, so the step can be undone.
-- A deleted save keeps its backups under 「Deleted saves」 and can be brought back from there.
+- A deleted save keeps its backups under **Deleted saves** and can be brought back from there.
 - If a save is suddenly behind its own last backup, for example after Steam Cloud put back an older copy, a message says so and the save manager offers to restore it.
 - Pin a backup to keep it no matter what. Old backups are removed by count for each kind and by a total size limit.
 - Made for Survival Log 1.1.19611.

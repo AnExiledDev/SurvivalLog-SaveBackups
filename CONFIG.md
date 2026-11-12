@@ -6,7 +6,7 @@ Settings live in `BepInEx\config\com.dev.survivallog.savebackups.cfg`, created t
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `BackupKey` | `None` | Key that saves the run you are playing and backs it up, like **Back up now** in the pause menu. It works only in a run, when the game could save. `None` leaves it unbound. |
+| `BackupKey` | `None` | Key that saves the run you are playing and backs it up, like **Back up now** in the pause menu. It only works in a run, when the game can save. `None` leaves it unbound. |
 
 The value is a Unity key name, for example `F8`, `F11`, `Insert` or `Keypad5`.
 
@@ -16,7 +16,7 @@ The value is a Unity key name, for example `F8`, `F11`, `Insert` or `Keypad5`.
 | --- | --- | --- |
 | `Folder` | empty | Folder the backups are kept in. Empty keeps them in the game's folder (`LocalLow\LLS\SLGame\SaveBackups`), next to `Saves` but out of Steam Cloud. |
 | `SecondFolder` | empty | A second folder that gets a copy of every backup, such as another drive or a synced folder. Empty keeps one copy. |
-| `OnMorning` | `true` | Back up the run each morning, right after the game's save. |
+| `OnMorning` | `true` | Back up the run each morning, right after the game saves. |
 | `OnQuit` | `true` | Back up the run when you quit to the title screen or close the game. |
 | `BeforeRebirth` | `true` | Back up the run right before a rebirth rolls it back. |
 | `BeforeExpedition` | `true` | Back up the run right before the survivor sets out on an expedition. The game saves first when it can. |
@@ -44,17 +44,17 @@ How many backups of each kind every save keeps, and how older ones are thinned. 
 | `Ending` | `3` | Backups made at an ending. |
 | `Timer` | `6` | Timer backups. |
 | `Update` | `5` | Backups made before the Mod Manager installs mod updates. |
-| `KeepAllDays` | `3` | Every backup of the last this many days of play is kept. Older automatic backups are thinned to one a day. `0` turns thinning off. |
-| `DailyDays` | `14` | After `KeepAllDays`, one backup a day is kept for this many more days of play. Thinned backups go to the trash. |
-| `PerLoop` | `true` | Past `DailyDays`, keep the last backup of each loop. `false` lets the counts above take them. |
-| `MaxTotalMB` | `2048` | Most space all backups and the trash together may take, in MB. Past it, the trash is emptied oldest first, then the oldest backups go, automatic ones before your own. Pinned backups and each save's newest backup are always kept. `0` means no limit. |
+| `KeepAllDays` | `3` | Every backup from this many of the most recent days of play is kept. Older automatic backups are thinned to one a day. `0` turns thinning off. |
+| `DailyDays` | `14` | After `KeepAllDays`, one backup a day is kept for this many more days of play. For older backups, the last one of each loop is kept when `PerLoop` is on. Thinned backups go to the trash. |
+| `PerLoop` | `true` | Past `DailyDays`, keep the last backup of each loop. `false` leaves them to the counts for each kind above. |
+| `MaxTotalMB` | `2048` | The most space all backups and the trash together may take, in MB. Past it, the trash is emptied oldest first, then the oldest backups go, automatic ones before your own. Pinned backups and each save's newest backup are always kept. `0` means no limit. |
 | `TrashDays` | `30` | Days a removed backup, or a deleted save's backups, stay in the trash before they are deleted for good. `0` keeps them until you empty the trash. |
 
 ## Screen
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `ReplaceLoadScreen` | `true` | The title screen's Load button opens the save manager. Its Default Load screen button opens the game's list. `false` keeps the game's list. |
+| `ReplaceLoadScreen` | `true` | The title screen's Load button opens the save manager. Its **Default Load screen** button opens the game's normal Load screen. `false` keeps the normal Load screen. |
 | `WarnWhenBehind` | `true` | Warn on the title screen when a save is older than its last backup, as when Steam Cloud put back an older copy. |
 | `ShowGameSnapshots` | `true` | Show the game's day snapshots of a save in the save manager, where each can be loaded as a new save. |
 
@@ -62,10 +62,10 @@ How many backups of each kind every save keeps, and how older ones are thinned. 
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `UiScale` | `0` | How big the save manager is drawn, in percent, from 75 to 200. At `0` it follows the UI size set in Exiled's Toolkit (its `UiScale`). The save manager nearly fills the screen, so past about 105 it is drawn only as big as still fits. |
+| `UiScale` | `0` | How big the save manager is drawn, in percent, from 75 to 200. At `0` it follows the UI size set in Exiled's Toolkit (its `UiScale`). The save manager nearly fills the screen, so above about 105 it stops at the biggest size that still fits. |
 
 ## Toasts
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `AutoBackupToasts` | `false` | Show a message for every automatic backup, not only for the ones you make. |
+| `AutoBackupToasts` | `false` | Show a message for every automatic backup as well as the ones you make yourself. |

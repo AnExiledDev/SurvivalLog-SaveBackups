@@ -19,7 +19,7 @@ namespace SaveBackups;
 public sealed class Plugin : BasePlugin
 {
     private const string Guid = "com.dev.survivallog.savebackups";
-    private const string Version = "0.5.2";
+    private const string Version = "0.5.3";
     private const long Megabyte = 1024L * 1024L;
 
     /// <summary>Exiled's Toolkit: its shared helpers, toasts, live settings, typing watch and pause menu buttons all come from it.</summary>
@@ -32,20 +32,20 @@ public sealed class Plugin : BasePlugin
     public override void Load()
     {
         ModUiSize.Bind(Config, UiSizeName, description:
-            "How big the save manager is drawn, in percent, from 75 to 200. At 0 it follows the UI size set in Exiled's Toolkit (its UiScale). The save manager nearly fills the screen, so past about 105 it is drawn only as big as still fits.\n" +
+            "How big the save manager is drawn, in percent, from 75 to 200. At 0 it follows the UI size set in Exiled's Toolkit (its UiScale). The save manager nearly fills the screen, so above about 105 it stops at the biggest size that still fits.\n" +
             "存档管理的显示大小（百分比），范围 75 到 200。设为 0 时跟随 Exiled's Toolkit 的界面大小设置（它的 UiScale）。存档管理几乎占满屏幕，所以超过 105 左右后只会以能完整显示的最大尺寸显示。");
 
         var backupKey = Config.Bind("Controls", "BackupKey", KeyCode.None,
-            "Key that saves the run you are playing and backs it up, like the Back up now button in the pause menu. It works only in a run, when the game could save. None, the default, leaves it unbound.\n" +
+            "Key that saves the run you are playing and backs it up, like the Back up now button in the pause menu. It only works in a run, when the game can save. None, the default, leaves it unbound.\n" +
             "在游戏中按下此键会先保存当前存档，再备份它，与暂停菜单里的「立即备份」按钮相同。只在可以存档的时候有效。默认为 None，即不绑定按键。");
         var folder = Config.Bind("Backups", "Folder", "",
             "Folder the backups are kept in. Empty, the default, keeps them in the game's folder (LocalLow/LLS/SLGame/SaveBackups), next to Saves but out of Steam Cloud.\n" +
-            "备份存放的文件夹。留空（默认）则放在游戏自己的文件夹（LocalLow/LLS/SLGame/SaveBackups），与 Saves 相邻，但不会被 Steam 云同步。");
+            "备份存放的文件夹。留空（默认）则放在游戏的数据文件夹（LocalLow/LLS/SLGame/SaveBackups），与 Saves 相邻，但不会被 Steam 云同步。");
         var secondFolder = Config.Bind("Backups", "SecondFolder", "",
             "A second folder that gets a copy of every backup, such as another drive or a synced folder. Empty, the default, keeps one copy.\n" +
             "第二个文件夹，每个备份都会再复制一份到这里，例如另一块硬盘或同步文件夹。留空（默认）则只保留一份。");
         var onMorning = Config.Bind("Backups", "OnMorning", true,
-            "Back up the run each morning, right after the game's save.\n" +
+            "Back up the run each morning, right after the game saves.\n" +
             "每天早上游戏自动存档后，备份当前存档。");
         var onQuit = Config.Bind("Backups", "OnQuit", true,
             "Back up the run when you quit to the title screen or close the game.\n" +
@@ -90,16 +90,16 @@ public sealed class Plugin : BasePlugin
         var keepTimer = Keep(Config, "Timer", 6, "timer backups", "定时备份");
         var keepUpdate = Keep(Config, "Update", 5, "backups made before mod updates", "模组更新前的备份");
         var keepAllDays = Config.Bind("Keep", "KeepAllDays", 3,
-            "Every backup of the last this many days of play is kept. Older automatic backups are thinned to one a day (see DailyDays). 0 turns thinning off.\n" +
+            "Every backup from this many of the most recent days of play is kept. Older automatic backups are thinned to one a day (see DailyDays). 0 turns thinning off.\n" +
             "最近这么多个游戏日的备份全部保留。更早的自动备份会精简为每天一个（见 DailyDays）。设为 0 表示不精简。");
         var dailyDays = Config.Bind("Keep", "DailyDays", 14,
-            "After KeepAllDays, one backup a day is kept for this many more days of play; older ones keep one per loop when PerLoop is on. Thinned backups go to the trash.\n" +
-            "超过 KeepAllDays 之后，再往前这么多个游戏日每天保留一个备份；更早的在开启 PerLoop 时每个轮回保留一个。被精简的备份会进入回收站。");
+            "After KeepAllDays, one backup a day is kept for this many more days of play. For older backups, the last one of each loop is kept when PerLoop is on. Thinned backups go to the trash.\n" +
+            "超过 KeepAllDays 之后，再往前这么多个游戏日每天保留一个备份。更早的备份在开启 PerLoop 时每个轮回保留最后一个。被精简的备份会进入回收站。");
         var perLoop = Config.Bind("Keep", "PerLoop", true,
-            "Past DailyDays, keep the last backup of each loop. False lets the per-kind limits take them.\n" +
+            "Past DailyDays, keep the last backup of each loop. False leaves them to the limit for each kind of backup.\n" +
             "超过 DailyDays 后，保留每个轮回的最后一个备份。设为 false 则交给各类备份的数量上限处理。");
         var maxTotal = Config.Bind("Keep", "MaxTotalMB", 2048,
-            "Most space all backups and the trash together may take, in MB. Past it, the trash is emptied oldest first, then the oldest backups go, automatic ones before your own. Pinned backups and each run's newest backup are always kept. 0 means no limit.\n" +
+            "The most space all backups and the trash together may take, in MB. Past it, the trash is emptied oldest first, then the oldest backups go, automatic ones before your own. Pinned backups and each save's newest backup are always kept. 0 means no limit.\n" +
             "所有备份和回收站合计最多占用的空间（MB）。超出后先从最旧的开始清空回收站，再删除最旧的备份，自动备份先于手动备份。已固定的备份和每个存档最新的备份始终保留。设为 0 表示不限制。");
         var binDays = Config.Bind("Keep", "TrashDays", 30,
             "Days a removed backup, or a deleted save's backups, stay in the trash before they are deleted for good. 0 keeps them until you empty the trash.\n" +
@@ -112,10 +112,10 @@ public sealed class Plugin : BasePlugin
             "当某个存档比它最近的备份更旧时（例如 Steam 云同步换回了旧存档），在标题画面提醒。");
         var showGameSnapshots = Config.Bind("Screen", "ShowGameSnapshots", true,
             "Show the game's day snapshots of a save in the save manager, where each can be copied out as a new save.\n" +
-            "在存档管理中显示游戏自带的每日快照，每个快照都可以复制为新存档。");
+            "在存档管理中显示游戏的每日快照，每个快照都可以复制为新存档。");
         var autoToasts = Config.Bind("Toasts", "AutoBackupToasts", false,
-            "Show a message for every automatic backup, not only for the ones you make.\n" +
-            "每次自动备份都显示提示，而不仅是手动备份。");
+            "Show a message for every automatic backup as well as the ones you make yourself.\n" +
+            "除了手动备份，每次自动备份也显示提示。");
 
         var log = new ModLog(Log, "save-backups.log");
         var hooks = new PatchKit(new Harmony(Guid), log.Write);
@@ -249,6 +249,6 @@ public sealed class Plugin : BasePlugin
 
     private static ConfigEntry<int> Keep(ConfigFile config, string kind, int keep, string what, string whatZh) =>
         config.Bind("Keep", kind, keep,
-            $"How many {what} each save keeps. Older ones go to the trash when a new one is made; pinned backups do not count. 0 means keep them all.\n" +
+            $"How many {what} each save keeps. Older ones go to the trash when a new one is made. Pinned backups do not count. 0 means keep them all.\n" +
             $"每个存档保留多少个{whatZh}。新备份完成后，更旧的会进入回收站，已固定的备份不计入。设为 0 表示全部保留。");
 }

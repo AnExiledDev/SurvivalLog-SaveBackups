@@ -14,7 +14,7 @@ public static class Texts
 
     public static readonly Phrase NoRun = new("There is no run to back up.", "当前没有可备份的存档。");
 
-    public static readonly Phrase Failed = new("Save Backups failed, see BepInEx/save-backups.log.", "存档备份出错，详见 BepInEx/save-backups.log。");
+    public static readonly Phrase Failed = new("Something went wrong. See BepInEx/save-backups.log for details.", "出错了，详见 BepInEx/save-backups.log。");
 
     public static readonly Phrase Restored = new("Restored {0} to day {1}.", "已将「{0}」恢复到第 {1} 天。");
 
@@ -56,7 +56,7 @@ public static class Texts
 
     public static readonly Phrase SettingRefused = new("That setting could not be changed: {0}", "无法修改这项设置：{0}");
 
-    public static readonly Phrase SnapCopied = new("The game's snapshot of day {0} is now a new save: {1}.", "游戏自带的第 {0} 天快照已成为新存档：「{1}」。");
+    public static readonly Phrase SnapCopied = new("The game's snapshot of day {0} is now a new save: {1}.", "游戏的第 {0} 天快照已成为新存档：「{1}」。");
 
     public static readonly Phrase ImportedSave = new("Added {0} as a new save.", "已添加为新存档：「{0}」。");
 

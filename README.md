@@ -1,59 +1,59 @@
 # Save Backups
 
-Automatic backups of every Survival Log save, kept out of Steam Cloud, and a save manager on the title screen to restore, copy and share any of them.
+Save Backups backs up every Survival Log save automatically, keeps the backups where Steam Cloud can't touch them, and adds a save manager to the title screen where you can restore, copy and share any of them.
 
 The game keeps one copy of each save, and Steam Cloud can quietly put back an older one. Save Backups copies your save each morning, when you quit, before a rebirth, an expedition or a zombie wave, and at an ending, into a folder Steam Cloud never touches. The title screen's Load button then opens a save manager where you can see every backup of every save and put any of them back with one click.
 
 ## Features
 
-- **Automatic backups**: each morning right after the game's save, when you quit to the title screen or close the game, right before a rebirth rolls the run back, right before an expedition, right before a zombie wave (once a day), when a run reaches an ending, right before the Mod Manager installs mod updates, and, if you turn it on, every few minutes of play. A backup copies every file of the save, its rebirth day snapshots included, and is read back and checked before it counts.
+- **Automatic backups**: each morning right after the game saves, when you quit to the title screen or close the game, right before a rebirth rolls the run back, right before an expedition, right before a zombie wave (once a day), when a run reaches an ending, right before the Mod Manager installs mod updates, and, if you turn it on, every few minutes of play. Each backup copies every file of the save, including its rebirth day snapshots, and is read back and checked before it counts.
 - **Pictures**: each backup made while you play takes a picture of the game, so you can see where you were. Click a picture to see it full size. Each save also shows its survivor's portrait.
 - **Pause menu buttons**: **Backups of this run** opens the save manager over the run you are playing, and **Back up now** saves the run and backs it up.
 - **Save manager**: the Load button on the title screen opens your saves, each with its survivor, loop, day and play time. Search, sort, filter, pin a save to the top, rename it or write a note on it. **Default Load screen** opens the game's normal Load screen.
-- **Timeline**: a save's backups and the game's day snapshots on one timeline, grouped by day, with the save as it is now on top. Click one to see its picture, how your survivor stood then (Life, Satiety, Morale, Stamina, Planning Points, Survival Points and items) and what changed since.
-- **Compare with now**: what changed between a backup and the save as it is now, item by item.
+- **Timeline**: a save's backups and the game's day snapshots on one timeline, grouped by day, with the save as it is now at the top. Click one to see its picture, your survivor's Life, Satiety, Morale, Stamina, Planning Points, Survival Points and items at that point, and what has changed since.
+- **Compare with now**: shows what changed between a backup and the save as it is now, item by item.
 - **Restore**: load any backup as a new save next to the original, or replace the save with it. The save as it is gets a backup of its own first, and if that backup cannot be made, nothing is changed.
 - **Snapshots as new saves**: any of the game's day snapshots can become a save of its own.
 - **Duplicate and export**: duplicate a save, export one backup to a `.slsave` file, or export a whole save with every backup. To bring one in, put `.slsave` files or loose save files in `SaveBackups\Import` and press **Import**: it lists what each file holds before you add it.
-- **Trash**: removed backups and deleted saves wait in the trash for 30 days, where you can put them back or delete them for good.
-- **Thinning**: every backup of the last 3 days of play is kept, then one a day for 14 more days, then the last one of each loop. Thinned backups go to the trash. Pinned backups are never touched, and each kind of backup also has a number kept.
-- **Size limit**: all backups and the trash together stay under 2 GB by default, the trash emptied first, then the oldest automatic backups. A bar in the save manager shows how much is in use.
+- **Trash**: removed backups and deleted saves wait in the trash for 30 days by default, where you can put them back or delete them for good.
+- **Thinning**: by default, every backup from the last 3 days of play is kept, then one a day for 14 more days, then the last one of each loop. You set all of these. Thinned backups go to the trash. Pinned backups are never touched, and you also set how many of each kind of backup every save keeps.
+- **Size limit**: all backups and the trash together stay under a limit you set, 2 GB by default. When it fills up, the trash is emptied first, then the oldest automatic backups are deleted. A bar in the save manager shows how much is in use.
 - **Second copy**: set a second folder, such as another drive or a synced folder, and every backup is copied there too.
 - **Steam Cloud check**: if a save is behind its own last backup, for example after Steam Cloud put back an older copy, the title screen says so and the save manager shows both days side by side so you can keep either.
 - **Game version warning**: a backup made on another game version is marked, and restoring it warns that it may not load as it did.
-- **Settings tab**: every setting can be changed in the save manager, the backup key included, and applies at once.
+- **Settings tab**: change every setting in the save manager, the backup key included. Changes apply at once.
 - **Log file**: every backup, restore and delete is written to `BepInEx\save-backups.log`.
 
 The save manager and messages follow the game's language, English or Simplified Chinese.
 
-The only thing Save Backups writes into a save is the most your survivor's Life, Satiety, Morale and Stamina can reach, so the save manager can show it; those numbers stay in the save if you remove the mod, and the game ignores them. You can remove it at any time; your saves stay as they are and the backups stay in their folder.
+Save Backups writes only one thing into a save: the maximum Life, Satiety, Morale and Stamina your survivor can reach, so the save manager can show them. Those numbers stay in the save if you remove the mod, and the game ignores them. You can remove the mod at any time. Your saves stay as they are, and the backups stay in their folder.
 
 ## Hotkeys
 
 | Key | What it does |
 | --- | --- |
-| `BackupKey` (unbound) | Saves the run you are playing and backs it up, like **Back up now** in the pause menu. Works only in a run, when the game could save. Set a key in the save manager's Settings tab or in the config. |
-| `Esc` | In the save manager, closes the open question, then the save manager. In the search box or a note, it clears or closes that first. |
+| `BackupKey` (unbound) | Saves the run you are playing and backs it up, like **Back up now** in the pause menu. It only works in a run, when the game can save. Set a key in the save manager's Settings tab or in the config. |
+| `Esc` | In the save manager, closes an open window first, then the save manager itself. In the search box or a note, it clears the search or closes the note first. |
 
 ## Where the backups are
 
-By default in `C:\Users\<you>\AppData\LocalLow\LLS\SLGame\SaveBackups`, next to the game's `Saves` folder. Each save has a folder named after its save file, and each backup is a folder in it named after the date, time and kind of backup. **Open folder** in the save manager opens it. The `Folder` setting moves it anywhere else.
+By default in `C:\Users\<you>\AppData\LocalLow\LLS\SLGame\SaveBackups`, next to the game's `Saves` folder. Each save has a folder named after its save file, and each backup is a folder in it named after the date, time and kind of backup. **Open folder** in the save manager opens it. Set `Folder` to keep the backups somewhere else.
 
 Steam Cloud only syncs `Saves`, so the backups stay on this PC. Copy the folder yourself if you want them on another one.
 
 ## Known issues and limits
 
-- In a run, the save manager can't load a save, start a new game, or restore over, rename or delete the run you are playing. Those wait for the title screen.
-- A copied save starts without the game's ending snapshots of the original, so it cannot jump back to one of the original's endings.
-- A game snapshot comes back as a new save, not in place of the save it belongs to.
+- In a run, the save manager can't load a save, start a new game, or restore over, rename or delete the run you are playing. Quit to the title screen to do those.
+- A copied save doesn't get the original's ending snapshots, so you can't jump back to one of the original's endings from it.
+- A game snapshot can only be loaded as a new save. It can't replace the save it belongs to.
 - Pictures are taken only while you play. Backups made on the title screen, and those from before 0.3.0, have none. Backups from before 0.4.0 have only the small picture.
-- The Steam Cloud check compares the loop and day the game's save list shows with the newest backup. A save you rolled back on purpose with the game's tools can show it once; **Dismiss** clears it.
+- The Steam Cloud check compares the loop and day the game's save list shows with the newest backup. A save you rolled back on purpose with the game's tools can show the warning once. **Dismiss** clears it.
 - Backups from earlier game versions can be restored, but the game decides whether it can still read them.
-- Saves and backups made before 0.4.2 show Life, Satiety, Morale and Stamina without the most they can reach, until the save is next saved in game.
+- Saves and backups made before 0.4.2 show Life, Satiety, Morale and Stamina without their maximum until the save is next saved in game.
 
 ## Requirements
 
-- Survival Log 1.1.20719. Built on this version; a game update can break it until the mod is updated.
+- Survival Log 1.1.20719. It was built on this version, and a game update can break it until the mod is updated.
 - The [BepInEx Pack for Survival Log](https://www.nexusmods.com/survivallog/mods/12), the BepInEx 6 (IL2CPP) build for the game.
 - [Exiled's Toolkit](https://github.com/AnExiledDev/SurvivalLog-ExiledToolkit) 0.19.0 or newer. Save Backups does not load without it. It shows the mod's messages as toasts, sizes the save manager to the Toolkit's UI size, and applies settings changed on the Mod Manager's Mods screen without a restart.
 - Optional: [Mod Manager](https://www.nexusmods.com/survivallog/mods/73). With it, you can change every setting in game on its Mods screen and see what each one does, without opening the config file.
@@ -76,15 +76,15 @@ Settings live in `BepInEx\config\com.dev.survivallog.savebackups.cfg`, created t
 
 ## Troubleshooting
 
-Check `BepInEx\LogOutput.log` for `===== Save Backups 0.4.3 started`, followed by `backup key` and the key set (`None` when unbound). Every backup, restore and delete, and anything that went wrong, is in `BepInEx\save-backups.log`, which survives restarts.
+Check `BepInEx\LogOutput.log` for `===== Save Backups <version> started`, then a `backup key` line with the key you set (`None` when unbound). Every backup, restore and delete, and anything that went wrong, is in `BepInEx\save-backups.log`, which survives restarts.
 
-If the pause menu has no **Back up now** button, check that Exiled's Toolkit 0.19.0 or newer is installed: it places the button. If the Load button opens the game's list, check that `ReplaceLoadScreen` is `true`, and look in the log for a line starting with `could not hook`.
+If the pause menu has no **Back up now** button, check that Exiled's Toolkit 0.19.0 or newer is installed, since the Toolkit places the button. If the Load button opens the game's normal Load screen, check that `ReplaceLoadScreen` is `true`, and look in the log for a line starting with `could not hook`.
 
 ## Feedback and bug reports
 
 Found a bug, have an idea, or something feels off? Come say so on the Core Directive Discord: https://discord.gg/trTsyxUFqg . When reporting a bug, attach `BepInEx\LogOutput.log` and `BepInEx\save-backups.log`.
 
-To reach me directly, message `exiled.dev` on Discord; you can find me in the [official Survival Log Discord](https://discord.gg/MZGg4gQAUe). I'm also on X as [@AnExiledDev](https://x.com/AnExiledDev).
+To reach me directly, message `exiled.dev` on Discord. You can find me in the [official Survival Log Discord](https://discord.gg/MZGg4gQAUe). I'm also on X as [@AnExiledDev](https://x.com/AnExiledDev).
 
 ## Build
 
@@ -96,7 +96,7 @@ dotnet build src/SaveBackups -c Release -p:GameDir="C:\path\to\Survival Log" -p:
 
 The output DLL is at `src\SaveBackups\bin\Release\SaveBackups.dll`.
 
-The unit tests cover the backup folder (copy, restore, cleanup and refusing paths outside it), copying a backup as a new save, export and import, notes, the limits, thinning, the trash, the second copy, the stats, the went-backwards check and the save manager's messages, and need nothing from the game:
+The unit tests cover the backup folder (copy, restore, cleanup and refusing paths outside it), copying a backup as a new save, export and import, notes, the limits, thinning, the trash, the second copy, the stats, the Steam Cloud check and the save manager's messages, and need nothing from the game:
 
 ```
 dotnet test tests/SaveBackups.Tests

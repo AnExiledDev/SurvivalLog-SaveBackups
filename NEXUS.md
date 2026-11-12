@@ -1,5 +1,5 @@
 Name: Save Backups
-Summary: Automatic backups of every save, out of Steam Cloud's reach, each with a picture of the game. The Load button opens a save manager with survivor portraits and a timeline: compare a backup with now, restore it as a new save or in place, and undo deletes from the trash. Back up now from the pause menu, plus export, import and a Steam Cloud check.
+Summary: Backs up every save automatically, out of Steam Cloud's reach, with a picture of the game each time. The Load button opens a save manager with survivor portraits and a timeline, where you can compare a backup with now, restore it as a new save or over the old one, and undo deletes. Adds Back up now to the pause menu, plus export and import.
 
 Description (BBCode):
 [center][img]https://sldb.core-directive.com/media/save/2-changes-stay.png[/img][/center]
@@ -8,18 +8,18 @@ The game keeps one copy of each save, and Steam Cloud can quietly put back an ol
 
 [size=5]Main features[/size]
 [list]
-[*][b]Automatic backups[/b]: each morning right after the game's save, when you quit or close the game, right before a rebirth, an expedition or a zombie wave, when a run reaches an ending, right before the Mod Manager installs mod updates, and on a timer if you want. Every file of the save is copied and checked.[/*]
+[*][b]Automatic backups[/b]: each morning right after the game saves, when you quit or close the game, right before a rebirth, an expedition or a zombie wave, when a run reaches an ending, right before the Mod Manager installs mod updates, and on a timer if you want. Every file of the save is copied and checked.[/*]
 [*][b]Pictures and portraits[/b]: each backup made while you play takes a picture of the game, which you can click to see full size, and each save shows its survivor's portrait.[/*]
-[*][b]Pause menu[/b]: Backups of this run opens the save manager over your run, and Back up now saves and backs it up.[/*]
-[*][b]Timeline[/b]: a save's backups and the game's day snapshots, grouped by day. Click one to see its picture, your survivor's Life, Satiety, Morale, Stamina, Planning Points, Survival Points and items then and how they changed.[/*]
+[*][b]Pause menu[/b]: Backups of this run opens the save manager over your run, and Back up now saves your run and backs it up.[/*]
+[*][b]Timeline[/b]: a save's backups and the game's day snapshots, grouped by day. Click one to see its picture, your survivor's Life, Satiety, Morale, Stamina, Planning Points, Survival Points and items at that point, and how they have changed since.[/*]
 [*][b]Compare with now[/b]: what changed between a backup and the save as it is now, item by item.[/*]
-[*][b]Restore[/b]: load a backup as a new save next to the original, or replace the save. The save as it is gets a backup of its own first.[/*]
-[*][b]Trash[/b]: removed backups and deleted saves wait 30 days in the trash, where you can put them back.[/*]
+[*][b]Restore[/b]: load a backup as a new save next to the original, or replace the save with it. The save as it is gets a backup of its own first.[/*]
+[*][b]Trash[/b]: removed backups and deleted saves wait in the trash for 30 days by default, where you can put them back.[/*]
 [*][b]Saves[/b]: search, sort, filter, pin, rename, write notes, duplicate a save, and turn any of the game's day snapshots into a save of its own.[/*]
 [*][b]Export and import[/b]: export one backup or a whole save to a .slsave file you can keep or share. Put .slsave files or loose save files in SaveBackups\Import and press Import to see what each holds and bring it in.[/*]
 [*][b]Steam Cloud check[/b]: if a save is suddenly behind its own last backup, the save manager shows both days side by side so you can keep either.[/*]
-[*][b]Keeps what matters[/b]: every backup of the last 3 days of play, then one a day, then one per loop, under a 2 GB limit by default. Pinned backups are kept no matter what. A second folder can get a copy of everything.[/*]
-[*][b]Settings tab[/b]: change every setting in the save manager, and it applies at once.[/*]
+[*][b]Thinning and size limit[/b]: by default, every backup from the last 3 days of play is kept, then one a day, then one per loop, with a 2 GB limit on the total. You set all of these. Pinned backups are always kept. You can also set a second folder that gets a copy of every backup.[/*]
+[*][b]Settings tab[/b]: change every setting in the save manager, and the change applies at once.[/*]
 [/list]
 
 [size=5]Hotkeys[/size]
@@ -28,17 +28,17 @@ The game keeps one copy of each save, and Steam Cloud can quietly put back an ol
 [*][b]Esc[/b]: closes the save manager. In the search box or a note, it clears or closes that first.[/*]
 [/list]
 
-Works in English and Chinese.
+Works in English and Simplified Chinese, following the language the game is set to.
 
-Backups are kept in [font=Courier New]AppData\LocalLow\LLS\SLGame\SaveBackups[/font], next to the game's Saves folder. Steam Cloud only syncs Saves, so the backups stay on this PC. The only thing it writes into a save is the most your survivor's Life, Satiety, Morale and Stamina can reach, so the save manager can show it. Those numbers stay in the save if you remove the mod, and the game ignores them, so you can remove it at any time.
+Backups are kept in [font=Courier New]AppData\LocalLow\LLS\SLGame\SaveBackups[/font], next to the game's Saves folder. Steam Cloud only syncs Saves, so the backups stay on this PC. Save Backups writes only one thing into a save: the maximum Life, Satiety, Morale and Stamina your survivor can reach, so the save manager can show them. Those numbers stay in the save if you remove the mod, and the game ignores them, so you can remove the mod at any time.
 
 [size=5]Known issues[/size]
 [list]
 [*]In a run, the save manager can't load a save, start a new game, or restore over, rename or delete the run you are playing. Those wait for the title screen.[/*]
 [*]A copied save starts without the original's ending snapshots, so it cannot jump back to one of the original's endings.[/*]
-[*]Pictures are taken only while you play. Backups made on the title screen, and older ones, have none. Older backups have only a small picture.[/*]
-[*]A save you rolled back on purpose with the game's tools can show the Steam Cloud warning once; keep the day you want and it clears.[/*]
-[*]Saves and backups made before you installed the mod show Life, Satiety, Morale and Stamina without the most they can reach, until the save is next saved in game.[/*]
+[*]Pictures are taken only while you play, so backups made on the title screen have none. Backups from early versions of the mod have no picture or only a small one.[/*]
+[*]A save you rolled back on purpose with the game's tools can show the Steam Cloud warning once. Keep the day you want, or press Dismiss, and the warning goes away.[/*]
+[*]Saves and backups made before you installed the mod show Life, Satiety, Morale and Stamina without their maximum until the save is next saved in game.[/*]
 [/list]
 
 [center][img]https://sldb.core-directive.com/img/mods-banner.jpg[/img]
@@ -65,11 +65,11 @@ Backups are kept in [font=Courier New]AppData\LocalLow\LLS\SLGame\SaveBackups[/f
 Delete [font=Courier New]SaveBackups.dll[/font] from the [font=Courier New]BepInEx\plugins[/font] folder. Your backups stay in the SaveBackups folder until you delete it.
 
 [size=5]Configuration[/size]
-To change the key, the backup folder or how many backups are kept, use the save manager's Settings tab, or edit [font=Courier New]BepInEx\config\com.dev.survivallog.savebackups.cfg[/font] while the game is closed, or do it in game on the Mod Manager's Mods screen, where changes take effect at once (see [url=https://github.com/AnExiledDev/SurvivalLog-SaveBackups/blob/main/CONFIG.md]CONFIG.md[/url]; the cfg file explains each setting in English and Chinese).
+Change the key, the backup folder or how many backups are kept in the save manager's Settings tab or on the Mod Manager's Mods screen, and the change applies at once. You can also edit [font=Courier New]BepInEx\config\com.dev.survivallog.savebackups.cfg[/font] while the game is closed. Every setting is listed in [url=https://github.com/AnExiledDev/SurvivalLog-SaveBackups/blob/main/CONFIG.md]CONFIG.md[/url], and the cfg file explains each one in English and Chinese.
 
 [size=5]Feedback[/size]
 Found a bug or have an idea? Come say hi on the [url=https://discord.gg/trTsyxUFqg]Core Directive Discord[/url], or post in this page's Posts tab. For bugs, please include [font=Courier New]BepInEx\LogOutput.log[/font] and [font=Courier New]BepInEx\save-backups.log[/font].
-To reach me directly, message [b]exiled.dev[/b] on Discord; you can find me in the [url=https://discord.gg/MZGg4gQAUe]official Survival Log Discord[/url]. I'm also on X as [url=https://x.com/AnExiledDev]@AnExiledDev[/url].
+To reach me directly, message [b]exiled.dev[/b] on Discord. You can find me in the [url=https://discord.gg/MZGg4gQAUe]official Survival Log Discord[/url]. I'm also on X as [url=https://x.com/AnExiledDev]@AnExiledDev[/url].
 
 [size=5]Source and license[/size]
 Open source under MIT: [url=https://github.com/AnExiledDev/SurvivalLog-SaveBackups]github.com/AnExiledDev/SurvivalLog-SaveBackups[/url]
@@ -84,14 +84,14 @@ Open source under MIT: [url=https://github.com/AnExiledDev/SurvivalLog-SaveBacku
 [*][b]自动备份[/b]：每天早上游戏自动存档之后、返回标题画面或关闭游戏时、重生之前、出发探索之前、尸潮开始之前、到达结局时、Mod Manager 安装模组更新之前，也可以按游玩时间定时备份。存档的所有文件都会复制并校验。[/*]
 [*][b]画面与头像[/b]：游玩时的每次备份都会拍下游戏画面，点开可以看大图，每个存档都显示角色头像。[/*]
 [*][b]暂停菜单[/b]：「本局备份」在游戏中打开存档管理，「立即备份」会先存档再备份。[/*]
-[*][b]时间线[/b]：存档的备份和游戏自带的每日快照按天排列。点开任意一个，可以看到当时的画面、角色的生命、饱腹、心态、体力、信念点、生存点和物品以及之后的变化。[/*]
+[*][b]时间线[/b]：存档的备份和游戏的每日快照按天排列。点开任意一个，可以看到当时的画面、角色的生命、饱腹、心态、体力、信念点、生存点和物品以及之后的变化。[/*]
 [*][b]与当前对比[/b]：逐个物品列出备份与当前存档之间的变化。[/*]
 [*][b]恢复[/b]：把备份读取为原存档旁边的新存档，或直接覆盖原存档。动手之前会先把当前存档备份一次。[/*]
-[*][b]回收站[/b]：移除的备份和删除的存档会在回收站里保留 30 天，期间可以找回。[/*]
-[*][b]存档[/b]：搜索、排序、筛选、置顶、重命名、写备注、复制存档，还能把游戏自带的每日快照变成独立的新存档。[/*]
+[*][b]回收站[/b]：移除的备份和删除的存档默认会在回收站里保留 30 天，期间可以找回。[/*]
+[*][b]存档[/b]：搜索、排序、筛选、置顶、重命名、写备注、复制存档，还能把游戏的每日快照变成独立的新存档。[/*]
 [*][b]导出与导入[/b]：把单个备份或整个存档导出为 .slsave 文件，方便保存或分享。把 .slsave 文件或零散的存档文件放进 SaveBackups\Import，点「导入」即可查看内容并加入。[/*]
 [*][b]Steam 云检查[/b]：如果存档突然比自己最近的备份还旧，存档管理会并排显示两个天数，保留哪个由你决定。[/*]
-[*][b]保留重要的备份[/b]：最近 3 个游戏日的备份全部保留，之后每天一个，再往前每个轮回一个，默认总大小不超过 2 GB。固定的备份永远保留。还可以设置第二个文件夹，再存一份副本。[/*]
+[*][b]精简与空间上限[/b]：默认情况下，最近 3 个游戏日的备份全部保留，之后每天一个，再往前每个轮回一个，总大小上限为 2 GB。这些都可以自己设置。固定的备份始终保留。还可以设置第二个文件夹，每个备份都会再复制一份过去。[/*]
 [*][b]设置页[/b]：在存档管理里就能修改所有设置，立即生效。[/*]
 [/list]
 
@@ -101,16 +101,16 @@ Open source under MIT: [url=https://github.com/AnExiledDev/SurvivalLog-SaveBacku
 [*][b]Esc[/b]：关闭存档管理。在搜索框或备注里时，先清空或关闭它们。[/*]
 [/list]
 
-支持英文和中文。
+支持英文和简体中文，跟随游戏的语言设置。
 
-备份保存在 [font=Courier New]AppData\LocalLow\LLS\SLGame\SaveBackups[/font]，与游戏的 Saves 文件夹相邻。Steam 云只同步 Saves，所以备份只留在这台电脑上。它只往存档里写入角色生命、饱腹、心态和体力的上限，供存档管理显示；移除本模组后这些数字仍留在存档里，但游戏会忽略它们，所以你可以随时移除它。
+备份保存在 [font=Courier New]AppData\LocalLow\LLS\SLGame\SaveBackups[/font]，与游戏的 Saves 文件夹相邻。Steam 云只同步 Saves，所以备份只留在这台电脑上。本模组只往存档里写入一样东西：角色生命、饱腹、心态和体力的上限，供存档管理显示。移除本模组后这些数字仍留在存档里，但游戏会忽略它们，所以你可以随时移除本模组。
 
 [size=5]已知问题[/size]
 [list]
 [*]游戏进行中，存档管理不能读取存档、开始新游戏，也不能覆盖、重命名或删除正在玩的存档，这些需回到标题画面。[/*]
 [*]复制出的新存档不带原存档的结局快照，所以不能跳回原存档的结局。[/*]
-[*]只有游玩时的备份会拍下画面。在标题画面做的备份以及较早的备份没有画面。较早的备份只有小图。[/*]
-[*]用游戏自带功能主动回退的存档可能会提示一次 Steam 云检查，保留你想要的那一天即可。[/*]
+[*]只有游玩时的备份会拍下画面，所以在标题画面做的备份没有画面。本模组早期版本做的备份没有画面，或者只有小图。[/*]
+[*]用游戏的功能主动回退的存档可能会提示一次 Steam 云检查。保留你想要的那一天，或者点「忽略」，提示就会消失。[/*]
 [*]安装本模组之前的存档和备份，生命、饱腹、心态和体力只显示数值、不显示上限，直到该存档在游戏中再次保存。[/*]
 [/list]
 
@@ -137,7 +137,7 @@ Open source under MIT: [url=https://github.com/AnExiledDev/SurvivalLog-SaveBacku
 从 [font=Courier New]BepInEx\plugins[/font] 文件夹中删除 [font=Courier New]SaveBackups.dll[/font]。备份会留在 SaveBackups 文件夹里，直到你自己删除。
 
 [size=5]配置[/size]
-可以在存档管理的设置页或游戏内 Mod Manager 的「模组」界面修改，改动立即生效；也可以在游戏关闭时编辑 [font=Courier New]BepInEx\config\com.dev.survivallog.savebackups.cfg[/font]。配置文件中每项设置都有中文说明，完整说明见 [url=https://github.com/AnExiledDev/SurvivalLog-SaveBackups/blob/main/CONFIG.md]CONFIG.md[/url]（英文）。
+可以在存档管理的设置页或游戏内 Mod Manager 的「模组」界面修改按键、备份文件夹和备份保留数量，改动立即生效。也可以在游戏关闭时编辑 [font=Courier New]BepInEx\config\com.dev.survivallog.savebackups.cfg[/font]。配置文件中每项设置都有中文说明，完整说明见 [url=https://github.com/AnExiledDev/SurvivalLog-SaveBackups/blob/main/CONFIG.md]CONFIG.md[/url]（英文）。
 
 [size=5]反馈[/size]
 发现 bug 或有好点子？欢迎来 [url=https://discord.gg/trTsyxUFqg]Core Directive Discord[/url] 打个招呼，或在本页的「Posts」标签里发帖。报告 bug 时，请附上 [font=Courier New]BepInEx\LogOutput.log[/font] 和 [font=Courier New]BepInEx\save-backups.log[/font]。

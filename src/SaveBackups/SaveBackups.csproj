@@ -41,7 +41,7 @@
   <!-- What the Mod Manager's Mods screen shows about this mod. -->
   <ItemGroup>
     <AssemblyMetadata Include="ModManager.Name" Value="Save Backups&#10;存档备份" />
-    <AssemblyMetadata Include="ModManager.Description" Value="Backs up every save each morning, when you quit, before a rebirth, an expedition or a zombie wave, at an ending and on a timer, outside Steam Cloud, with a picture of the game. The Load button opens a save manager with each survivor&apos;s portrait and a timeline of backups: compare with now, restore as a new save or in place, bring back from the trash, export and import. The pause menu gets Back up now.&#10;每天早上、退出时、重生前、探索前、尸潮前、到达结局时以及定时自动备份所有存档，备份放在 Steam 云同步之外，并附带一张游戏画面。「读取存档」按钮会打开存档管理，显示每位角色的头像和备份时间线：可以与当前对比、恢复为新存档或覆盖原存档、从回收站找回，以及导出和导入。暂停菜单新增「立即备份」。" />
+    <AssemblyMetadata Include="ModManager.Description" Value="Backs up every save automatically each morning, when you quit, before a rebirth, an expedition or a zombie wave, and at an ending. The backups are kept where Steam Cloud can&apos;t touch them, each with a picture of the game. The Load button opens a save manager with each survivor&apos;s portrait and a timeline of backups, where you can compare a backup with now, restore it as a new save or over the old one, bring things back from the trash, and export or import saves. The pause menu gets a Back up now button.&#10;每天早上、退出时、重生前、探索前、尸潮前和到达结局时自动备份所有存档。备份放在 Steam 云同步碰不到的地方，每个都附带一张游戏画面。「读取存档」按钮会打开存档管理，显示每位角色的头像和备份时间线，可以与当前对比、恢复为新存档或覆盖原存档、从回收站找回，以及导出和导入存档。暂停菜单会多出「立即备份」按钮。" />
     <AssemblyMetadata Include="ModManager.Author" Value="AnExiledDev" />
     <AssemblyMetadata Include="ModManager.Category" Value="QualityOfLife" />
     <AssemblyMetadata Include="ModManager.GameVersion" Value="1.1.20719" />
