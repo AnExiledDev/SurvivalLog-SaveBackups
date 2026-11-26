@@ -132,12 +132,8 @@ public static class Retention
             foreach (var old in dayGroup.OrderByDescending(meta => meta.CreatedUtc).Skip(1))
                 yield return old;
 
-        if (!thin.PerLoop)
-        {
-            foreach (var old in older) yield return old;
-
-            yield break;
-        }
+        // Without one per loop, thinning stops at the daily window and the counts for each kind decide the rest.
+        if (!thin.PerLoop) yield break;
 
         // Past it, the newest of each loop stays, unless a newer backup of that loop already stands for it.
         var keptPerLoop = run.Where(meta => !older.Contains(meta)).Select(meta => meta.Run.Progress.Turn).ToHashSet();

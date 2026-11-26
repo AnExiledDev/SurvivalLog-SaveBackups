@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.5
+
+- Fixed: with `PerLoop` off, thinning deleted every backup older than the daily window. Now those backups stay, and the counts for each kind decide how many are kept, as the setting says.
+- Made for Survival Log 1.1.21671.
+
 ## 0.5.4
 
 - Fixed: a settings box left blank, or with a value the setting can't take (a number out of range, a folder that isn't a full path), no longer locks the save manager. Before, clicks and Esc stopped working in it. Now the box goes back to the saved value, and if you typed something, a message says what the box takes.

@@ -199,14 +199,27 @@ public sealed class LibraryTests : IDisposable
     }
 
     [Fact]
-    public void Without_one_per_loop_everything_past_the_daily_window_goes()
+    public void Without_one_per_loop_thinning_leaves_backups_past_the_daily_window_alone()
     {
-        var oldLoop = Create(BackupKind.Morning, turn: 1, day: 9);
+        Create(BackupKind.Morning, turn: 1, day: 8);
+        Create(BackupKind.Morning, turn: 1, day: 9);
         Create(BackupKind.Morning, turn: 2, day: 10);
 
         var limits = NoLimits with { Thin = new Thinning(1, 1, PerLoop: false) };
 
-        Assert.Equal(oldLoop.Id, Assert.Single(Retention.Thin(_store.All(), limits)).Id);
+        Assert.Empty(Retention.Thin(_store.All(), limits));
+    }
+
+    [Fact]
+    public void Without_one_per_loop_the_daily_window_is_still_thinned()
+    {
+        var earlier = Create(BackupKind.Morning, turn: 1, day: 8);
+        Create(BackupKind.Morning, turn: 1, day: 8);
+        Create(BackupKind.Morning, turn: 1, day: 10);
+
+        var limits = NoLimits with { Thin = new Thinning(1, 5, PerLoop: false) };
+
+        Assert.Equal(earlier.Id, Assert.Single(Retention.Thin(_store.All(), limits)).Id);
     }
 
     [Fact]
