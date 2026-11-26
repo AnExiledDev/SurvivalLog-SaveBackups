@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.6
+
+- A rebirth the game turns down no longer makes a Rebirth backup, which pushed out an older one, and no longer holds the game up while it copies.
+- A loose save from the Import folder now stays in the list if copying it in fails, so you can try again.
+- Made for Survival Log 1.1.21671.
+
 ## 0.5.5
 
 - Fixed: with `PerLoop` off, thinning deleted every backup older than the daily window. Now those backups stay, and the counts for each kind decide how many are kept, as the setting says.

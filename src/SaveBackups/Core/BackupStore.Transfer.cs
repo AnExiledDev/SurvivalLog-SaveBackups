@@ -269,7 +269,8 @@ public sealed partial class BackupStore
 
     /// <summary>
     /// Copies a loose save from the Import folder into <paramref name="saveFolder"/> as <paramref name="newStem"/>,
-    /// with the round and snapshot files beside it, and gives the names written. Nothing is overwritten.
+    /// with the round and snapshot files beside it, and gives the names written. Nothing is overwritten. The files
+    /// stay in the Import folder until <see cref="MoveLooseAside"/>, so a copy that fails later can be tried again.
     /// </summary>
     public Result<IReadOnlyList<string>> CopyLoose(string fileName, string saveFolder, string newStem)
     {
@@ -290,8 +291,6 @@ public sealed partial class BackupStore
 
             for (var i = 0; i < files.Count; i++) File.Copy(Path.Combine(ImportPath, files[i]), Path.Combine(saveFolder, targets[i]));
 
-            foreach (var name in files) MoveAside(Path.Combine(ImportPath, name), Path.Combine(ImportPath, ImportedFolder));
-
             return Result.Done<IReadOnlyList<string>>(targets);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -300,6 +299,17 @@ public sealed partial class BackupStore
 
             return Result.Failed<IReadOnlyList<string>>(ex.Message);
         }
+    }
+
+    /// <summary>Moves a loose save and the files beside it into the Imported folder, once its copy is in the game's list.</summary>
+    public void MoveLooseAside(string fileName)
+    {
+        if (!IsLooseSave(fileName)) return;
+
+        var stem = RunFiles.Stem(fileName);
+
+        foreach (var name in RunFiles.In(ImportPath, stem).Where(name => NewSave.IsCopied(stem, name)))
+            MoveAside(Path.Combine(ImportPath, name), Path.Combine(ImportPath, ImportedFolder));
     }
 
     /// <summary>Imports one .slsave from the Import folder and moves it aside when it was added or was already there.</summary>

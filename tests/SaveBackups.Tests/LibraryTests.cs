@@ -354,7 +354,22 @@ public sealed class LibraryTests : IDisposable
 
         Assert.Contains("Save_New.bytes", names);
         Assert.Equal("r", _dirs.Read("Save_New.round.bytes"));
+    }
+
+    [Fact]
+    public void A_loose_save_stays_in_the_import_list_until_it_is_moved_aside()
+    {
+        Directory.CreateDirectory(_store.ImportPath);
+        File.WriteAllText(Path.Combine(_store.ImportPath, "Save_X.bytes"), "x");
+        File.WriteAllText(Path.Combine(_store.ImportPath, "Save_X.round.bytes"), "r");
+
+        Assert.IsType<Result<IReadOnlyList<string>>.Done>(_store.CopyLoose("Save_X.bytes", _dirs.Saves, "Save_New"));
+        Assert.Single(_store.ImportCandidates());
+
+        _store.MoveLooseAside("Save_X.bytes");
+
         Assert.Empty(_store.ImportCandidates());
+        Assert.Equal(2, Directory.GetFiles(Path.Combine(_store.ImportPath, BackupStore.ImportedFolder)).Length);
     }
 
     // ===== Stats =====

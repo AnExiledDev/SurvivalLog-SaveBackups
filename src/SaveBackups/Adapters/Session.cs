@@ -1363,7 +1363,7 @@ internal sealed class Session
         NewSave.FreeStem(DateTime.Now, taken => RunFiles.In(saveFolder, taken).Count > 0 || Directory.Exists(store.RunFolder(taken)));
 
     /// <summary>After files were copied in as a new save: names it inside, puts it in the game's list, or undoes the copy. An empty name takes the one inside the save.</summary>
-    private void Copied(string saveFolder, string from, string newStem, Result<IReadOnlyList<string>> made, string name, Phrase toast)
+    private void Copied(string saveFolder, string from, string newStem, Result<IReadOnlyList<string>> made, string name, Phrase toast, Action? afterAdded = null)
     {
         var isChinese = GameLanguage.IsChinese();
 
@@ -1393,6 +1393,7 @@ internal sealed class Session
 
         _game.AddEntry(newFile, name);
         _game.RefreshEntry(newFile);
+        afterAdded?.Invoke();
         _log($"copied {from} as {newFile} ({name}), {done.Value.Count} file(s)");
         _page.Toast(Texts.Format(toast, isChinese, name), ToastKind.Success);
         Refresh();
@@ -1617,7 +1618,7 @@ internal sealed class Session
                 : (NewStem: "", Made: Result.Failed<IReadOnlyList<string>>("no free save name")),
             answer =>
             {
-                Copied(saveFolder, file, answer.NewStem, answer.Made, "", Texts.ImportedSave);
+                Copied(saveFolder, file, answer.NewStem, answer.Made, "", Texts.ImportedSave, () => store.MoveLooseAside(file));
                 ImportList();
             },
             ex =>

@@ -48,7 +48,14 @@ internal static class Hooks
 
     private static void AfterGameQuit() => Guard(() => Session?.LeftRun(wait: true));
 
-    private static void BeforeRebirth() => Guard(() => Session?.RebirthStarting());
+    /// <summary>The game checks the rebirth can happen first, unless told to skip that, so a refused one is not backed up.</summary>
+    private static void BeforeRebirth(GameSaveManager __instance, int daysBack, bool skipPrecheck) =>
+        Guard(() =>
+        {
+            if (!skipPrecheck && !__instance.CanMinorRebirth(daysBack, out _, out _)) return;
+
+            Session?.RebirthStarting();
+        });
 
     private static void BeforeExpedition() => Guard(() => Session?.ExpeditionStarting());
 
